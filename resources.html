@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Budget Pro | Resources</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .input-highlight:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+        }
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: #4f46e5;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -100px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .mobile-menu.open {
+            max-height: 500px;
+        }
+        .resource-category {
+            transition: all 0.3s ease;
+        }
+        .resource-category:hover {
+            background-color: #f5f3ff;
+        }
+        .download-btn {
+            transition: all 0.3s ease;
+        }
+        .download-btn:hover {
+            background-color: #4f46e5;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="gradient-bg text-white">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-money-bill-wave text-3xl"></i>
+                    <h1 class="text-2xl font-bold">EventBudget Pro</h1>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#" class="hover:text-indigo-200 transition">Home</a>
+                    <a href="#" class="hover:text-indigo-200 transition">Calculator</a>
+                    <a href="#" class="hover:text-indigo-200 transition font-bold text-indigo-200">Resources</a>
+                    <a href="#" class="hover:text-indigo-200 transition">Contact</a>
+                </nav>
+                <button id="mobileMenuButton" class="md:hidden text-xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="mobile-menu md:hidden bg-indigo-700 rounded-lg mt-4">
+                <div class="flex flex-col space-y-3 p-4">
+                    <a href="#" class="hover:text-indigo-200 transition">Home</a>
+                    <a href="#" class="hover:text-indigo-200 transition">Calculator</a>
+                    <a href="#" class="hover:text-indigo-200 transition font-bold text-indigo-200">Resources</a>
+                    <a href="#" class="hover:text-indigo-200 transition">Contact</a>
+                </div>
+            </div>
+            
+            <div class="mt-16 mb-20 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Event Planning Resources</h2>
+                <p class="text-xl md:text-2xl max-w-3xl mx-auto">Expert tools and guides to help you plan successful events within budget</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 py-12">
+        <!-- Resource Search -->
+        <div class="max-w-3xl mx-auto mb-16">
+            <div class="relative">
+                <input type="text" placeholder="Search resources..." class="w-full px-6 py-4 rounded-full border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 shadow-sm">
+                <button class="absolute right-2 top-2 gradient-bg text-white p-2 rounded-full hover:opacity-90 transition">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div class="flex flex-wrap justify-center mt-4 gap-2">
+                <span class="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">Templates</span>
+                <span class="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">Guides</span>
+                <span class="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">Checklists</span>
+                <span class="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">Videos</span>
+                <span class="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">Webinars</span>
+                <span class="px-4 py-2 bg-indigo-100 text-indigo-800 rounded-full text-sm font-medium">Case Studies</span>
+            </div>
+        </div>
+
+        <!-- Featured Resources -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold mb-8 text-center">Featured Resources</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Resource 1 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+                    <div class="h-48 bg-indigo-100 flex items-center justify-center">
+                        <i class="fas fa-file-excel text-6xl text-indigo-600"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded">Template</span>
+                            <span class="text-gray-500 text-sm ml-auto"><i class="fas fa-download mr-1"></i> 1,245</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Comprehensive Event Budget Template</h3>
+                        <p class="text-gray-600 mb-4">Detailed Excel template with formulas for automatic calculations across all event categories.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Updated: 2 weeks ago</span>
+                            <button class="download-btn px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg font-medium">
+                                Download <i class="fas fa-arrow-down ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resource 2 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+                    <div class="h-48 bg-indigo-100 flex items-center justify-center">
+                        <i class="fas fa-book-open text-6xl text-indigo-600"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded">Guide</span>
+                            <span class="text-gray-500 text-sm ml-auto"><i class="fas fa-download mr-1"></i> 892</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Vendor Negotiation Playbook</h3>
+                        <p class="text-gray-600 mb-4">Proven strategies to negotiate with venues, caterers, and other vendors to save 15-30%.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Updated: 1 month ago</span>
+                            <button class="download-btn px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg font-medium">
+                                Download <i class="fas fa-arrow-down ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Resource 3 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden card-hover">
+                    <div class="h-48 bg-indigo-100 flex items-center justify-center">
+                        <i class="fas fa-list-check text-6xl text-indigo-600"></i>
+                    </div>
+                    <div class="p-6">
+                        <div class="flex items-center mb-2">
+                            <span class="bg-indigo-100 text-indigo-800 text-xs font-medium px-2.5 py-0.5 rounded">Checklist</span>
+                            <span class="text-gray-500 text-sm ml-auto"><i class="fas fa-download mr-1"></i> 2,341</span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-2">Event Planning Timeline</h3>
+                        <p class="text-gray-600 mb-4">Month-by-month checklist from initial planning to post-event follow-up.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500">Updated: 3 days ago</span>
+                            <button class="download-btn px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg font-medium">
+                                Download <i class="fas fa-arrow-down ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- All Resources -->
+        <section>
+            <h2 class="text-3xl font-bold mb-8 text-center">All Resources</h2>
+            
+            <!-- Resource Categories -->
+            <div class="mb-12">
+                <h3 class="text-xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-file-alt text-indigo-600 mr-3"></i>
+                    Templates
+                </h3>
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <!-- Template 1 -->
+                    <div class="resource-category p-6 border-b border-gray-100 hover:shadow-sm">
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-3 rounded-lg mr-4">
+                                <i class="fas fa-file-excel text-indigo-600 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg mb-1">Wedding Budget Template</h4>
+                                <p class="text-gray-600 mb-3">Detailed spreadsheet with formulas for venue, catering, floral, photography, and all wedding expenses.</p>
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <span class="mr-4"><i class="fas fa-file-excel mr-1"></i> Excel</span>
+                                    <span class="mr-4"><i class="fas fa-file-lines mr-1"></i> 12 pages</span>
+                                    <span><i class="fas fa-download mr-1"></i> 3,421 downloads</span>
+                                </div>
+                            </div>
+                            <button class="download-btn px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg font-medium">
+                                Download <i class="fas fa-arrow-down ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Template 2 -->
+                    <div class="resource-category p-6 border-b border-gray-100 hover:shadow-sm">
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-3 rounded-lg mr-4">
+                                <i class="fas fa-file-word text-indigo-600 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg mb-1">Corporate Event Proposal Template</h4>
+                                <p class="text-gray-600 mb-3">Professional Word template for creating client-ready event proposals with budget breakdowns.</p>
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <span class="mr-4"><i class="fas fa-file-word mr-1"></i> Word</span>
+                                    <span class="mr-4"><i class="fas fa-file-lines mr-1"></i> 8 pages</span>
+                                    <span><i class="fas fa-download mr-1"></i> 1,876 downloads</span>
+                                </div>
+                            </div>
+                            <button class="download-btn px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg font-medium">
+                                Download <i class="fas fa-arrow-down ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Template 3 -->
+                    <div class="resource-category p-6 hover:shadow-sm">
+                        <div class="flex items-start">
+                            <div class="bg-indigo-100 p-3 rounded-lg mr-4">
+                                <i class="fas fa-file-pdf text-indigo-600 text-xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <h4 class="font-bold text-lg mb-1">Sponsorship Package Template</h4>
+                                <p class="text-gray-600 mb-3">Customizable PDF template for creating sponsorship packages with tiered benefits.</p>
+                                <div class="flex items-center text-sm text-gray-500">
+                                    <span class="mr-4"><i class="fas fa-file-pdf mr-1"></i> PDF</span>
+                                    <span class="mr-4"><i class="fas fa-file-lines mr-1"></i> 10 pages</span>
+                                    <span><i class="fas fa-download mr-1"></i> 2,543 downloads</span>
+                                </div>
+                            </div>
+                            <button class="download-btn px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg font-medium">
+                                Download <i class="fas fa-arrow-down ml-1"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Guides Section -->
+            <div class="mb-12">
+                <h3 class="text-xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-book-open text-indigo-600 mr-3"></i>
+                    Guides
+                </h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <!-- Guide 1 -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition resource-category">
+                        <div class="flex items-start mb-4">
+                            <div class="bg-indigo-100 p-3 rounded-lg mr-4">
+                                <i class="fas fa-hand-holding-dollar text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Cost-Saving Strategies for Large Events</h4>
+                                <p class="text-gray-500 text-sm">23-page PDF guide</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">Learn how professional planners save 20-40% on large events without sacrificing quality. Includes real case studies.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500"><i class="fas fa-star text-yellow-400 mr-1"></i> 4.9 (128 reviews)</span>
+                            <button class="download-btn px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg font-medium text-sm">
+                                Download Guide
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Guide 2 -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition resource-category">
+                        <div class="flex items-start mb-4">
+                            <div class="bg-indigo-100 p-3 rounded-lg mr-4">
+                                <i class="fas fa-users text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Virtual & Hybrid Event Planning</h4>
+                                <p class="text-gray-500 text-sm">18-page PDF guide</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">Complete guide to planning successful virtual and hybrid events with budget considerations for technology platforms.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500"><i class="fas fa-star text-yellow-400 mr-1"></i> 4.7 (95 reviews)</span>
+                            <button class="download-btn px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg font-medium text-sm">
+                                Download Guide
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Guide 3 -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition resource-category">
+                        <div class="flex items-start mb-4">
+                            <div class="bg-indigo-100 p-3 rounded-lg mr-4">
+                                <i class="fas fa-chart-pie text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Event ROI Measurement</h4>
+                                <p class="text-gray-500 text-sm">15-page PDF guide</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">How to measure and maximize return on investment for corporate events and conferences.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500"><i class="fas fa-star text-yellow-400 mr-1"></i> 4.8 (76 reviews)</span>
+                            <button class="download-btn px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg font-medium text-sm">
+                                Download Guide
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Guide 4 -->
+                    <div class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition resource-category">
+                        <div class="flex items-start mb-4">
+                            <div class="bg-indigo-100 p-3 rounded-lg mr-4">
+                                <i class="fas fa-utensils text-indigo-600"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg">Catering Cost Control</h4>
+                                <p class="text-gray-500 text-sm">12-page PDF guide</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-600 mb-4">Strategies to reduce catering costs by 15-25% while maintaining quality and guest satisfaction.</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-gray-500"><i class="fas fa-star text-yellow-400 mr-1"></i> 4.6 (112 reviews)</span>
+                            <button class="download-btn px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg font-medium text-sm">
+                                Download Guide
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Video Tutorials -->
+            <div class="mb-12">
+                <h3 class="text-xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-video text-indigo-600 mr-3"></i>
+                    Video Tutorials
+                </h3>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <!-- Video 1 -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+                        <div class="h-40 bg-indigo-100 flex items-center justify-center relative">
+                            <i class="fas fa-play text-4xl text-indigo-600"></i>
+                            <span class="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">12:45</span>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-bold mb-2">Mastering Event Budget Spreadsheets</h4>
+                            <p class="text-gray-600 text-sm mb-3">Learn advanced Excel techniques for event budgeting.</p>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-eye mr-1"></i> 1,245 views
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video 2 -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+                        <div class="h-40 bg-indigo-100 flex items-center justify-center relative">
+                            <i class="fas fa-play text-4xl text-indigo-600"></i>
+                            <span class="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">08:32</span>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-bold mb-2">Venue Contract Negotiation Tips</h4>
+                            <p class="text-gray-600 text-sm mb-3">Key clauses to negotiate for better terms and pricing.</p>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-eye mr-1"></i> 892 views
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Video 3 -->
+                    <div class="bg-white rounded-xl shadow-sm overflow-hidden card-hover">
+                        <div class="h-40 bg-indigo-100 flex items-center justify-center relative">
+                            <i class="fas fa-play text-4xl text-indigo-600"></i>
+                            <span class="absolute bottom-2 right-2 bg-black bg-opacity-70 text-white text-xs px-2 py-1 rounded">15:18</span>
+                        </div>
+                        <div class="p-4">
+                            <h4 class="font-bold mb-2">Creating Contingency Budgets</h4>
+                            <p class="text-gray-600 text-sm mb-3">How to prepare for unexpected event expenses.</p>
+                            <div class="flex items-center text-sm text-gray-500">
+                                <i class="fas fa-eye mr-1"></i> 1,532 views
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Webinars -->
+            <div>
+                <h3 class="text-xl font-bold mb-6 flex items-center">
+                    <i class="fas fa-chalkboard-teacher text-indigo-600 mr-3"></i>
+                    Upcoming Webinars
+                </h3>
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <!-- Webinar 1 -->
+                    <div class="p-6 border-b border-gray-100 hover:bg-gray-50 transition resource-category">
+                        <div class="flex flex-col md:flex-row md:items-center">
+                            <div class="md:w-1/4 mb-4 md:mb-0">
+                                <div class="bg-indigo-100 text-indigo-800 rounded-lg p-3 inline-block">
+                                    <div class="text-2xl font-bold">15</div>
+                                    <div class="text-sm">June</div>
+                                </div>
+                                <span class="ml-3 text-gray-600">2:00 PM EST</span>
+                            </div>
+                            <div class="md:w-2/4">
+                                <h4 class="font-bold text-lg mb-1">Event Budgeting for Non-Profits</h4>
+                                <p class="text-gray-600">Learn how to maximize impact with limited budgets for charity galas and fundraisers.</p>
+                            </div>
+                            <div class="md:w-1/4 mt-4 md:mt-0">
+                                <button class="w-full gradient-bg text-white py-2 px-4 rounded-lg font-medium hover:opacity-90 transition">
+                                    Register Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Webinar 2 -->
+                    <div class="p-6 border-b border-gray-100 hover:bg-gray-50 transition resource-category">
+                        <div class="flex flex-col md:flex-row md:items-center">
+                            <div class="md:w-1/4 mb-4 md:mb-0">
+                                <div class="bg-indigo-100 text-indigo-800 rounded-lg p-3 inline-block">
+                                    <div class="text-2xl font-bold">22</div>
+                                    <div class="text-sm">June</div>
+                                </div>
+                                <span class="ml-3 text-gray-600">11:00 AM EST</span>
+                            </div>
+                            <div class="md:w-2/4">
+                                <h4 class="font-bold text-lg mb-1">Corporate Event Budget Trends 2023</h4>
+                                <p class="text-gray-600">Industry expert panel discussing current budgeting trends and cost-saving innovations.</p>
+                            </div>
+                            <div class="md:w-1/4 mt-4 md:mt-0">
+                                <button class="w-full gradient-bg text-white py-2 px-4 rounded-lg font-medium hover:opacity-90 transition">
+                                    Register Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Webinar 3 -->
+                    <div class="p-6 hover:bg-gray-50 transition resource-category">
+                        <div class="flex flex-col md:flex-row md:items-center">
+                            <div class="md:w-1/4 mb-4 md:mb-0">
+                                <div class="bg-indigo-100 text-indigo-800 rounded-lg p-3 inline-block">
+                                    <div class="text-2xl font-bold">05</div>
+                                    <div class="text-sm">July</div>
+                                </div>
+                                <span class="ml-3 text-gray-600">3:30 PM EST</span>
+                            </div>
+                            <div class="md:w-2/4">
+                                <h4 class="font-bold text-lg mb-1">Wedding Budget Deep Dive</h4>
+                                <p class="text-gray-600">How to allocate your wedding budget for maximum impact and where to splurge vs. save.</p>
+                            </div>
+                            <div class="md:w-1/4 mt-4 md:mt-0">
+                                <button class="w-full gradient-bg text-white py-2 px-4 rounded-lg font-medium hover:opacity-90 transition">
+                                    Register Now
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- CTA Section -->
+    <section class="py-16 gradient-bg text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6">Need Personalized Budget Help?</h2>
+            <p class="text-xl max-w-2xl mx-auto mb-8">Our event budgeting consultants can review your plans and provide customized recommendations.</p>
+            <button class="bg-white text-indigo-600 py-3 px-8 rounded-lg font-medium hover:bg-gray-100 transition text-lg">
+                Schedule a Consultation
+            </button>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- Column 1 -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-money-bill-wave mr-2"></i>
+                        EventBudget Pro
+                    </h3>
+                    <p class="text-gray-400">The professional's choice for accurate event budgeting since 2015.</p>
+                </div>
+                
+                <!-- Column 2 -->
+                <div>
+                    <h4 class="font-bold mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Budget Templates</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Vendor Negotiation Guide</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Event Planning Checklist</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Cost-Saving Strategies</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3 -->
+                <div>
+                    <h4 class="font-bold mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Testimonials</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Press</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 4 -->
+                <div>
+                    <h4 class="font-bold mb-4">Contact</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2 text-gray-400"></i>
+                            <a href="mailto:hello@eventbudgetpro.com" class="text-gray-400 hover:text-white transition">hello@eventbudgetpro.com</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2 text-gray-400"></i>
+                            <a href="tel:+18005551234" class="text-gray-400 hover:text-white transition">(800) 555-1234</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">New York, NY</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 EventBudget Pro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('open');
+                // Change icon based on menu state
+                const icon = mobileMenuButton.querySelector('i');
+                if (mobileMenu.classList.contains('open')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+
+            // Close menu when clicking on a link
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.remove('open');
+                    mobileMenuButton.querySelector('i').classList.remove('fa-times');
+                    mobileMenuButton.querySelector('i').classList.add('fa-bars');
+                });
+            });
+
+            // Download button animation
+            const downloadButtons = document.querySelectorAll('.download-btn');
+            downloadButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Add animation class
+                    this.classList.add('bg-indigo-600', 'text-white');
+                    
+                    // Change icon briefly
+                    const icon = this.querySelector('i');
+                    const originalIcon = icon.className;
+                    icon.className = 'fas fa-check';
+                    
+                    // Reset after animation
+                    setTimeout(() => {
+                        this.classList.remove('bg-indigo-600', 'text-white');
+                        icon.className = originalIcon;
+                    }, 2000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
