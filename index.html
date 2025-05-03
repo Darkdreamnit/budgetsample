@@ -45,6 +45,14 @@
             visibility: visible;
             opacity: 1;
         }
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .mobile-menu.open {
+            max-height: 500px;
+        }
     </style>
 </head>
 <body class="bg-gray-50 font-sans">
@@ -62,9 +70,19 @@
                     <a href="#" class="hover:text-indigo-200 transition">Resources</a>
                     <a href="#" class="hover:text-indigo-200 transition">Contact</a>
                 </nav>
-                <button class="md:hidden text-xl">
+                <button id="mobileMenuButton" class="md:hidden text-xl">
                     <i class="fas fa-bars"></i>
                 </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="mobile-menu md:hidden bg-indigo-700 rounded-lg mt-4">
+                <div class="flex flex-col space-y-3 p-4">
+                    <a href="#" class="hover:text-indigo-200 transition">Home</a>
+                    <a href="#" class="hover:text-indigo-200 transition">Calculator</a>
+                    <a href="#" class="hover:text-indigo-200 transition">Resources</a>
+                    <a href="#" class="hover:text-indigo-200 transition">Contact</a>
+                </div>
             </div>
             
             <div class="mt-16 mb-20 text-center">
@@ -81,7 +99,7 @@
                 <!-- Calculator Form -->
                 <div class="md:w-1/2 p-8">
                     <h3 class="text-2xl font-bold text-gray-800 mb-6">Event Details</h3>
-                    
+                                        
                     <div class="space-y-6">
                         <!-- Event Type -->
                         <div>
@@ -102,7 +120,7 @@
                                 <option value="trade">Trade Show</option>
                             </select>
                         </div>
-                        
+                                                
                         <!-- Guest Count -->
                         <div>
                             <label class="block text-gray-700 font-medium mb-2 flex items-center">
@@ -114,7 +132,7 @@
                             </label>
                             <input id="guestCount" type="number" min="1" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="e.g. 150">
                         </div>
-                        
+                                                
                         <!-- Event Duration -->
                         <div>
                             <label class="block text-gray-700 font-medium mb-2 flex items-center">
@@ -126,7 +144,7 @@
                             </label>
                             <input id="duration" type="number" min="1" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="e.g. 5">
                         </div>
-                        
+                                                
                         <!-- Date Picker -->
                         <div>
                             <label class="block text-gray-700 font-medium mb-2 flex items-center">
@@ -138,7 +156,7 @@
                             </label>
                             <input id="eventDate" type="date" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
                         </div>
-                        
+                                                
                         <!-- Location -->
                         <div>
                             <label class="block text-gray-700 font-medium mb-2 flex items-center">
@@ -157,7 +175,7 @@
                                 <option value="unique">Unique Venue</option>
                             </select>
                         </div>
-                        
+                                                
                         <!-- Budget Slider -->
                         <div>
                             <label class="block text-gray-700 font-medium mb-2 flex items-center">
@@ -173,7 +191,7 @@
                                 <span id="budgetValue" class="text-gray-700 font-medium">$25K</span>
                             </div>
                         </div>
-                        
+                                                
                         <!-- Calculate Button -->
                         <button id="calculateBtn" class="w-full gradient-bg text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition flex items-center justify-center space-x-2">
                             <i class="fas fa-calculator"></i>
@@ -181,7 +199,7 @@
                         </button>
                     </div>
                 </div>
-                
+                                
                 <!-- Results Section -->
                 <div id="resultsSection" class="md:w-1/2 bg-gray-50 p-8 hidden">
                     <div class="flex justify-between items-center mb-6">
@@ -190,14 +208,14 @@
                             <i class="fas fa-redo mr-1"></i> Reset
                         </button>
                     </div>
-                    
+                                        
                     <!-- Budget Summary -->
                     <div class="bg-white rounded-lg shadow p-6 mb-6">
                         <div class="flex justify-between items-center mb-4">
                             <h4 class="font-bold text-lg">Total Estimated Cost</h4>
                             <span id="totalCost" class="text-3xl font-bold text-indigo-600">$0</span>
                         </div>
-                        
+                                                
                         <div class="mb-4">
                             <div class="flex justify-between text-sm text-gray-600 mb-1">
                                 <span>Budget Utilization</span>
@@ -207,7 +225,7 @@
                                 <div id="progressBar" class="progress-bar bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
                             </div>
                         </div>
-                        
+                                                
                         <!-- Budget Breakdown with Explanations -->
                         <div class="space-y-4">
                             <!-- Venue -->
@@ -223,7 +241,7 @@
                                     <i class="fas fa-info-circle mr-1"></i> Venues typically account for 25-35% of total budget. Consider weekday discounts or off-season rates.
                                 </div>
                             </div>
-                            
+                                                    
                             <!-- Catering -->
                             <div class="p-3 bg-indigo-50 rounded-lg">
                                 <div class="flex justify-between items-center">
@@ -237,7 +255,7 @@
                                     <i class="fas fa-info-circle mr-1"></i> Catering averages $35-$150 per person. Buffets are 20-30% cheaper than plated meals.
                                 </div>
                             </div>
-                            
+                                                    
                             <!-- AV/Tech -->
                             <div class="p-3 bg-indigo-50 rounded-lg">
                                 <div class="flex justify-between items-center">
@@ -251,7 +269,7 @@
                                     <i class="fas fa-info-circle mr-1"></i> AV costs vary widely. Package deals with the venue can save 15-20%.
                                 </div>
                             </div>
-                            
+                                                    
                             <!-- Decor -->
                             <div class="p-3 bg Indigo-50 rounded-lg">
                                 <div class="flex justify-between items-center">
@@ -265,7 +283,7 @@
                                     <i class="fas fa-info-circle mr-1"></i> Seasonal flowers can reduce costs by 30%. Consider reusable decor elements.
                                 </div>
                             </div>
-                            
+                                                    
                             <!-- Staffing -->
                             <div class="p-3 bg-indigo-50 rounded-lg">
                                 <div class="flex justify-between items-center">
@@ -279,7 +297,7 @@
                                     <i class="fas fa-info-circle mr-1"></i> Typically 1 staff per 25 guests. Overtime rates apply after 8 hours.
                                 </div>
                             </div>
-                            
+                                                    
                             <!-- Marketing -->
                             <div class="p-3 bg-indigo-50 rounded-lg">
                                 <div class="flex justify-between items-center">
@@ -293,7 +311,7 @@
                                     <i class="fas fa-info-circle mr-1"></i> Digital invitations can save 80% vs. printed. Early RSVP discounts improve planning.
                                 </div>
                             </div>
-                            
+                                                    
                             <!-- Misc -->
                             <div class="p-3 bg-indigo-50 rounded-lg">
                                 <div class="flex justify-between items-center">
@@ -309,7 +327,7 @@
                             </div>
                         </div>
                     </div>
-                    
+                                        
                     <!-- Budget Optimization Tips -->
                     <div class="bg-white rounded-lg p-6 shadow mb-6">
                         <h4 class="font-bold text-lg mb-4 flex items-center">
@@ -325,7 +343,7 @@
                             </div>
                         </div>
                     </div>
-                    
+                                        
                     <!-- Budget Timeline -->
                     <div class="bg-white rounded-lg p-6 shadow">
                         <h4 class="font-bold text-lg mb-4 flex items-center">
@@ -363,7 +381,7 @@
                         </div>
                     </div>
                 </div>
-                
+                                
                 <!-- Placeholder before calculation -->
                 <div id="placeholderSection" class="md:w-1/2 bg-gray-50 p-8 flex flex-col items-center justify-center">
                     <div class="text-center max-w-xs">
@@ -380,7 +398,7 @@
     <section class="bg-gray-100 py-16">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl font-bold text-center mb-12">Budget Comparison Tool</h2>
-            
+                        
             <div class="bg-white rounded-xl shadow-lg p-6 max-w-4xl mx-auto">
                 <div class="grid md:grid-cols-2 gap-8">
                     <!-- Option 1 -->
@@ -411,7 +429,7 @@
                             </div>
                         </div>
                     </div>
-                    
+                                        
                     <!-- Option 2 -->
                     <div>
                         <h3 class="text-xl font-bold mb-4 text-center">Value Package</h3>
@@ -441,7 +459,7 @@
                         </div>
                     </div>
                 </div>
-                
+                                
                 <div class="mt-8 text-center">
                     <p class="text-gray-600 mb-4">Compare different budget scenarios to find the right balance for your event</p>
                     <button class="gradient-bg text-white py-2 px-6 rounded-lg font-medium hover:opacity-90 transition">
@@ -456,7 +474,7 @@
     <section class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl font-bold text-center mb-12">Recommended Vendors</h2>
-            
+                        
             <div class="grid md:grid-cols-3 gap-8">
                 <!-- Venue -->
                 <div class="border border-gray-200 rounded-lg overflow-hidden card-hover transition">
@@ -471,7 +489,7 @@
                         </button>
                     </div>
                 </div>
-                
+                                
                 <!-- Catering -->
                 <div class="border border-gray-200 rounded-lg overflow-hidden card-hover transition">
                     <div class="h-48 bg-indigo-100 flex items-center justify-center">
@@ -485,7 +503,7 @@
                         </button>
                     </div>
                 </div>
-                
+                                
                 <!-- AV -->
                 <div class="border border-gray-200 rounded-lg overflow-hidden card-hover transition">
                     <div class="h-48 bg-indigo-100 flex items-center justify-center">
@@ -526,7 +544,7 @@
                     </h3>
                     <p class="text-gray-400">The professional's choice for accurate event budgeting since 2015.</p>
                 </div>
-                
+                                
                 <!-- Column 2 -->
                 <div>
                     <h4 class="font-bold mb-4">Resources</h4>
@@ -537,7 +555,7 @@
                         <li><a href="#" class="text-gray-400 hover:text-white transition">Cost-Saving Strategies</a></li>
                     </ul>
                 </div>
-                
+                                
                 <!-- Column 3 -->
                 <div>
                     <h4 class="font-bold mb-4">Company</h4>
@@ -548,7 +566,7 @@
                         <li><a href="#" class="text-gray-400 hover:text-white transition">Press</a></li>
                     </ul>
                 </div>
-                
+                                
                 <!-- Column 4 -->
                 <div>
                     <h4 class="font-bold mb-4">Contact</h4>
@@ -568,7 +586,7 @@
                     </ul>
                 </div>
             </div>
-            
+                        
             <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
                 <p>&copy; 2023 EventBudget Pro. All rights reserved.</p>
             </div>
@@ -577,76 +595,103 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('open');
+                // Change icon based on menu state
+                const icon = mobileMenuButton.querySelector('i');
+                if (mobileMenu.classList.contains('open')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+
+            // Close menu when clicking on a link
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.remove('open');
+                    mobileMenuButton.querySelector('i').classList.remove('fa-times');
+                    mobileMenuButton.querySelector('i').classList.add('fa-bars');
+                });
+            });
+
             const calculateBtn = document.getElementById('calculateBtn');
             const resetBtn = document.getElementById('resetBtn');
             const resultsSection = document.getElementById('resultsSection');
             const placeholderSection = document.getElementById('placeholderSection');
             const budgetRange = document.getElementById('budgetRange');
             const budgetValue = document.getElementById('budgetValue');
-            
+                        
             // Update budget range display
             budgetRange.addEventListener('input', function() {
                 budgetValue.textContent = '$' + (this.value / 1000) + 'K';
             });
-            
+                        
             // Event types with detailed cost structures
             const eventTypes = {
-                wedding: { 
-                    base: 8000, 
-                    venue: 0.35, 
-                    catering: 0.4, 
-                    av: 0.08, 
-                    decor: 0.1, 
-                    staff: 0.05, 
-                    marketing: 0.02 
-                },
-                corporate: { 
-                    base: 5000, 
-                    venue: 0.3, 
-                    catering: 0.35, 
-                    av: 0.15, 
-                    decor: 0.08, 
-                    staff: 0.08, 
-                    marketing: 0.04 
-                },
-                conference: { 
-                    base: 15000, 
-                    venue: 0.4, 
-                    catering: 0.3, 
-                    av: 0.15, 
-                    decor: 0.05, 
-                    staff: 0.07, 
-                    marketing: 0.03 
-                },
-                birthday: { 
-                    base: 2000, 
-                    venue: 0.25, 
-                    catering: 0.5, 
-                    av: 0.05, 
-                    decor: 0.15, 
-                    staff: 0.03, 
-                    marketing: 0.02 
-                },
-                charity: { 
-                    base: 10000, 
-                    venue: 0.3, 
-                    catering: 0.35, 
-                    av: 0.1, 
-                    decor: 0.15, 
-                    staff: 0.07, 
-                    marketing: 0.03 
-                },
-                trade: { 
-                    base: 20000, 
-                    venue: 0.45, 
-                    catering: 0.25, 
-                    av: 0.15, 
-                    decor: 0.1, 
-                    staff: 0.03, 
-                    marketing: 0.02 
-                }
+                wedding: {
+                     base: 8000,
+                     venue: 0.35,
+                     catering: 0.4,
+                     av: 0.08,
+                     decor: 0.1,
+                     staff: 0.05,
+                     marketing: 0.02
+                 },
+                corporate: {
+                     base: 5000,
+                     venue: 0.3,
+                     catering: 0.35,
+                     av: 0.15,
+                     decor: 0.08,
+                     staff: 0.08,
+                     marketing: 0.04
+                 },
+                conference: {
+                     base: 15000,
+                     venue: 0.4,
+                     catering: 0.3,
+                     av: 0.15,
+                     decor: 0.05,
+                     staff: 0.07,
+                     marketing: 0.03
+                 },
+                birthday: {
+                     base: 2000,
+                     venue: 0.25,
+                     catering: 0.5,
+                     av: 0.05,
+                     decor: 0.15,
+                     staff: 0.03,
+                     marketing: 0.02
+                 },
+                charity: {
+                     base: 10000,
+                     venue: 0.3,
+                     catering: 0.35,
+                     av: 0.1,
+                     decor: 0.15,
+                     staff: 0.07,
+                     marketing: 0.03
+                 },
+                trade: {
+                     base: 20000,
+                     venue: 0.45,
+                     catering: 0.25,
+                     av: 0.15,
+                     decor: 0.1,
+                     staff: 0.03,
+                     marketing: 0.02
+                 }
             };
-            
+                        
             // Budget optimization tips by event type
             const optimizationTips = {
                 wedding: [
@@ -686,40 +731,40 @@
                     "Multi-event contracts with venues provide better rates"
                 ]
             };
-            
+                        
             calculateBtn.addEventListener('click', function() {
                 // Get form values
                 const eventType = document.getElementById('eventType').value;
                 const guestCount = parseInt(document.getElementById('guestCount').value) || 100;
                 const duration = parseInt(document.getElementById('duration').value) || 4;
                 const locationType = document.getElementById('locationType').value;
-                
+                                
                 if (!eventType) {
                     alert('Please select an event type');
                     return;
                 }
-                
+                                
                 if (!locationType) {
                     alert('Please select a location type');
                     return;
                 }
-                
+                                
                 // Calculate costs based on event type
                 const eventData = eventTypes[eventType];
-                
+                                
                 // Location multiplier (urban more expensive, etc.)
                 let locationMultiplier = 1;
                 if (locationType === 'urban') locationMultiplier = 1.2;
                 if (locationType === 'unique') locationMultiplier = 1.3;
                 if (locationType === 'suburban') locationMultiplier = 0.9;
                 if (locationType === 'outdoor') locationMultiplier = 0.8; // but may need tent, etc.
-                
+                                
                 // Duration multiplier (non-linear scaling)
                 const durationMultiplier = Math.min(2, 1 + (duration / 10));
-                
+                                
                 // Calculate base cost with adjustments
                 const adjustedBase = eventData.base * (guestCount / 100) * locationMultiplier * durationMultiplier;
-                
+                                
                 // Calculate category costs
                 const venueCost = adjustedBase * eventData.venue;
                 const cateringCost = adjustedBase * eventData.catering;
@@ -728,9 +773,9 @@
                 const staffCost = adjustedBase * eventData.staff;
                 const marketingCost = adjustedBase * eventData.marketing;
                 const miscCost = adjustedBase * 0.05; // Standard 5% contingency
-                
+                                
                 const totalCost = venueCost + cateringCost + avCost + decorCost + staffCost + marketingCost + miscCost;
-                
+                                
                 // Update UI with calculated values
                 document.getElementById('totalCost').textContent = '$' + Math.round(totalCost).toLocaleString();
                 document.getElementById('venueCost').textContent = '$' + Math.round(venueCost).toLocaleString();
@@ -740,17 +785,17 @@
                 document.getElementById('staffCost').textContent = '$' + Math.round(staffCost).toLocaleString();
                 document.getElementById('marketingCost').textContent = '$' + Math.round(marketingCost).toLocaleString();
                 document.getElementById('miscCost').textContent = '$' + Math.round(miscCost).toLocaleString();
-                
+                                
                 // Calculate budget percentage
                 const userBudget = parseInt(budgetRange.value);
                 const budgetPercentage = Math.min(100, Math.round((totalCost / userBudget) * 100));
                 document.getElementById('budgetPercentage').textContent = budgetPercentage + '%';
                 document.getElementById('progressBar').style.width = budgetPercentage + '%';
-                
+                                
                 // Set optimization tips
                 const tipsContainer = document.getElementById('optimizationTips');
                 tipsContainer.innerHTML = '';
-                
+                                
                 optimizationTips[eventType].forEach(tip => {
                     const tipElement = document.createElement('div');
                     tipElement.className = 'flex items-start';
@@ -762,12 +807,12 @@
                     `;
                     tipsContainer.appendChild(tipElement);
                 });
-                
+                                
                 // Show results
                 resultsSection.classList.remove('hidden');
                 placeholderSection.classList.add('hidden');
             });
-            
+                        
             resetBtn.addEventListener('click', function() {
                 // Reset form
                 document.getElementById('eventType').value = '';
@@ -777,7 +822,7 @@
                 document.getElementById('locationType').value = '';
                 budgetRange.value = 25000;
                 budgetValue.textContent = '$25K';
-                
+                                
                 // Show placeholder
                 resultsSection.classList.add('hidden');
                 placeholderSection.classList.remove('hidden');
