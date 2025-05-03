@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | Event Budget Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .input-highlight:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+        }
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .mobile-menu.open {
+            max-height: 500px;
+        }
+        .contact-icon {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .map-container {
+            height: 100%;
+            min-height: 300px;
+            border-radius: 0.75rem;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="gradient-bg text-white">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-money-bill-wave text-3xl"></i>
+                    <h1 class="text-2xl font-bold">EventBudget Pro</h1>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#" class="hover:text-indigo-200 transition">Home</a>
+                    <a href="#" class="hover:text-indigo-200 transition">Calculator</a>
+                    <a href="#" class="hover:text-indigo-200 transition">Resources</a>
+                    <a href="#" class="text-indigo-200 font-medium transition">Contact</a>
+                </nav>
+                <button id="mobileMenuButton" class="md:hidden text-xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="mobile-menu md:hidden bg-indigo-700 rounded-lg mt-4">
+                <div class="flex flex-col space-y-3 p-4">
+                    <a href="#" class="hover:text-indigo-200 transition">Home</a>
+                    <a href="#" class="hover:text-indigo-200 transition">Calculator</a>
+                    <a href="#" class="hover:text-indigo-200 transition">Resources</a>
+                    <a href="#" class="text-indigo-200 font-medium transition">Contact</a>
+                </div>
+            </div>
+
+            <div class="mt-16 mb-20 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Get In Touch With Our Team</h2>
+                <p class="text-xl md:text-2xl max-w-3xl mx-auto">Our event budgeting experts are ready to help you plan your perfect event</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contact Section -->
+    <section class="container mx-auto px-4 py-12 -mt-10">
+        <div class="bg-white rounded-xl shadow-xl overflow-hidden">
+            <div class="md:flex">
+                <!-- Contact Form -->
+                <div class="md:w-1/2 p-8">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Send Us a Message</h3>
+                    
+                    <form id="contactForm" class="space-y-6">
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Your Name</label>
+                            <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="John Smith" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Email Address</label>
+                            <input type="email" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="john@example.com" required>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Phone Number</label>
+                            <input type="tel" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="(123) 456-7890">
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Event Type</label>
+                            <select class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
+                                <option value="">Select event type</option>
+                                <option value="wedding">Wedding</option>
+                                <option value="corporate">Corporate Event</option>
+                                <option value="conference">Conference</option>
+                                <option value="birthday">Birthday Party</option>
+                                <option value="charity">Charity Gala</option>
+                                <option value="trade">Trade Show</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Estimated Budget</label>
+                            <select class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
+                                <option value="">Select budget range</option>
+                                <option value="5k">Under $5,000</option>
+                                <option value="10k">$5,000 - $10,000</option>
+                                <option value="25k">$10,000 - $25,000</option>
+                                <option value="50k">$25,000 - $50,000</option>
+                                <option value="100k">$50,000 - $100,000</option>
+                                <option value="100k+">Over $100,000</option>
+                            </select>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-gray-700 font-medium mb-2">Your Message</label>
+                            <textarea rows="5" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="Tell us about your event and how we can help..." required></textarea>
+                        </div>
+                        
+                        <button type="submit" class="w-full gradient-bg text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition flex items-center justify-center space-x-2">
+                            <i class="fas fa-paper-plane"></i>
+                            <span>Send Message</span>
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Contact Info -->
+                <div class="md:w-1/2 bg-gray-50 p-8">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Contact Information</h3>
+                    
+                    <div class="space-y-8">
+                        <!-- Contact Card 1 -->
+                        <div class="flex items-start">
+                            <div class="mr-4">
+                                <i class="fas fa-envelope text-3xl contact-icon"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">Email Us</h4>
+                                <p class="text-gray-600 mb-2">Our team typically responds within 1 business day</p>
+                                <a href="mailto:hello@eventbudgetpro.com" class="text-indigo-600 hover:text-indigo-800 transition">hello@eventbudgetpro.com</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Contact Card 2 -->
+                        <div class="flex items-start">
+                            <div class="mr-4">
+                                <i class="fas fa-phone text-3xl contact-icon"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">Call Us</h4>
+                                <p class="text-gray-600 mb-2">Monday-Friday, 9am-5pm EST</p>
+                                <a href="tel:+18005551234" class="text-indigo-600 hover:text-indigo-800 transition">(800) 555-1234</a>
+                            </div>
+                        </div>
+                        
+                        <!-- Contact Card 3 -->
+                        <div class="flex items-start">
+                            <div class="mr-4">
+                                <i class="fas fa-map-marker-alt text-3xl contact-icon"></i>
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-lg mb-1">Visit Us</h4>
+                                <p class="text-gray-600 mb-2">Schedule an in-person consultation at our offices</p>
+                                <p class="text-gray-800">123 Event Planning Blvd<br>New York, NY 10001</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Social Media -->
+                        <div>
+                            <h4 class="font-bold text-lg mb-4">Connect With Us</h4>
+                            <div class="flex space-x-4">
+                                <a href="#" class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition">
+                                    <i class="fab fa-linkedin-in"></i>
+                                </a>
+                                <a href="#" class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 hover:bg-indigo-200 transition">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Map -->
+                    <div class="mt-8 bg-white p-4 rounded-lg shadow-sm">
+                        <h4 class="font-bold text-lg mb-4">Our Location</h4>
+                        <div class="map-container">
+                            <!-- Embedded Google Map (placeholder) -->
+                            <div class="w-full h-full bg-indigo-100 flex items-center justify-center">
+                                <i class="fas fa-map-marked-alt text-5xl text-indigo-500"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="bg-gray-100 py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Frequently Asked Questions</h2>
+            
+            <div class="max-w-3xl mx-auto space-y-4">
+                <!-- FAQ Item 1 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <h3 class="font-bold text-lg">How accurate is your budget calculator?</h3>
+                        <i class="fas fa-chevron-down text-indigo-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 pb-6 hidden">
+                        <p class="text-gray-600">Our calculator uses industry-standard cost structures based on thousands of real events. While individual vendor prices may vary, our estimates are typically within 10-15% of actual costs for most event types. For the most accurate budget, we recommend scheduling a consultation with our team.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ Item 2 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <h3 class="font-bold text-lg">Do you offer event planning services?</h3>
+                        <i class="fas fa-chevron-down text-indigo-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 pb-6 hidden">
+                        <p class="text-gray-600">Yes! While our budget calculator is available for free, we offer full-service event planning for clients who need hands-on assistance. Our team can help with venue selection, vendor coordination, budget management, and day-of execution. Contact us to discuss your specific needs.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ Item 3 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <h3 class="font-bold text-lg">Can I save my budget calculations?</h3>
+                        <i class="fas fa-chevron-down text-indigo-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 pb-6 hidden">
+                        <p class="text-gray-600">Absolutely. When you create a free account with EventBudget Pro, you can save unlimited budgets, make adjustments over time, and compare different scenarios. Your saved budgets sync across all your devices for easy access.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ Item 4 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <h3 class="font-bold text-lg">How do you recommend vendors?</h3>
+                        <i class="fas fa-chevron-down text-indigo-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 pb-6 hidden">
+                        <p class="text-gray-600">Our vendor recommendations are based on several factors: your budget range, event type, location, and our team's firsthand experience. We only recommend vendors we've vetted for quality and reliability. Many offer exclusive discounts to EventBudget Pro users.</p>
+                    </div>
+                </div>
+                
+                <!-- FAQ Item 5 -->
+                <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+                    <button class="faq-toggle w-full flex justify-between items-center p-6 text-left">
+                        <h3 class="font-bold text-lg">What payment methods do you accept?</h3>
+                        <i class="fas fa-chevron-down text-indigo-600 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content px-6 pb-6 hidden">
+                        <p class="text-gray-600">We accept all major credit cards (Visa, Mastercard, American Express, Discover), PayPal, and bank transfers for our premium services. The budget calculator itself is completely free to use with no payment required.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-12">
+                <p class="text-gray-600 mb-4">Don't see your question here?</p>
+                <a href="#contactForm" class="gradient-bg text-white py-2 px-6 rounded-lg font-medium hover:opacity-90 transition inline-block">
+                    Ask Our Team Directly
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 gradient-bg text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6">Ready to Plan Your Perfect Event?</h2>
+            <p class="text-xl max-w-2xl mx-auto mb-8">Our team of event budgeting experts is standing by to help you create a financial plan that works for your vision.</p>
+            <div class="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                <a href="#contactForm" class="bg-white text-indigo-600 py-3 px-8 rounded-lg font-medium hover:bg-gray-100 transition text-lg">
+                    Contact Our Team
+                </a>
+                <a href="#" class="border-2 border-white text-white py-3 px-8 rounded-lg font-medium hover:bg-white hover:bg-opacity-10 transition text-lg">
+                    Try Our Calculator
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- Column 1 -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-money-bill-wave mr-2"></i>
+                        EventBudget Pro
+                    </h3>
+                    <p class="text-gray-400">The professional's choice for accurate event budgeting since 2015.</p>
+                </div>
+                
+                <!-- Column 2 -->
+                <div>
+                    <h4 class="font-bold mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Budget Templates</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Vendor Negotiation Guide</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Event Planning Checklist</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Cost-Saving Strategies</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 3 -->
+                <div>
+                    <h4 class="font-bold mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Testimonials</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Press</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Column 4 -->
+                <div>
+                    <h4 class="font-bold mb-4">Contact</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2 text-gray-400"></i>
+                            <a href="mailto:hello@eventbudgetpro.com" class="text-gray-400 hover:text-white transition">hello@eventbudgetpro.com</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2 text-gray-400"></i>
+                            <a href="tel:+18005551234" class="text-gray-400 hover:text-white transition">(800) 555-1234</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">New York, NY</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2023 EventBudget Pro. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobileMenuButton');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            mobileMenuButton.addEventListener('click', function() {
+                mobileMenu.classList.toggle('open');
+                // Change icon based on menu state
+                const icon = mobileMenuButton.querySelector('i');
+                if (mobileMenu.classList.contains('open')) {
+                    icon.classList.remove('fa-bars');
+                    icon.classList.add('fa-times');
+                } else {
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+
+            // Close menu when clicking on a link
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.remove('open');
+                    mobileMenuButton.querySelector('i').classList.remove('fa-times');
+                    mobileMenuButton.querySelector('i').classList.add('fa-bars');
+                });
+            });
+
+            // FAQ accordion functionality
+            const faqToggles = document.querySelectorAll('.faq-toggle');
+            faqToggles.forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('i');
+                    
+                    // Toggle content
+                    content.classList.toggle('hidden');
+                    
+                    // Rotate icon
+                    if (content.classList.contains('hidden')) {
+                        icon.classList.remove('fa-chevron-up');
+                        icon.classList.add('fa-chevron-down');
+                    } else {
+                        icon.classList.remove('fa-chevron-down');
+                        icon.classList.add('fa-chevron-up');
+                    }
+                });
+            });
+
+            // Form submission
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm) {
+                contactForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    
+                    // In a real implementation, you would send the form data to your server
+                    // For this demo, we'll just show a success message
+                    alert('Thank you for your message! Our team will get back to you within 1 business day.');
+                    contactForm.reset();
+                });
+            }
+        });
+    </script>
+</body>
+</html>
