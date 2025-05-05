@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest List Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #6b73ff 0%, #000dff 100%);
+        }
+        .input-highlight:focus {
+            border-color: #6b73ff;
+            box-shadow: 0 0 0 3px rgba(107, 115, 255, 0.2);
+        }
+        .category-chip {
+            transition: all 0.2s;
+        }
+        .category-chip:hover {
+            transform: translateY(-2px);
+        }
+        .guest-card {
+            transition: all 0.2s;
+        }
+        .guest-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        .status-pending {
+            background-color: #fef08a;
+            color: #854d0e;
+        }
+        .status-confirmed {
+            background-color: #bbf7d0;
+            color: #166534;
+        }
+        .status-declined {
+            background-color: #fecaca;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Guest List Manager</h1>
+            <p class="text-gray-600 max-w-2xl mx-auto">Track RSVPs, manage guest categories, and visualize attendance data</p>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Add Guest Form -->
+            <div class="lg:col-span-1 bg-white rounded-xl shadow-md p-6 h-fit">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Add Guest</h2>
+                <form id="guestForm" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Full Name</label>
+                        <input type="text" id="guestName" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="John Smith" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Email</label>
+                        <input type="email" id="guestEmail" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="john@example.com">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Phone</label>
+                        <input type="tel" id="guestPhone" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="(123) 456-7890">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">RSVP Status</label>
+                        <select id="guestStatus" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="declined">Declined</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Category</label>
+                        <div class="flex space-x-2 mb-2">
+                            <select id="guestCategory" class="flex-1 px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
+                                <option value="general">General</option>
+                                <option value="vip">VIP</option>
+                                <option value="speaker">Speaker</option>
+                                <option value="sponsor">Sponsor</option>
+                                <option value="staff">Staff</option>
+                            </select>
+                            <button type="button" onclick="addCustomCategory()" class="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                        <input type="text" id="customCategory" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none hidden" placeholder="New category name">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Meal Preference</label>
+                        <select id="guestMeal" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
+                            <option value="none">Not specified</option>
+                            <option value="vegetarian">Vegetarian</option>
+                            <option value="vegan">Vegan</option>
+                            <option value="gluten-free">Gluten-free</option>
+                            <option value="regular">Regular</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Special Notes</label>
+                        <textarea id="guestNotes" rows="3" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="Allergies, special requests..."></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full gradient-bg text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition flex items-center justify-center space-x-2">
+                        <i class="fas fa-user-plus"></i>
+                        <span>Add Guest</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Guest List and Stats -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Stats Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Total Guests</p>
+                                <h3 class="text-2xl font-bold text-gray-800" id="totalGuests">0</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-blue-100 text-blue-600">
+                                <i class="fas fa-users text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Confirmed</p>
+                                <h3 class="text-2xl font-bold text-green-600" id="confirmedGuests">0</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-green-100 text-green-600">
+                                <i class="fas fa-check-circle text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-gray-500">Declined</p>
+                                <h3 class="text-2xl font-bold text-red-600" id="declinedGuests">0</h3>
+                            </div>
+                            <div class="p-3 rounded-full bg-red-100 text-red-600">
+                                <i class="fas fa-times-circle text-xl"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4">RSVP Status</h3>
+                        <canvas id="rsvpChart" height="200"></canvas>
+                    </div>
+                    <div class="bg-white rounded-xl shadow p-6">
+                        <h3 class="font-semibold text-gray-800 mb-4">Guest Categories</h3>
+                        <canvas id="categoryChart" height="200"></canvas>
+                    </div>
+                </div>
+
+                <!-- Guest List -->
+                <div class="bg-white rounded-xl shadow overflow-hidden">
+                    <div class="p-6 border-b border-gray-200 flex justify-between items-center">
+                        <h2 class="text-xl font-semibold text-gray-800">Guest List</h2>
+                        <div class="flex space-x-2">
+                            <button onclick="exportToExcel()" class="px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 flex items-center space-x-2">
+                                <i class="fas fa-file-excel"></i>
+                                <span>Excel</span>
+                            </button>
+                            <button onclick="exportToPDF()" class="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 flex items-center space-x-2">
+                                <i class="fas fa-file-pdf"></i>
+                                <span>PDF</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="p-4">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="relative w-64">
+                                <input type="text" id="searchGuests" placeholder="Search guests..." class="w-full pl-10 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:border-blue-500">
+                                <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                            </div>
+                            <div class="flex space-x-2">
+                                <select id="filterStatus" class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none">
+                                    <option value="all">All Statuses</option>
+                                    <option value="pending">Pending</option>
+                                    <option value="confirmed">Confirmed</option>
+                                    <option value="declined">Declined</option>
+                                </select>
+                                <select id="filterCategory" class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none">
+                                    <option value="all">All Categories</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Meal</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="guestList" class="bg-white divide-y divide-gray-200">
+                                    <!-- Guest rows will be added here dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Guest Modal -->
+    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl w-full max-w-md mx-4">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-xl font-semibold text-gray-800">Edit Guest</h3>
+                    <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <form id="editForm" class="space-y-4">
+                    <input type="hidden" id="editId">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Full Name</label>
+                        <input type="text" id="editName" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Email</label>
+                        <input type="email" id="editEmail" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Phone</label>
+                        <input type="tel" id="editPhone" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">RSVP Status</label>
+                        <select id="editStatus" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="declined">Declined</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Category</label>
+                        <select id="editCategory" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
+                            <!-- Categories will be added dynamically -->
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Meal Preference</label>
+                        <select id="editMeal" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
+                            <option value="none">Not specified</option>
+                            <option value="vegetarian">Vegetarian</option>
+                            <option value="vegan">Vegan</option>
+                            <option value="gluten-free">Gluten-free</option>
+                            <option value="regular">Regular</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-2">Special Notes</label>
+                        <textarea id="editNotes" rows="3" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4">
+                        <button type="button" onclick="closeModal()" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100">Cancel</button>
+                        <button type="submit" class="px-6 py-2 gradient-bg text-white rounded-lg hover:opacity-90">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize guest list and categories
+        let guests = [];
+        let categories = ['general', 'vip', 'speaker', 'sponsor', 'staff'];
+        let rsvpChart, categoryChart;
+
+        // DOM elements
+        const guestForm = document.getElementById('guestForm');
+        const editForm = document.getElementById('editForm');
+        const guestList = document.getElementById('guestList');
+        const searchInput = document.getElementById('searchGuests');
+        const filterStatus = document.getElementById('filterStatus');
+        const filterCategory = document.getElementById('filterCategory');
+        const editModal = document.getElementById('editModal');
+        const customCategoryInput = document.getElementById('customCategory');
+        const guestCategorySelect = document.getElementById('guestCategory');
+
+        // Initialize the app when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load any saved data from localStorage
+            loadData();
+            
+            // Initialize charts
+            initCharts();
+            
+            // Populate category filters
+            updateCategoryFilters();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Render initial guest list
+            renderGuestList();
+        });
+
+        function loadData() {
+            const savedGuests = localStorage.getItem('guests');
+            const savedCategories = localStorage.getItem('categories');
+            
+            if (savedGuests) {
+                guests = JSON.parse(savedGuests);
+            }
+            
+            if (savedCategories) {
+                categories = JSON.parse(savedCategories);
+                // Update the category select dropdowns
+                updateCategorySelects();
+            }
+        }
+
+        function saveData() {
+            localStorage.setItem('guests', JSON.stringify(guests));
+            localStorage.setItem('categories', JSON.stringify(categories));
+        }
+
+        function setupEventListeners() {
+            // Add guest form submission
+            guestForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                addGuest();
+            });
+            
+            // Edit guest form submission
+            editForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                saveEditedGuest();
+            });
+            
+            // Search and filter listeners
+            searchInput.addEventListener('input', renderGuestList);
+            filterStatus.addEventListener('change', renderGuestList);
+            filterCategory.addEventListener('change', renderGuestList);
+        }
+
+        function addGuest() {
+            const name = document.getElementById('guestName').value;
+            const email = document.getElementById('guestEmail').value;
+            const phone = document.getElementById('guestPhone').value;
+            const status = document.getElementById('guestStatus').value;
+            const category = document.getElementById('guestCategory').value;
+            const meal = document.getElementById('guestMeal').value;
+            const notes = document.getElementById('guestNotes').value;
+            
+            const newGuest = {
+                id: Date.now().toString(),
+                name,
+                email,
+                phone,
+                status,
+                category,
+                meal,
+                notes,
+                createdAt: new Date().toISOString()
+            };
+            
+            guests.push(newGuest);
+            saveData();
+            renderGuestList();
+            updateCharts();
+            updateStats();
+            
+            // Reset form
+            guestForm.reset();
+            
+            // Show success message
+            alert('Guest added successfully!');
+        }
+
+        function renderGuestList() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const statusFilter = filterStatus.value;
+            const categoryFilter = filterCategory.value;
+            
+            // Filter guests based on search and filters
+            const filteredGuests = guests.filter(guest => {
+                const matchesSearch = guest.name.toLowerCase().includes(searchTerm) || 
+                                      guest.email.toLowerCase().includes(searchTerm) || 
+                                      guest.phone.toLowerCase().includes(searchTerm);
+                const matchesStatus = statusFilter === 'all' || guest.status === statusFilter;
+                const matchesCategory = categoryFilter === 'all' || guest.category === categoryFilter;
+                
+                return matchesSearch && matchesStatus && matchesCategory;
+            });
+            
+            // Clear current list
+            guestList.innerHTML = '';
+            
+            if (filteredGuests.length === 0) {
+                guestList.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">No guests found</td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            // Add filtered guests to the table
+            filteredGuests.forEach(guest => {
+                const row = document.createElement('tr');
+                row.className = 'guest-card hover:bg-gray-50';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${guest.name}</div>
+                                <div class="text-sm text-gray-500">${formatDate(guest.createdAt)}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${guest.email || 'N/A'}</div>
+                        <div class="text-sm text-gray-500">${guest.phone || 'N/A'}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClass(guest.status)}">
+                            ${capitalizeFirstLetter(guest.status)}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${capitalizeFirstLetter(guest.category)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        ${guest.meal === 'none' ? 'N/A' : capitalizeFirstLetter(guest.meal)}
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                        <button onclick="editGuest('${guest.id}')" class="text-blue-600 hover:text-blue-900 mr-3">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="deleteGuest('${guest.id}')" class="text-red-600 hover:text-red-900">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                guestList.appendChild(row);
+            });
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'pending': return 'status-pending';
+                case 'confirmed': return 'status-confirmed';
+                case 'declined': return 'status-declined';
+                default: return 'bg-gray-100 text-gray-800';
+            }
+        }
+
+        function editGuest(id) {
+            const guest = guests.find(g => g.id === id);
+            if (!guest) return;
+            
+            document.getElementById('editId').value = guest.id;
+            document.getElementById('editName').value = guest.name;
+            document.getElementById('editEmail').value = guest.email || '';
+            document.getElementById('editPhone').value = guest.phone || '';
+            document.getElementById('editStatus').value = guest.status;
+            document.getElementById('editMeal').value = guest.meal;
+            document.getElementById('editNotes').value = guest.notes || '';
+            
+            // Populate category select in edit modal
+            const editCategorySelect = document.getElementById('editCategory');
+            editCategorySelect.innerHTML = '';
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = capitalizeFirstLetter(category);
+                if (category === guest.category) option.selected = true;
+                editCategorySelect.appendChild(option);
+            });
+            
+            // Show modal
+            editModal.classList.remove('hidden');
+        }
+
+        function saveEditedGuest() {
+            const id = document.getElementById('editId').value;
+            const guestIndex = guests.findIndex(g => g.id === id);
+            
+            if (guestIndex === -1) return;
+            
+            guests[guestIndex] = {
+                ...guests[guestIndex],
+                name: document.getElementById('editName').value,
+                email: document.getElementById('editEmail').value,
+                phone: document.getElementById('editPhone').value,
+                status: document.getElementById('editStatus').value,
+                category: document.getElementById('editCategory').value,
+                meal: document.getElementById('editMeal').value,
+                notes: document.getElementById('editNotes').value
+            };
+            
+            saveData();
+            renderGuestList();
+            updateCharts();
+            updateStats();
+            closeModal();
+            
+            alert('Guest updated successfully!');
+        }
+
+        function deleteGuest(id) {
+            if (!confirm('Are you sure you want to delete this guest?')) return;
+            
+            guests = guests.filter(guest => guest.id !== id);
+            saveData();
+            renderGuestList();
+            updateCharts();
+            updateStats();
+        }
+
+        function closeModal() {
+            editModal.classList.add('hidden');
+        }
+
+        function addCustomCategory() {
+            if (customCategoryInput.classList.contains('hidden')) {
+                // Show the input field
+                customCategoryInput.classList.remove('hidden');
+                guestCategorySelect.classList.add('hidden');
+                customCategoryInput.focus();
+            } else {
+                // Add the new category
+                const newCategory = customCategoryInput.value.trim().toLowerCase();
+                if (newCategory && !categories.includes(newCategory)) {
+                    categories.push(newCategory);
+                    saveData();
+                    updateCategorySelects();
+                    updateCategoryFilters();
+                    
+                    // Select the new category
+                    document.getElementById('guestCategory').value = newCategory;
+                }
+                
+                // Hide the input field
+                customCategoryInput.classList.add('hidden');
+                guestCategorySelect.classList.remove('hidden');
+                customCategoryInput.value = '';
+            }
+        }
+
+        function updateCategorySelects() {
+            const selects = [guestCategorySelect, document.getElementById('editCategory'), filterCategory];
+            
+            selects.forEach(select => {
+                if (!select) return;
+                
+                // Save current value
+                const currentValue = select.value;
+                
+                // Clear existing options (except "All Categories" for filter)
+                if (select.id === 'filterCategory') {
+                    select.innerHTML = '<option value="all">All Categories</option>';
+                } else {
+                    select.innerHTML = '';
+                }
+                
+                // Add all categories
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category;
+                    option.textContent = capitalizeFirstLetter(category);
+                    select.appendChild(option);
+                });
+                
+                // Restore current value if it still exists
+                if (categories.includes(currentValue)) {
+                    select.value = currentValue;
+                }
+            });
+        }
+
+        function updateCategoryFilters() {
+            const filterSelect = document.getElementById('filterCategory');
+            filterSelect.innerHTML = '<option value="all">All Categories</option>';
+            
+            categories.forEach(category => {
+                const option = document.createElement('option');
+                option.value = category;
+                option.textContent = capitalizeFirstLetter(category);
+                filterSelect.appendChild(option);
+            });
+        }
+
+        function initCharts() {
+            const rsvpCtx = document.getElementById('rsvpChart').getContext('2d');
+            const categoryCtx = document.getElementById('categoryChart').getContext('2d');
+            
+            rsvpChart = new Chart(rsvpCtx, {
+                type: 'pie',
+                data: {
+                    labels: ['Pending', 'Confirmed', 'Declined'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: [
+                            '#fef08a',
+                            '#bbf7d0',
+                            '#fecaca'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+            
+            categoryChart = new Chart(categoryCtx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Guests by Category',
+                        data: [],
+                        backgroundColor: '#6b73ff',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    }
+                }
+            });
+            
+            updateCharts();
+        }
+
+        function updateCharts() {
+            // Update RSVP chart
+            const pending = guests.filter(g => g.status === 'pending').length;
+            const confirmed = guests.filter(g => g.status === 'confirmed').length;
+            const declined = guests.filter(g => g.status === 'declined').length;
+            
+            rsvpChart.data.datasets[0].data = [pending, confirmed, declined];
+            rsvpChart.update();
+            
+            // Update category chart
+            const categoryCounts = {};
+            categories.forEach(cat => {
+                categoryCounts[cat] = guests.filter(g => g.category === cat).length;
+            });
+            
+            categoryChart.data.labels = categories.map(c => capitalizeFirstLetter(c));
+            categoryChart.data.datasets[0].data = categories.map(c => categoryCounts[c]);
+            categoryChart.update();
+        }
+
+        function updateStats() {
+            document.getElementById('totalGuests').textContent = guests.length;
+            document.getElementById('confirmedGuests').textContent = guests.filter(g => g.status === 'confirmed').length;
+            document.getElementById('declinedGuests').textContent = guests.filter(g => g.status === 'declined').length;
+        }
+
+        function exportToExcel() {
+            // Prepare data for export
+            const data = [
+                ['Name', 'Email', 'Phone', 'Status', 'Category', 'Meal Preference', 'Notes', 'Date Added']
+            ];
+            
+            guests.forEach(guest => {
+                data.push([
+                    guest.name,
+                    guest.email || '',
+                    guest.phone || '',
+                    capitalizeFirstLetter(guest.status),
+                    capitalizeFirstLetter(guest.category),
+                    guest.meal === 'none' ? 'N/A' : capitalizeFirstLetter(guest.meal),
+                    guest.notes || '',
+                    formatDate(guest.createdAt)
+                ]);
+            });
+            
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            XLSX.utils.book_append_sheet(wb, ws, 'Guest List');
+            
+            // Export to file
+            XLSX.writeFile(wb, 'guest_list.xlsx');
+        }
+
+        function exportToPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(18);
+            doc.text('Guest List', 105, 15, { align: 'center' });
+            
+            // Add date
+            doc.setFontSize(10);
+            doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 22, { align: 'center' });
+            
+            // Prepare data for table
+            const headers = ['Name', 'Email', 'Phone', 'Status', 'Category', 'Meal', 'Date Added'];
+            const rows = guests.map(guest => [
+                guest.name,
+                guest.email || 'N/A',
+                guest.phone || 'N/A',
+                capitalizeFirstLetter(guest.status),
+                capitalizeFirstLetter(guest.category),
+                guest.meal === 'none' ? 'N/A' : capitalizeFirstLetter(guest.meal),
+                formatDate(guest.createdAt)
+            ]);
+            
+            // Add table
+            doc.autoTable({
+                head: [headers],
+                body: rows,
+                startY: 30,
+                styles: {
+                    fontSize: 9,
+                    cellPadding: 2
+                },
+                headStyles: {
+                    fillColor: [107, 115, 255],
+                    textColor: 255
+                }
+            });
+            
+            // Save the PDF
+            doc.save('guest_list.pdf');
+        }
+
+        // Helper functions
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+    </script>
+</body>
+</html>
