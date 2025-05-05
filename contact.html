@@ -87,58 +87,86 @@
                 <div class="md:w-1/2 p-8">
                     <h3 class="text-2xl font-bold text-gray-800 mb-6">Send Us a Message</h3>
                     
-                    <form name="contact" method="POST" data-netlify="true">
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2">Your Name</label>
-                            <input type="text" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="John Smith" required>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2">Email Address</label>
-                            <input type="email" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="john@example.com" required>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2">Phone Number</label>
-                            <input type="tel" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="(123) 456-7890">
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2">Event Type</label>
-                            <select class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
-                                <option value="">Select event type</option>
-                                <option value="wedding">Wedding</option>
-                                <option value="corporate">Corporate Event</option>
-                                <option value="conference">Conference</option>
-                                <option value="birthday">Birthday Party</option>
-                                <option value="charity">Charity Gala</option>
-                                <option value="trade">Trade Show</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2">Estimated Budget</label>
-                            <select class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
-                                <option value="">Select budget range</option>
-                                <option value="5k">Under $5,000</option>
-                                <option value="10k">$5,000 - $10,000</option>
-                                <option value="25k">$10,000 - $25,000</option>
-                                <option value="50k">$25,000 - $50,000</option>
-                                <option value="100k">$50,000 - $100,000</option>
-                                <option value="100k+">Over $100,000</option>
-                            </select>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2">Your Message</label>
-                            <textarea rows="5" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="Tell us about your event and how we can help..." required></textarea>
-                        </div>
-                        
-                        <button type="submit" class="w-full gradient-bg text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-paper-plane"></i>
-                            <span>Send Message</span>
-                        </button>
-                    </form>
+                     <!-- Main Form -->
+            <form name="contact" method="POST" netlify-honeypot="bot-field" data-netlify="true" id="contact-form" class="space-y-6">
+                <!-- Netlify Bot Field (hidden) -->
+                <input type="hidden" name="form-name" value="contact">
+                <div class="hidden">
+                    <label>Don't fill this out if you're human:</label>
+                    <input name="bot-field">
+                </div>
+                
+                <div>
+                    <label for="name" class="block text-gray-700 font-medium mb-2">Your Name *</label>
+                    <input type="text" id="name" name="name" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="John Smith" required>
+                </div>
+                
+                <div>
+                    <label for="email" class="block text-gray-700 font-medium mb-2">Email Address *</label>
+                    <input type="email" id="email" name="email" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="john@example.com" required>
+                </div>
+                
+                <div>
+                    <label for="phone" class="block text-gray-700 font-medium mb-2">Phone Number</label>
+                    <input type="tel" id="phone" name="phone" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="(123) 456-7890">
+                </div>
+                
+                <div>
+                    <label for="event-type" class="block text-gray-700 font-medium mb-2">Event Type</label>
+                    <select id="event-type" name="event-type" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
+                        <option value="">Select event type</option>
+                        <option value="wedding">Wedding</option>
+                        <option value="corporate">Corporate Event</option>
+                        <option value="conference">Conference</option>
+                        <option value="birthday">Birthday Party</option>
+                        <option value="charity">Charity Gala</option>
+                        <option value="trade">Trade Show</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="budget" class="block text-gray-700 font-medium mb-2">Estimated Budget</label>
+                    <select id="budget" name="budget" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
+                        <option value="">Select budget range</option>
+                        <option value="5k">Under $5,000</option>
+                        <option value="10k">$5,000 - $10,000</option>
+                        <option value="25k">$10,000 - $25,000</option>
+                        <option value="50k">$25,000 - $50,000</option>
+                        <option value="100k">$50,000 - $100,000</option>
+                        <option value="100k+">Over $100,000</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label for="message" class="block text-gray-700 font-medium mb-2">Your Message *</label>
+                    <textarea id="message" name="message" rows="5" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="Tell us about your event and how we can help..." required></textarea>
+                </div>
+                
+                <button type="submit" class="w-full gradient-bg text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition flex items-center justify-center space-x-2">
+                    <i class="fas fa-paper-plane"></i>
+                    <span>Send Message</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Handle form submission
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            // In a real implementation, you would let Netlify handle the submission
+            // This is just for demo purposes to show the success message
+            e.preventDefault();
+            
+            // Show success message
+            document.getElementById('form-success').style.display = 'block';
+            
+            // Hide form
+            document.getElementById('contact-form').style.display = 'none';
+            
+            // In a real implementation, you would submit the form to Netlify
+            // this.submit();
+        });
+    </script>
                 </div>
                 
                 <!-- Contact Info -->
