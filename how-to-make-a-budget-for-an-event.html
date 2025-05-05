@@ -557,7 +557,7 @@
         </div>
     </section>
 
-    <!-- Footer -->
+   <!-- Footer -->
     <footer class="bg-gray-900 text-white py-12">
         <div class="container mx-auto px-4">
             <div class="grid md:grid-cols-4 gap-8">
@@ -574,10 +574,10 @@
                 <div>
                     <h4 class="font-bold mb-4">Resources</h4>
                     <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Blog</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Templates</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Calculators</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Guides</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Budget Templates</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Vendor Negotiation Guide</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Event Planning Checklist</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Cost-Saving Strategies</a></li>
                     </ul>
                 </div>
                                 
@@ -588,69 +588,36 @@
                         <li><a href="#" class="text-gray-400 hover:text-white transition">About Us</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-white transition">Testimonials</a></li>
                         <li><a href="#" class="text-gray-400 hover:text-white transition">Careers</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Contact</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Press</a></li>
                     </ul>
                 </div>
                                 
                 <!-- Column 4 -->
                 <div>
-                    <h4 class="font-bold mb-4">Connect</h4>
+                    <h4 class="font-bold mb-4">Contact</h4>
                     <ul class="space-y-2">
                         <li class="flex items-center">
-                            <i class="fab fa-facebook mr-2 text-gray-400"></i>
-                            <a href="#" class="text-gray-400 hover:text-white transition">Facebook</a>
+                            <i class="fas fa-envelope mr-2 text-gray-400"></i>
+                            <a href="mailto:hello@eventbudgetpro.com" class="text-gray-400 hover:text-white transition">eventbudgetsample@gmail.com</a>
                         </li>
                         <li class="flex items-center">
-                            <i class="fab fa-twitter mr-2 text-gray-400"></i>
-                            <a href="#" class="text-gray-400 hover:text-white transition">Twitter</a>
+                            <i class="fas fa-phone mr-2 text-gray-400"></i>
+                            <a href="tel:+18005551234" class="text-gray-400 hover:text-white transition">(757) 949-4621</a>
                         </li>
                         <li class="flex items-center">
-                            <i class="fab fa-instagram mr-2 text-gray-400"></i>
-                            <a href="#" class="text-gray-400 hover:text-white transition">Instagram</a>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fab fa-linkedin mr-2 text-gray-400"></i>
-                            <a href="#" class="text-gray-400 hover:text-white transition">LinkedIn</a>
+                            <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">New York, NY</span>
                         </li>
                     </ul>
                 </div>
             </div>
                         
             <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2023 EventBudget Pro. All rights reserved.</p>
+                <p>&copy; 2025 Event Budget Sample. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mobile menu toggle
-            const mobileMenuButton = document.getElementById('mobileMenuButton');
-            const mobileMenu = document.getElementById('mobileMenu');
-            
-            mobileMenuButton.addEventListener('click', function() {
-                mobileMenu.classList.toggle('open');
-                // Change icon based on menu state
-                const icon = mobileMenuButton.querySelector('i');
-                if (mobileMenu.classList.contains('open')) {
-                    icon.classList.remove('fa-bars');
-                    icon.classList.add('fa-times');
-                } else {
-                    icon.classList.remove('fa-times');
-                    icon.classList.add('fa-bars');
-                }
-            });
-
-            // Close menu when clicking on a link
-            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
-            mobileMenuLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    mobileMenu.classList.remove('open');
-                    mobileMenuButton.querySelector('i').classList.remove('fa-times');
-                    mobileMenuButton.querySelector('i').classList.add('fa-bars');
-                });
-            });
-        });
-    </script>
+   
 </body>
 </html>

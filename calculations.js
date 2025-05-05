@@ -231,5 +231,36 @@
                 resultsSection.classList.add('hidden');
                 placeholderSection.classList.remove('hidden');
             });
+
+
+
+            document.addEventListener('DOMContentLoaded', function() {
+                // Mobile menu toggle
+                const mobileMenuButton = document.getElementById('mobileMenuButton');
+                const mobileMenu = document.getElementById('mobileMenu');
+                
+                mobileMenuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('open');
+                    // Change icon based on menu state
+                    const icon = mobileMenuButton.querySelector('i');
+                    if (mobileMenu.classList.contains('open')) {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    } else {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+    
+                // Close menu when clicking on a link
+                const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+                mobileMenuLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        mobileMenu.classList.remove('open');
+                        mobileMenuButton.querySelector('i').classList.remove('fa-times');
+                        mobileMenuButton.querySelector('i').classList.add('fa-bars');
+                    });
+                });
+            });
         });
     
