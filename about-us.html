@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us | Event Budget Pro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .gradient-bg {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+        }
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        .mobile-menu {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        .mobile-menu.open {
+            max-height: 500px;
+        }
+        .team-card:hover .team-social {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .team-social {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s ease;
+        }
+        .timeline-item:not(:last-child):after {
+            content: '';
+            position: absolute;
+            left: 24px;
+            top: 32px;
+            height: calc(100% - 32px);
+            width: 2px;
+            background: #e5e7eb;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans">
+    <!-- Header -->
+    <header class="gradient-bg text-white">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-money-bill-wave text-3xl"></i>
+                    <h1 class="text-2xl font-bold">Event Budget Pro</h1>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="index.html" class="hover:text-indigo-200 transition">Home</a>
+                    <a href="calculator.html" class="hover:text-indigo-200 transition">Calculator</a>
+                    <a href="blog.html" class="hover:text-indigo-200 transition">Blog</a>
+                    <a href="resources.html" class="hover:text-indigo-200 transition">Resources</a>
+                    <a href="about.html" class="font-medium text-indigo-200 transition">About</a>
+                    <a href="contact.html" class="hover:text-indigo-200 transition">Contact</a>
+                </nav>
+                <button id="mobileMenuButton" class="md:hidden text-xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="mobile-menu md:hidden bg-indigo-700 rounded-lg mt-4">
+                <div class="flex flex-col space-y-3 p-4">
+                    <a href="index.html" class="hover:text-indigo-200 transition">Home</a>
+                    <a href="calculator.html" class="hover:text-indigo-200 transition">Calculator</a>
+                    <a href="blog.html" class="hover:text-indigo-200 transition">Blog</a>
+                    <a href="resources.html" class="hover:text-indigo-200 transition">Resources</a>
+                    <a href="about.html" class="font-medium text-indigo-200 transition">About</a>
+                    <a href="contact.html" class="hover:text-indigo-200 transition">Contact</a>
+                </div>
+            </div>
+
+            <div class="mt-16 mb-20 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Our Story</h2>
+                <p class="text-xl md:text-2xl max-w-3xl mx-auto">We have been helping event professionals plan with confidence</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- About Content -->
+    <section class="py-16 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-16">
+                    <h3 class="text-3xl font-bold text-gray-800 mb-4">Who We Are</h3>
+                    <p class="text-gray-600 text-lg">Event Budget Sample was founded by Kevin Pommells who was frustrated by the lack of accurate budgeting tools that were available on the market. I have set out to create a solution that will help professionals plan better events with financial accuracy.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-12 mb-16">
+                    <div>
+                        <div class="bg-indigo-50 p-6 rounded-xl mb-6">
+                            <i class="fas fa-bullseye text-4xl text-indigo-600 mb-4"></i>
+                            <h4 class="text-xl font-bold text-gray-800 mb-3">Our Mission</h4>
+                            <p class="text-gray-600">The mission I set is to help event professionals with accurate budgeting tools. My aim is to provide insights that remove the guesswork from financial planning which in turn allows professionals to focus on creating accurate and memorable experiences.</p>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="bg-indigo-50 p-6 rounded-xl mb-6">
+                            <i class="fas fa-eye text-4xl text-indigo-600 mb-4"></i>
+                            <h4 class="text-xl font-bold text-gray-800 mb-3">Our Vision</h4>
+                            <p class="text-gray-600"> Within the next couple of years, I would like for Event Budgeting Sample to become the worldwide standard for event budgeting. I want this tool to help transform how the budgeting industry approach financial planning through data-driven insights and innovative technology.</p>
+                        </div>
+                    </div>
+                </div>
+
+               
+
+              
+            </div>
+        </div>
+
+        
+    
+    </section>
+    
+
+   
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- CTA Section -->
+    <section class="py-16 gradient-bg text-white">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6">Ready to Transform Your Event Planning?</h2>
+            <p class="text-xl max-w-2xl mx-auto mb-8">Join thousands of event professionals who trust our tools for accurate budgeting and financial planning.</p>
+            <a href="calculator.html" class="inline-block bg-white text-indigo-600 py-3 px-8 rounded-lg font-medium hover:bg-gray-100 transition text-lg">
+                Try Our Calculator
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- Column 1 -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-money-bill-wave mr-2"></i>
+                        EventBudget Pro
+                    </h3>
+                    <p class="text-gray-400">The professional's choice for accurate event budgeting since 2015.</p>
+                </div>
+
+                <!-- Column 2 -->
+                <div>
+                    <h4 class="font-bold mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="how-to-make-a-budget-for-an-event.html" class="text-gray-400 hover:text-white transition">How to make a budget for an event</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Vendor Negotiation Guide</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Event Planning Checklist</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Cost-Saving Strategies</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 3 -->
+                <div>
+                    <h4 class="font-bold mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="about.html" class="text-indigo-300 hover:text-white transition">About Us</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Testimonials</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Careers</a></li>
+                        <li><a href="#" class="text-gray-400 hover:text-white transition">Press</a></li>
+                    </ul>
+                </div>
+
+                <!-- Column 4 -->
+                <div>
+                    <h4 class="font-bold mb-4">Contact</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2 text-gray-400"></i>
+                            <a href="mailto:hello@eventbudgetpro.com" class="text-gray-400 hover:text-white transition">eventbudgetsample@gmail.com</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2 text-gray-400"></i>
+                            <a href="tel:+18005551234" class="text-gray-400 hover:text-white transition">(757) 949-4621</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">New York, NY</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Event Budget Sample. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuButton').addEventListener('click', function() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('open');
+        });
+    </script>
+</body>
+</html>
