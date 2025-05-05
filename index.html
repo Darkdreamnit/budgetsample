@@ -6,7 +6,10 @@
     <title>Event Budget Pro | Professional Event Cost Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    
 </head>
 <body class="bg-gray-50 font-sans">
     <!-- Header -->
@@ -39,7 +42,7 @@
                     <a href="contact.html" class="hover:text-indigo-200 transition">Contact</a>
                 </div>
             </div>
-            
+
             <div class="mt-16 mb-20 text-center">
                 <h2 class="text-4xl md:text-5xl font-bold mb-4">Professional Event Budget Calculator</h2>
                 <p class="text-xl md:text-2xl max-w-3xl mx-auto">Use our calculator to plan with precision using our industry-standard budgeting tool</p>
@@ -54,7 +57,7 @@
                 <!-- Calculator Form -->
                 <div class="md:w-1/2 p-8">
                     <h3 class="text-2xl font-bold text-gray-800 mb-6">Event Details</h3>
-                                        
+
                     <div class="space-y-6">
                         <!-- Event Type -->
                         <div>
@@ -75,7 +78,7 @@
                                 <option value="trade">Trade Show</option>
                             </select>
                         </div>
-                                                
+
                         <!-- Guest Count -->
                         <div>
                             <label class="block text-gray-700 font-medium mb-2 flex items-center">
@@ -87,7 +90,7 @@
                             </label>
                             <input id="guestCount" type="number" min="1" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="e.g. 150">
                         </div>
-                                                
+
                         <!-- Event Duration -->
                         <div>
                             <label class="block text-gray-700 font-medium mb-2 flex items-center">
@@ -99,7 +102,7 @@
                             </label>
                             <input id="duration" type="number" min="1" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="e.g. 5">
                         </div>
-                                                
+
                         <!-- Date Picker -->
                         <div>
                             <label class="block text-gray-700 font-medium mb-2 flex items-center">
@@ -111,7 +114,7 @@
                             </label>
                             <input id="eventDate" type="date" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
                         </div>
-                                                
+
                         <!-- Location -->
                         <div>
                             <label class="block text-gray-700 font-medium mb-2 flex items-center">
@@ -130,7 +133,7 @@
                                 <option value="unique">Unique Venue</option>
                             </select>
                         </div>
-                                                
+
                         <!-- Budget Slider -->
                         <div>
                             <label class="block text-gray-700 font-medium mb-2 flex items-center">
@@ -146,7 +149,7 @@
                                 <span id="budgetValue" class="text-gray-700 font-medium">$25K</span>
                             </div>
                         </div>
-                                                
+
                         <!-- Calculate Button -->
                         <button id="calculateBtn" class="w-full gradient-bg text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition flex items-center justify-center space-x-2">
                             <i class="fas fa-calculator"></i>
@@ -154,7 +157,7 @@
                         </button>
                     </div>
                 </div>
-                                
+
                 <!-- Results Section -->
                 <div id="resultsSection" class="md:w-1/2 bg-gray-50 p-8 hidden">
                     <div class="flex justify-between items-center mb-6">
@@ -163,14 +166,27 @@
                             <i class="fas fa-redo mr-1"></i> Reset
                         </button>
                     </div>
-                                        
+
+                    <!-- Download Buttons -->
+                    <div class="flex flex-wrap gap-3 mb-6">
+                        <button id="downloadPngBtn" class="download-btn bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-50 transition flex items-center">
+                            <i class="fas fa-image mr-2 text-indigo-600"></i> PNG
+                        </button>
+                        <button id="downloadPdfBtn" class="download-btn bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-50 transition flex items-center">
+                            <i class="fas fa-file-pdf mr-2 text-red-600"></i> PDF
+                        </button>
+                        <button id="downloadExcelBtn" class="download-btn bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-50 transition flex items-center">
+                            <i class="fas fa-file-excel mr-2 text-green-600"></i> Excel
+                        </button>
+                    </div>
+
                     <!-- Budget Summary -->
                     <div class="bg-white rounded-lg shadow p-6 mb-6">
                         <div class="flex justify-between items-center mb-4">
                             <h4 class="font-bold text-lg">Total Estimated Cost</h4>
                             <span id="totalCost" class="text-3xl font-bold text-indigo-600">$0</span>
                         </div>
-                                                
+
                         <div class="mb-4">
                             <div class="flex justify-between text-sm text-gray-600 mb-1">
                                 <span>Budget Utilization</span>
@@ -180,7 +196,7 @@
                                 <div id="progressBar" class="progress-bar bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
                             </div>
                         </div>
-                                                
+
                         <!-- Budget Breakdown with Explanations -->
                         <div class="space-y-4">
                             <!-- Venue -->
@@ -196,7 +212,7 @@
                                     <i class="fas fa-info-circle mr-1"></i> Venues typically account for 25-35% of total budget. Consider weekday discounts or off-season rates.
                                 </div>
                             </div>
-                                                    
+
                             <!-- Catering -->
                             <div class="p-3 bg-indigo-50 rounded-lg">
                                 <div class="flex justify-between items-center">
@@ -210,7 +226,7 @@
                                     <i class="fas fa-info-circle mr-1"></i> Catering averages $35-$150 per person. Buffets are 20-30% cheaper than plated meals.
                                 </div>
                             </div>
-                                                    
+
                             <!-- AV/Tech -->
                             <div class="p-3 bg-indigo-50 rounded-lg">
                                 <div class="flex justify-between items-center">
@@ -224,9 +240,9 @@
                                     <i class="fas fa-info-circle mr-1"></i> AV costs vary widely. Package deals with the venue can save 15-20%.
                                 </div>
                             </div>
-                                                    
+
                             <!-- Decor -->
-                            <div class="p-3 bg Indigo-50 rounded-lg">
+                            <div class="p-3 bg-indigo-50 rounded-lg">
                                 <div class="flex justify-between items-center">
                                     <div>
                                         <h5 class="font-medium">Decor & Floral</h5>
@@ -238,7 +254,7 @@
                                     <i class="fas fa-info-circle mr-1"></i> Seasonal flowers can reduce costs by 30%. Consider reusable decor elements.
                                 </div>
                             </div>
-                                                    
+
                             <!-- Staffing -->
                             <div class="p-3 bg-indigo-50 rounded-lg">
                                 <div class="flex justify-between items-center">
@@ -252,7 +268,7 @@
                                     <i class="fas fa-info-circle mr-1"></i> Typically 1 staff per 25 guests. Overtime rates apply after 8 hours.
                                 </div>
                             </div>
-                                                    
+
                             <!-- Marketing -->
                             <div class="p-3 bg-indigo-50 rounded-lg">
                                 <div class="flex justify-between items-center">
@@ -266,7 +282,7 @@
                                     <i class="fas fa-info-circle mr-1"></i> Digital invitations can save 80% vs. printed. Early RSVP discounts improve planning.
                                 </div>
                             </div>
-                                                    
+
                             <!-- Misc -->
                             <div class="p-3 bg-indigo-50 rounded-lg">
                                 <div class="flex justify-between items-center">
@@ -282,7 +298,7 @@
                             </div>
                         </div>
                     </div>
-                                        
+
                     <!-- Budget Optimization Tips -->
                     <div class="bg-white rounded-lg p-6 shadow mb-6">
                         <h4 class="font-bold text-lg mb-4 flex items-center">
@@ -298,7 +314,7 @@
                             </div>
                         </div>
                     </div>
-                                        
+
                     <!-- Budget Timeline -->
                     <div class="bg-white rounded-lg p-6 shadow">
                         <h4 class="font-bold text-lg mb-4 flex items-center">
@@ -336,7 +352,7 @@
                         </div>
                     </div>
                 </div>
-                                
+
                 <!-- Placeholder before calculation -->
                 <div id="placeholderSection" class="md:w-1/2 bg-gray-50 p-8 flex flex-col items-center justify-center">
                     <div class="text-center max-w-xs">
@@ -353,7 +369,7 @@
     <section class="bg-gray-100 py-16">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl font-bold text-center mb-12">Budget Comparison Tool</h2>
-                        
+
             <div class="bg-white rounded-xl shadow-lg p-6 max-w-4xl mx-auto">
                 <div class="grid md:grid-cols-2 gap-8">
                     <!-- Option 1 -->
@@ -384,7 +400,7 @@
                             </div>
                         </div>
                     </div>
-                                        
+
                     <!-- Option 2 -->
                     <div>
                         <h3 class="text-xl font-bold mb-4 text-center">Value Package</h3>
@@ -414,10 +430,10 @@
                         </div>
                     </div>
                 </div>
-                                
+
                 <div class="mt-8 text-center">
                     <p class="text-gray-600 mb-4">Compare different budget scenarios to find the right choice that fits your needs</p>
-                    <button class="gradient-bg text-white py-2 px-6 rounded-lg font-medium hover:opacity-90 transition">
+                    <button id="customComparisonBtn" class="gradient-bg text-white py-2 px-6 rounded-lg font-medium hover:opacity-90 transition">
                         Create Your Custom Comparison
                     </button>
                 </div>
@@ -425,11 +441,172 @@
         </div>
     </section>
 
+    <!-- Comparison Modal -->
+    <div id="comparisonModal" class="comparison-modal">
+        <div class="comparison-modal-content">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Custom Budget Comparison</h3>
+                <button id="closeComparisonModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-gray-700 font-medium mb-2">Comparison Name</label>
+                <input type="text" id="comparisonName" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. Summer vs Winter Wedding">
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Option 1 Name</label>
+                    <input type="text" id="option1Name" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. Premium Package">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-medium mb-2">Option 2 Name</label>
+                    <input type="text" id="option2Name" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. Budget Package">
+                </div>
+            </div>
+            
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <span class="font-medium">Venue Cost</span>
+                    <div class="flex items-center space-x-4">
+                        <input type="number" id="option1Venue" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
+                        <input type="number" id="option2Venue" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="font-medium">Catering Cost</span>
+                    <div class="flex items-center space-x-4">
+                        <input type="number" id="option1Catering" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
+                        <input type="number" id="option2Catering" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="font-medium">Entertainment</span>
+                    <div class="flex items-center space-x-4">
+                        <input type="number" id="option1Entertainment" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
+                        <input type="number" id="option2Entertainment" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="font-medium">Decor</span>
+                    <div class="flex items-center space-x-4">
+                        <input type="number" id="option1Decor" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
+                        <input type="number" id="option2Decor" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
+                    </div>
+                </div>
+                <div class="flex items-center justify-between">
+                    <span class="font-medium">Staffing</span>
+                    <div class="flex items-center space-x-4">
+                        <input type="number" id="option1Staffing" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
+                        <input type="number" id="option2Staffing" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 flex justify-center">
+                <button id="generateComparisonBtn" class="gradient-bg text-white py-2 px-6 rounded-lg font-medium hover:opacity-90 transition">
+                    Generate Comparison
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Comparison Results -->
+    <div id="comparisonResults" class="hidden container mx-auto px-4 py-8">
+        <div class="bg-white rounded-xl shadow-lg p-6 max-w-4xl mx-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 id="comparisonResultsTitle" class="text-2xl font-bold">Comparison Results</h3>
+                <button id="downloadComparisonPdf" class="bg-indigo-600 text-white py-1 px-3 rounded text-sm hover:bg-indigo-700 transition">
+                    <i class="fas fa-file-pdf mr-1"></i> Export as PDF
+                </button>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <div>
+                    <h4 id="option1ResultsTitle" class="text-xl font-bold mb-4 text-center">Option 1</h4>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span>Venue</span>
+                            <span id="option1VenueResult" class="font-medium">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span>Catering</span>
+                            <span id="option1CateringResult" class="font-medium">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span>Entertainment</span>
+                            <span id="option1EntertainmentResult" class="font-medium">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span>Decor</span>
+                            <span id="option1DecorResult" class="font-medium">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span>Staffing</span>
+                            <span id="option1StaffingResult" class="font-medium">$0</span>
+                        </div>
+                        <div class="border-t border-gray-200 pt-3 mt-2">
+                            <div class="flex justify-between font-bold">
+                                <span>Total</span>
+                                <span id="option1TotalResult">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 id="option2ResultsTitle" class="text-xl font-bold mb-4 text-center">Option 2</h4>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span>Venue</span>
+                            <span id="option2VenueResult" class="font-medium">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span>Catering</span>
+                            <span id="option2CateringResult" class="font-medium">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span>Entertainment</span>
+                            <span id="option2EntertainmentResult" class="font-medium">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span>Decor</span>
+                            <span id="option2DecorResult" class="font-medium">$0</span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                            <span>Staffing</span>
+                            <span id="option2StaffingResult" class="font-medium">$0</span>
+                        </div>
+                        <div class="border-t border-gray-200 pt-3 mt-2">
+                            <div class="flex justify-between font-bold">
+                                <span>Total</span>
+                                <span id="option2TotalResult">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-8 bg-indigo-50 p-4 rounded-lg">
+                <h4 class="font-bold text-lg mb-2">Savings Analysis</h4>
+                <p id="savingsAnalysis" class="text-sm">Option 2 saves you <span id="savingsAmount" class="font-bold">$0</span> compared to Option 1, which is a <span id="savingsPercentage" class="font-bold">0%</span> reduction in costs.</p>
+            </div>
+            
+            <div class="mt-6 text-center">
+                <button id="newComparisonBtn" class="gradient-bg text-white py-2 px-6 rounded-lg font-medium hover:opacity-90 transition">
+                    Create New Comparison
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Vendor Directory -->
     <section class="py-16 bg-white">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl font-bold text-center mb-12">Recommended Vendors</h2>
-                        
+
             <div class="grid md:grid-cols-3 gap-8">
                 <!-- Venue -->
                 <div class="border border-gray-200 rounded-lg overflow-hidden card-hover transition">
@@ -444,7 +621,7 @@
                         </button>
                     </div>
                 </div>
-                                
+
                 <!-- Catering -->
                 <div class="border border-gray-200 rounded-lg overflow-hidden card-hover transition">
                     <div class="h-48 bg-indigo-100 flex items-center justify-center">
@@ -458,7 +635,7 @@
                         </button>
                     </div>
                 </div>
-                                
+
                 <!-- AV -->
                 <div class="border border-gray-200 rounded-lg overflow-hidden card-hover transition">
                     <div class="h-48 bg-indigo-100 flex items-center justify-center">
@@ -499,7 +676,7 @@
                     </h3>
                     <p class="text-gray-400">The professional's choice for accurate event budgeting since 2015.</p>
                 </div>
-                                
+
                 <!-- Column 2 -->
                 <div>
                     <h4 class="font-bold mb-4">Resources</h4>
@@ -510,7 +687,7 @@
                         <li><a href="#" class="text-gray-400 hover:text-white transition">Cost-Saving Strategies</a></li>
                     </ul>
                 </div>
-                                
+
                 <!-- Column 3 -->
                 <div>
                     <h4 class="font-bold mb-4">Company</h4>
@@ -521,7 +698,7 @@
                         <li><a href="#" class="text-gray-400 hover:text-white transition">Press</a></li>
                     </ul>
                 </div>
-                                
+
                 <!-- Column 4 -->
                 <div>
                     <h4 class="font-bold mb-4">Contact</h4>
@@ -541,15 +718,13 @@
                     </ul>
                 </div>
             </div>
-                        
+
             <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
                 <p>&copy; 2025 Event Budget Sample. All rights reserved.</p>
             </div>
         </div>
     </footer>
-
-    <script src="calculations.js"></script>
-
-    
+<script src="index.js"></script>
+   
 </body>
 </html>
