@@ -28,9 +28,6 @@
         .gradient-bg-warning {
             background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
         }
-        .gradient-bg-info {
-            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-        }
         .input-highlight:focus {
             border-color: #6b73ff;
             box-shadow: 0 0 0 3px rgba(107, 115, 255, 0.2);
@@ -76,12 +73,6 @@
         }
         .glow:hover {
             box-shadow: 0 0 20px rgba(107, 115, 255, 0.8);
-        }
-        #fileInput {
-            display: none;
-        }
-        .file-upload-btn:hover {
-            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -230,10 +221,6 @@
                                 <i class="fas fa-file-pdf"></i>
                                 <span>PDF</span>
                             </button>
-                            <button onclick="importFromExcel()" class="px-4 py-2 gradient-bg-info text-white rounded-xl hover:opacity-90 transition flex items-center space-x-2 file-upload-btn">
-                                <i class="fas fa-file-import"></i>
-                                <span>Import Excel</span>
-                            </button>
                             <button onclick="confirmClearData()" class="px-4 py-2 gradient-bg-secondary text-white rounded-xl hover:opacity-90 transition flex items-center space-x-2">
                                 <i class="fas fa-trash-alt"></i>
                                 <span>Clear Data</span>
@@ -363,58 +350,11 @@
         </div>
     </div>
 
-    <!-- Import Modal -->
-    <div id="importModal" class="fixed inset-0 modal-overlay flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md mx-4 p-6 transform transition-all duration-300 scale-95">
-            <div class="text-center">
-                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 mb-4">
-                    <i class="fas fa-file-excel text-blue-600 text-xl"></i>
-                </div>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">Import Guests from Excel</h3>
-                <p class="text-gray-500 mb-4">Select an Excel file to import guest data. The file should match the export format.</p>
-                
-                <div class="mt-6">
-                    <input type="file" id="fileInput" accept=".xlsx, .xls" />
-                    <label for="fileInput" class="cursor-pointer gradient-bg-info text-white py-3 px-6 rounded-xl font-medium hover:opacity-90 transition inline-flex items-center space-x-2">
-                        <i class="fas fa-file-upload"></i>
-                        <span>Choose Excel File</span>
-                    </label>
-                </div>
-                
-                <div id="importPreview" class="mt-6 max-h-60 overflow-y-auto hidden">
-                    <h4 class="font-medium text-gray-700 mb-2">Preview (first 5 rows)</h4>
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-3 py-2 text-left font-medium text-gray-500">Name</th>
-                                <th class="px-3 py-2 text-left font-medium text-gray-500">Status</th>
-                                <th class="px-3 py-2 text-left font-medium text-gray-500">Category</th>
-                            </tr>
-                        </thead>
-                        <tbody id="previewTable" class="bg-white divide-y divide-gray-200">
-                            <!-- Preview rows will be added here -->
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div class="flex justify-center space-x-4 mt-6">
-                    <button type="button" onclick="closeImportModal()" class="px-6 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-100 transition">
-                        Cancel
-                    </button>
-                    <button type="button" id="confirmImportBtn" onclick="processImport()" class="px-6 py-2 gradient-bg-success text-white rounded-xl hover:opacity-90 transition hidden">
-                        <i class="fas fa-check mr-2"></i> Confirm Import
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script>
         // Initialize guest list and categories
         let guests = [];
         let categories = ['general', 'vip', 'speaker', 'sponsor', 'staff'];
         let rsvpChart, categoryChart;
-        let importData = []; // Store imported data temporarily
 
         // DOM elements
         const guestForm = document.getElementById('guestForm');
@@ -425,13 +365,8 @@
         const filterCategory = document.getElementById('filterCategory');
         const editModal = document.getElementById('editModal');
         const confirmModal = document.getElementById('confirmModal');
-        const importModal = document.getElementById('importModal');
         const customCategoryInput = document.getElementById('customCategory');
         const guestCategorySelect = document.getElementById('guestCategory');
-        const fileInput = document.getElementById('fileInput');
-        const importPreview = document.getElementById('importPreview');
-        const previewTable = document.getElementById('previewTable');
-        const confirmImportBtn = document.getElementById('confirmImportBtn');
 
         // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
@@ -488,9 +423,6 @@
             searchInput.addEventListener('input', renderGuestList);
             filterStatus.addEventListener('change', renderGuestList);
             filterCategory.addEventListener('change', renderGuestList);
-            
-            // File input change listener
-            fileInput.addEventListener('change', handleFileSelect);
         }
 
         function addGuest() {
@@ -893,319 +825,189 @@
                                 }
                             }
                         }
-                },
-                plugins: {
-                    legend: {
-                        display: false
                     },
-                    tooltip: {
-                        bodyFont: {
-                            family: 'Poppins'
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            bodyFont: {
+                                family: 'Poppins'
+                            }
                         }
                     }
                 }
-            }
-        });
-        
-        updateCharts();
-    }
-
-    function updateCharts() {
-        // Update RSVP chart
-        const pending = guests.filter(g => g.status === 'pending').length;
-        const confirmed = guests.filter(g => g.status === 'confirmed').length;
-        const declined = guests.filter(g => g.status === 'declined').length;
-        
-        rsvpChart.data.datasets[0].data = [pending, confirmed, declined];
-        rsvpChart.update();
-        
-        // Update category chart
-        const categoryCounts = {};
-        categories.forEach(cat => {
-            categoryCounts[cat] = guests.filter(g => g.category === cat).length;
-        });
-        
-        categoryChart.data.labels = categories.map(c => capitalizeFirstLetter(c));
-        categoryChart.data.datasets[0].data = categories.map(c => categoryCounts[c]);
-        categoryChart.update();
-    }
-
-    function updateStats() {
-        document.getElementById('totalGuests').textContent = guests.length;
-        document.getElementById('confirmedGuests').textContent = guests.filter(g => g.status === 'confirmed').length;
-        document.getElementById('declinedGuests').textContent = guests.filter(g => g.status === 'declined').length;
-    }
-
-    function exportToExcel() {
-        if (guests.length === 0) {
-            alert('No guests to export!');
-            return;
+            });
+            
+            updateCharts();
         }
-        
-        // Prepare data for export
-        const data = [
-            ['Name', 'Email', 'Phone', 'Status', 'Category', 'Meal Preference', 'Notes', 'Date Added']
-        ];
-        
-        guests.forEach(guest => {
-            data.push([
-                guest.name,
-                guest.email || '',
-                guest.phone || '',
-                capitalizeFirstLetter(guest.status),
-                capitalizeFirstLetter(guest.category),
-                guest.meal === 'none' ? 'N/A' : capitalizeFirstLetter(guest.meal),
-                guest.notes || '',
-                formatDate(guest.createdAt)
-            ]);
-        });
-        
-        // Create workbook
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet(data);
-        XLSX.utils.book_append_sheet(wb, ws, 'Guest List');
-        
-        // Export to file
-        XLSX.writeFile(wb, 'guest_list.xlsx');
-        
-        // Show success toast
-        showToast('Exported to Excel successfully!', 'success');
-    }
 
-    function exportToPDF() {
-        if (guests.length === 0) {
-            alert('No guests to export!');
-            return;
+        function updateCharts() {
+            // Update RSVP chart
+            const pending = guests.filter(g => g.status === 'pending').length;
+            const confirmed = guests.filter(g => g.status === 'confirmed').length;
+            const declined = guests.filter(g => g.status === 'declined').length;
+            
+            rsvpChart.data.datasets[0].data = [pending, confirmed, declined];
+            rsvpChart.update();
+            
+            // Update category chart
+            const categoryCounts = {};
+            categories.forEach(cat => {
+                categoryCounts[cat] = guests.filter(g => g.category === cat).length;
+            });
+            
+            categoryChart.data.labels = categories.map(c => capitalizeFirstLetter(c));
+            categoryChart.data.datasets[0].data = categories.map(c => categoryCounts[c]);
+            categoryChart.update();
         }
-        
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        
-        // Add title
-        doc.setFontSize(18);
-        doc.setFont('helvetica', 'bold');
-        doc.text('Guest List', 105, 15, { align: 'center' });
-        
-        // Add date
-        doc.setFontSize(10);
-        doc.setFont('helvetica', 'normal');
-        doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 22, { align: 'center' });
-        
-        // Prepare data for table
-        const headers = ['Name', 'Email', 'Phone', 'Status', 'Category', 'Meal', 'Date Added'];
-        const rows = guests.map(guest => [
-            guest.name,
-            guest.email || 'N/A',
-            guest.phone || 'N/A',
-            capitalizeFirstLetter(guest.status),
-            capitalizeFirstLetter(guest.category),
-            guest.meal === 'none' ? 'N/A' : capitalizeFirstLetter(guest.meal),
-            formatDate(guest.createdAt)
-        ]);
-        
-        // Add table
-        doc.autoTable({
-            head: [headers],
-            body: rows,
-            startY: 30,
-            styles: {
-                fontSize: 9,
-                cellPadding: 2,
-                font: 'helvetica'
-            },
-            headStyles: {
-                fillColor: [107, 115, 255],
-                textColor: 255,
-                fontStyle: 'bold'
-            },
-            alternateRowStyles: {
-                fillColor: [240, 240, 240]
-            }
-        });
-        
-        // Save the PDF
-        doc.save('guest_list.pdf');
-        
-        // Show success toast
-        showToast('Exported to PDF successfully!', 'success');
-    }
 
-    function importFromExcel() {
-        // Show import modal
-        importModal.classList.remove('hidden');
-        setTimeout(() => {
-            document.querySelector('#importModal > div').classList.remove('scale-95');
-            document.querySelector('#importModal > div').classList.add('scale-100');
-        }, 10);
-    }
+        function updateStats() {
+            document.getElementById('totalGuests').textContent = guests.length;
+            document.getElementById('confirmedGuests').textContent = guests.filter(g => g.status === 'confirmed').length;
+            document.getElementById('declinedGuests').textContent = guests.filter(g => g.status === 'declined').length;
+        }
 
-    function closeImportModal() {
-        document.querySelector('#importModal > div').classList.remove('scale-100');
-        document.querySelector('#importModal > div').classList.add('scale-95');
-        setTimeout(() => {
-            importModal.classList.add('hidden');
-            // Reset import state
-            importData = [];
-            importPreview.classList.add('hidden');
-            confirmImportBtn.classList.add('hidden');
-            fileInput.value = '';
-        }, 200);
-    }
-
-    function handleFileSelect(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, { type: 'array' });
-            
-            // Get first worksheet
-            const worksheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[worksheetName];
-            
-            // Convert to JSON
-            const jsonData = XLSX.utils.sheet_to_json(worksheet);
-            
-            if (jsonData.length === 0) {
-                alert('The Excel file is empty!');
+        function exportToExcel() {
+            if (guests.length === 0) {
+                alert('No guests to export!');
                 return;
             }
             
-            // Store the imported data temporarily
-            importData = jsonData;
+            // Prepare data for export
+            const data = [
+                ['Name', 'Email', 'Phone', 'Status', 'Category', 'Meal Preference', 'Notes', 'Date Added']
+            ];
             
-            // Show preview
-            showImportPreview();
-        };
-        reader.readAsArrayBuffer(file);
-    }
-
-    function showImportPreview() {
-        // Clear previous preview
-        previewTable.innerHTML = '';
-        
-        // Show first 5 rows for preview
-        const previewRows = importData.slice(0, 5);
-        
-        previewRows.forEach(row => {
-            const tr = document.createElement('tr');
-            tr.className = 'hover:bg-gray-50';
-            tr.innerHTML = `
-                <td class="px-3 py-2 whitespace-nowrap">${row.Name || 'N/A'}</td>
-                <td class="px-3 py-2 whitespace-nowrap">${row.Status ? capitalizeFirstLetter(row.Status) : 'Pending'}</td>
-                <td class="px-3 py-2 whitespace-nowrap">${row.Category ? capitalizeFirstLetter(row.Category) : 'General'}</td>
-            `;
-            previewTable.appendChild(tr);
-        });
-        
-        // Show the preview section
-        importPreview.classList.remove('hidden');
-        confirmImportBtn.classList.remove('hidden');
-    }
-
-    function processImport() {
-        if (importData.length === 0) return;
-        
-        // Process each imported row
-        importData.forEach(row => {
-            // Skip if name is missing
-            if (!row.Name) return;
+            guests.forEach(guest => {
+                data.push([
+                    guest.name,
+                    guest.email || '',
+                    guest.phone || '',
+                    capitalizeFirstLetter(guest.status),
+                    capitalizeFirstLetter(guest.category),
+                    guest.meal === 'none' ? 'N/A' : capitalizeFirstLetter(guest.meal),
+                    guest.notes || '',
+                    formatDate(guest.createdAt)
+                ]);
+            });
             
-            // Check if this guest already exists (by name)
-            const existingIndex = guests.findIndex(g => g.name.toLowerCase() === row.Name.toLowerCase());
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            XLSX.utils.book_append_sheet(wb, ws, 'Guest List');
             
-            const guestData = {
-                id: Date.now().toString(),
-                name: row.Name,
-                email: row.Email || '',
-                phone: row.Phone || '',
-                status: (row.Status || 'pending').toLowerCase(),
-                category: (row.Category || 'general').toLowerCase(),
-                meal: (row['Meal Preference'] || 'none').toLowerCase(),
-                notes: row.Notes || '',
-                createdAt: new Date().toISOString()
-            };
+            // Export to file
+            XLSX.writeFile(wb, 'guest_list.xlsx');
             
-            if (existingIndex >= 0) {
-                // Update existing guest
-                guests[existingIndex] = guestData;
-            } else {
-                // Add new guest
-                guests.push(guestData);
-            }
-            
-            // Add new categories if they don't exist
-            if (row.Category && !categories.includes(row.Category.toLowerCase())) {
-                categories.push(row.Category.toLowerCase());
-            }
-        });
-        
-        // Save the data
-        saveData();
-        
-        // Update UI
-        updateCategorySelects();
-        updateCategoryFilters();
-        renderGuestList();
-        updateCharts();
-        updateStats();
-        
-        // Close the modal
-        closeImportModal();
-        
-        // Show success message
-        showToast(`Successfully imported ${importData.length} guests!`, 'success');
-    }
-
-    function showToast(message, type) {
-        const toast = document.createElement('div');
-        let bgColor = 'bg-blue-500';
-        
-        switch(type) {
-            case 'success': bgColor = 'bg-green-500'; break;
-            case 'warning': bgColor = 'bg-yellow-500'; break;
-            case 'error': bgColor = 'bg-red-500'; break;
+            // Show success toast
+            showToast('Exported to Excel successfully!', 'success');
         }
-        
-        toast.className = `fixed bottom-4 right-4 ${bgColor} text-white px-6 py-3 rounded-xl shadow-lg flex items-center space-x-2 transform transition-all duration-300 translate-y-4 opacity-0`;
-        toast.innerHTML = `
-            <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-times-circle'}"></i>
-            <span>${message}</span>
-        `;
-        
-        document.body.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.classList.remove('translate-y-4');
-            toast.classList.remove('opacity-0');
-            toast.classList.add('translate-y-0');
-            toast.classList.add('opacity-100');
-        }, 10);
-        
-        setTimeout(() => {
-            toast.classList.remove('translate-y-0');
-            toast.classList.remove('opacity-100');
-            toast.classList.add('translate-y-4');
-            toast.classList.add('opacity-0');
+
+        function exportToPDF() {
+            if (guests.length === 0) {
+                alert('No guests to export!');
+                return;
+            }
+            
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(18);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Guest List', 105, 15, { align: 'center' });
+            
+            // Add date
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 22, { align: 'center' });
+            
+            // Prepare data for table
+            const headers = ['Name', 'Email', 'Phone', 'Status', 'Category', 'Meal', 'Date Added'];
+            const rows = guests.map(guest => [
+                guest.name,
+                guest.email || 'N/A',
+                guest.phone || 'N/A',
+                capitalizeFirstLetter(guest.status),
+                capitalizeFirstLetter(guest.category),
+                guest.meal === 'none' ? 'N/A' : capitalizeFirstLetter(guest.meal),
+                formatDate(guest.createdAt)
+            ]);
+            
+            // Add table
+            doc.autoTable({
+                head: [headers],
+                body: rows,
+                startY: 30,
+                styles: {
+                    fontSize: 9,
+                    cellPadding: 2,
+                    font: 'helvetica'
+                },
+                headStyles: {
+                    fillColor: [107, 115, 255],
+                    textColor: 255,
+                    fontStyle: 'bold'
+                },
+                alternateRowStyles: {
+                    fillColor: [240, 240, 240]
+                }
+            });
+            
+            // Save the PDF
+            doc.save('guest_list.pdf');
+            
+            // Show success toast
+            showToast('Exported to PDF successfully!', 'success');
+        }
+
+        function showToast(message, type) {
+            const toast = document.createElement('div');
+            let bgColor = 'bg-blue-500';
+            
+            switch(type) {
+                case 'success': bgColor = 'bg-green-500'; break;
+                case 'warning': bgColor = 'bg-yellow-500'; break;
+                case 'error': bgColor = 'bg-red-500'; break;
+            }
+            
+            toast.className = `fixed bottom-4 right-4 ${bgColor} text-white px-6 py-3 rounded-xl shadow-lg flex items-center space-x-2 transform transition-all duration-300 translate-y-4 opacity-0`;
+            toast.innerHTML = `
+                <i class="fas ${type === 'success' ? 'fa-check-circle' : type === 'warning' ? 'fa-exclamation-triangle' : 'fa-times-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(toast);
             
             setTimeout(() => {
-                document.body.removeChild(toast);
-            }, 300);
-        }, 3000);
-    }
+                toast.classList.remove('translate-y-4');
+                toast.classList.remove('opacity-0');
+                toast.classList.add('translate-y-0');
+                toast.classList.add('opacity-100');
+            }, 10);
+            
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0');
+                toast.classList.remove('opacity-100');
+                toast.classList.add('translate-y-4');
+                toast.classList.add('opacity-0');
+                
+                setTimeout(() => {
+                    document.body.removeChild(toast);
+                }, 300);
+            }, 3000);
+        }
 
-    // Helper functions
-    function capitalizeFirstLetter(string) {
-        if (!string) return '';
-        return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
-    }
+        // Helper functions
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
 
-    function formatDate(dateString) {
-        const options = { year: 'numeric', month: 'short', day: 'numeric' };
-        return new Date(dateString).toLocaleDateString(undefined, options);
-    }
-</script>
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+    </script>
 </body>
 </html>
