@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Budget Tracker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        .notification {
+            animation: slideIn 0.5s forwards, fadeOut 0.5s 3s forwards;
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; }
+        }
+        .chart-container {
+            height: 300px;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-10 text-center">
+            <h1 class="text-4xl font-bold text-indigo-700 mb-2">Event Budget Tracker</h1>
+            <p class="text-gray-600">Plan, track, and manage your event expenses with ease</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Budget Summary Card -->
+            <div class="bg-white rounded-xl shadow-md p-6 lg:col-span-1 order-1">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800">Budget Summary</h2>
+                    <button id="newBudgetBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+                        <i class="fas fa-plus mr-2"></i>New Budget
+                    </button>
+                </div>
+
+                <div class="space-y-6">
+                    <div class="bg-indigo-50 p-4 rounded-lg">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600">Total Budget</span>
+                            <span id="totalBudget" class="font-bold">$0.00</span>
+                        </div>
+                        <div class="flex justify-between mb-2">
+                            <span class="text-gray-600">Total Spent</span>
+                            <span id="totalSpent" class="font-bold text-red-500">$0.00</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Remaining</span>
+                            <span id="remainingBudget" class="font-bold text-green-500">$0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 p-4 rounded-lg">
+                        <h3 class="font-medium text-gray-700 mb-3">Budget Progress</h3>
+                        <div class="w-full bg-gray-200 rounded-full h-4 mb-2">
+                            <div id="budgetProgress" class="progress-bar h-4 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between text-sm text-gray-600">
+                            <span>0%</span>
+                            <span id="progressPercentage">0%</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 p-4 rounded-lg">
+                        <h3 class="font-medium text-gray-700 mb-3">Quick Actions</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button id="exportPdfBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-3 rounded-lg text-sm transition flex items-center justify-center">
+                                <i class="fas fa-file-pdf mr-2 text-red-500"></i>Export PDF
+                            </button>
+                            <button id="addExpenseBtn" class="bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-3 rounded-lg text-sm transition flex items-center justify-center">
+                                <i class="fas fa-receipt mr-2 text-indigo-500"></i>Add Expense
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expense Categories and Chart -->
+            <div class="bg-white rounded-xl shadow-md p-6 lg:col-span-2 order-2">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800">Expense Categories</h2>
+                    <div class="relative">
+                        <select id="timeFilter" class="appearance-none bg-gray-100 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="all">All Time</option>
+                            <option value="month">This Month</option>
+                            <option value="week">This Week</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container mb-8">
+                    <canvas id="expenseChart"></canvas>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Budget</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Spent</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Remaining</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+                            </tr>
+                        </thead>
+                        <tbody id="categoryTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Categories will be added here dynamically -->
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No categories added yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Recent Transactions -->
+            <div class="bg-white rounded-xl shadow-md p-6 lg:col-span-3 order-3">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-xl font-semibold text-gray-800">Recent Transactions</h2>
+                    <button id="viewAllBtn" class="text-indigo-600 hover:text-indigo-800 transition">View All</button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+                                <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactionsTableBody" class="bg-white divide-y divide-gray-200">
+                            <!-- Transactions will be added here dynamically -->
+                            <tr>
+                                <td colspan="5" class="px-6 py-4 text-center text-gray-500">No transactions recorded yet</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Budget Modal -->
+    <div id="newBudgetModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">Create New Budget</h3>
+                <button id="closeBudgetModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="budgetForm" class="space-y-4">
+                <div>
+                    <label for="budgetName" class="block text-sm font-medium text-gray-700 mb-1">Budget Name</label>
+                    <input type="text" id="budgetName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Wedding, Conference">
+                </div>
+                <div>
+                    <label for="totalBudgetAmount" class="block text-sm font-medium text-gray-700 mb-1">Total Amount ($)</label>
+                    <input type="number" id="totalBudgetAmount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="0.00" min="0" step="0.01">
+                </div>
+                <div>
+                    <label for="eventDate" class="block text-sm font-medium text-gray-700 mb-1">Event Date</label>
+                    <input type="date" id="eventDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                        Create Budget
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div id="addCategoryModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">Add Expense Category</h3>
+                <button id="closeCategoryModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="categoryForm" class="space-y-4">
+                <div>
+                    <label for="categoryName" class="block text-sm font-medium text-gray-700 mb-1">Category Name</label>
+                    <input type="text" id="categoryName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Venue, Food">
+                </div>
+                <div>
+                    <label for="categoryBudget" class="block text-sm font-medium text-gray-700 mb-1">Allocated Amount ($)</label>
+                    <input type="number" id="categoryBudget" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="0.00" min="0" step="0.01">
+                </div>
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                        Add Category
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Expense Modal -->
+    <div id="addExpenseModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">Record New Expense</h3>
+                <button id="closeExpenseModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <form id="expenseForm" class="space-y-4">
+                <div>
+                    <label for="expenseDate" class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <input type="date" id="expenseDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                </div>
+                <div>
+                    <label for="expenseCategory" class="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                    <select id="expenseCategory" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
+                        <option value="">Select a category</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="expenseDescription" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <input type="text" id="expenseDescription" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="What was this expense for?" required>
+                </div>
+                <div>
+                    <label for="expenseAmount" class="block text-sm font-medium text-gray-700 mb-1">Amount ($)</label>
+                    <input type="number" id="expenseAmount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="0.00" min="0" step="0.01" required>
+                </div>
+                <div class="pt-2">
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                        Record Expense
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Notification Container -->
+    <div id="notificationContainer" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Initialize the application when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // State management
+            const state = {
+                currentBudget: null,
+                categories: [],
+                expenses: [],
+                budgets: []
+            };
+
+            // DOM elements
+            const elements = {
+                newBudgetBtn: document.getElementById('newBudgetBtn'),
+                addExpenseBtn: document.getElementById('addExpenseBtn'),
+                exportPdfBtn: document.getElementById('exportPdfBtn'),
+                newBudgetModal: document.getElementById('newBudgetModal'),
+                addCategoryModal: document.getElementById('addCategoryModal'),
+                addExpenseModal: document.getElementById('addExpenseModal'),
+                closeBudgetModal: document.getElementById('closeBudgetModal'),
+                closeCategoryModal: document.getElementById('closeCategoryModal'),
+                closeExpenseModal: document.getElementById('closeExpenseModal'),
+                budgetForm: document.getElementById('budgetForm'),
+                categoryForm: document.getElementById('categoryForm'),
+                expenseForm: document.getElementById('expenseForm'),
+                categoryTableBody: document.getElementById('categoryTableBody'),
+                transactionsTableBody: document.getElementById('transactionsTableBody'),
+                totalBudget: document.getElementById('totalBudget'),
+                totalSpent: document.getElementById('totalSpent'),
+                remainingBudget: document.getElementById('remainingBudget'),
+                budgetProgress: document.getElementById('budgetProgress'),
+                progressPercentage: document.getElementById('progressPercentage'),
+                expenseCategory: document.getElementById('expenseCategory'),
+                timeFilter: document.getElementById('timeFilter'),
+                notificationContainer: document.getElementById('notificationContainer'),
+                expenseChart: document.getElementById('expenseChart')
+            };
+
+            // Chart instance
+            let expenseChart = null;
+
+            // Event listeners
+            elements.newBudgetBtn.addEventListener('click', showNewBudgetModal);
+            elements.addExpenseBtn.addEventListener('click', showAddExpenseModal);
+            elements.exportPdfBtn.addEventListener('click', exportToPdf);
+            elements.closeBudgetModal.addEventListener('click', () => elements.newBudgetModal.classList.add('hidden'));
+            elements.closeCategoryModal.addEventListener('click', () => elements.addCategoryModal.classList.add('hidden'));
+            elements.closeExpenseModal.addEventListener('click', () => elements.addExpenseModal.classList.add('hidden'));
+            elements.budgetForm.addEventListener('submit', handleBudgetSubmit);
+            elements.categoryForm.addEventListener('submit', handleCategorySubmit);
+            elements.expenseForm.addEventListener('submit', handleExpenseSubmit);
+            elements.timeFilter.addEventListener('change', updateUI);
+
+            // Load data from localStorage if available
+            loadData();
+
+            // Initialize UI
+            updateUI();
+
+            // Modal functions
+            function showNewBudgetModal() {
+                elements.newBudgetModal.classList.remove('hidden');
+            }
+
+            function showAddCategoryModal() {
+                elements.addCategoryModal.classList.remove('hidden');
+            }
+
+            function showAddExpenseModal() {
+                if (!state.currentBudget) {
+                    showNotification('Please create a budget first', 'error');
+                    return;
+                }
+                if (state.categories.length === 0) {
+                    showNotification('Please add at least one category first', 'error');
+                    return;
+                }
+                
+                // Populate category dropdown
+                elements.expenseCategory.innerHTML = '<option value="">Select a category</option>';
+                state.categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category.id;
+                    option.textContent = category.name;
+                    elements.expenseCategory.appendChild(option);
+                });
+                
+                // Set default date to today
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('expenseDate').value = today;
+                
+                elements.addExpenseModal.classList.remove('hidden');
+            }
+
+            // Form handlers
+            function handleBudgetSubmit(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('budgetName').value.trim();
+                const amount = parseFloat(document.getElementById('totalBudgetAmount').value);
+                const eventDate = document.getElementById('eventDate').value;
+                
+                if (!name || isNaN(amount) || amount <= 0 || !eventDate) {
+                    showNotification('Please fill all fields with valid values', 'error');
+                    return;
+                }
+                
+                const newBudget = {
+                    id: Date.now().toString(),
+                    name,
+                    totalAmount: amount,
+                    eventDate,
+                    createdAt: new Date().toISOString()
+                };
+                
+                state.currentBudget = newBudget;
+                state.budgets.push(newBudget);
+                state.categories = [];
+                state.expenses = [];
+                
+                saveData();
+                elements.newBudgetModal.classList.add('hidden');
+                elements.budgetForm.reset();
+                
+                showNotification('Budget created successfully! Now add some categories.', 'success');
+                updateUI();
+                
+                // Show add category modal after a short delay
+                setTimeout(showAddCategoryModal, 1000);
+            }
+
+            function handleCategorySubmit(e) {
+                e.preventDefault();
+                
+                const name = document.getElementById('categoryName').value.trim();
+                const budget = parseFloat(document.getElementById('categoryBudget').value);
+                
+                if (!name || isNaN(budget) || budget <= 0) {
+                    showNotification('Please fill all fields with valid values', 'error');
+                    return;
+                }
+                
+                // Check if category already exists
+                if (state.categories.some(cat => cat.name.toLowerCase() === name.toLowerCase())) {
+                    showNotification('Category with this name already exists', 'error');
+                    return;
+                }
+                
+                const newCategory = {
+                    id: Date.now().toString(),
+                    name,
+                    budget,
+                    spent: 0
+                };
+                
+                state.categories.push(newCategory);
+                saveData();
+                elements.addCategoryModal.classList.add('hidden');
+                elements.categoryForm.reset();
+                
+                showNotification('Category added successfully!', 'success');
+                updateUI();
+            }
+
+            function handleExpenseSubmit(e) {
+                e.preventDefault();
+                
+                const date = document.getElementById('expenseDate').value;
+                const categoryId = document.getElementById('expenseCategory').value;
+                const description = document.getElementById('expenseDescription').value.trim();
+                const amount = parseFloat(document.getElementById('expenseAmount').value);
+                
+                if (!date || !categoryId || !description || isNaN(amount) || amount <= 0) {
+                    showNotification('Please fill all fields with valid values', 'error');
+                    return;
+                }
+                
+                const category = state.categories.find(cat => cat.id === categoryId);
+                if (!category) {
+                    showNotification('Selected category not found', 'error');
+                    return;
+                }
+                
+                // Check if expense exceeds category budget
+                if ((category.spent + amount) > category.budget) {
+                    showNotification(`Warning: This expense will exceed the ${category.name} budget!`, 'warning');
+                }
+                
+                const newExpense = {
+                    id: Date.now().toString(),
+                    date,
+                    categoryId,
+                    categoryName: category.name,
+                    description,
+                    amount,
+                    createdAt: new Date().toISOString()
+                };
+                
+                state.expenses.push(newExpense);
+                
+                // Update category spent amount
+                category.spent += amount;
+                
+                saveData();
+                elements.addExpenseModal.classList.add('hidden');
+                elements.expenseForm.reset();
+                
+                showNotification('Expense recorded successfully!', 'success');
+                updateUI();
+            }
+
+            // UI update functions
+            function updateUI() {
+                if (!state.currentBudget) {
+                    // No budget created yet
+                    elements.totalBudget.textContent = '$0.00';
+                    elements.totalSpent.textContent = '$0.00';
+                    elements.remainingBudget.textContent = '$0.00';
+                    elements.budgetProgress.style.width = '0%';
+                    elements.progressPercentage.textContent = '0%';
+                    
+                    // Clear tables
+                    elements.categoryTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">No categories added yet</td>
+                        </tr>
+                    `;
+                    
+                    elements.transactionsTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">No transactions recorded yet</td>
+                        </tr>
+                    `;
+                    
+                    // Clear chart
+                    if (expenseChart) {
+                        expenseChart.destroy();
+                    }
+                    
+                    return;
+                }
+                
+                // Update budget summary
+                const totalBudget = state.currentBudget.totalAmount;
+                const totalSpent = state.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+                const remaining = totalBudget - totalSpent;
+                const progressPercentage = Math.min(100, (totalSpent / totalBudget) * 100);
+                
+                elements.totalBudget.textContent = `$${totalBudget.toFixed(2)}`;
+                elements.totalSpent.textContent = `$${totalSpent.toFixed(2)}`;
+                elements.remainingBudget.textContent = `$${remaining.toFixed(2)}`;
+                elements.budgetProgress.style.width = `${progressPercentage}%`;
+                elements.progressPercentage.textContent = `${progressPercentage.toFixed(1)}%`;
+                
+                // Update progress bar color based on percentage
+                if (progressPercentage > 90) {
+                    elements.budgetProgress.classList.remove('bg-gradient-to-r', 'from-indigo-500', 'to-purple-500');
+                    elements.budgetProgress.classList.add('bg-gradient-to-r', 'from-red-500', 'to-pink-500');
+                } else if (progressPercentage > 70) {
+                    elements.budgetProgress.classList.remove('bg-gradient-to-r', 'from-indigo-500', 'to-purple-500');
+                    elements.budgetProgress.classList.add('bg-gradient-to-r', 'from-yellow-500', 'to-orange-500');
+                } else {
+                    elements.budgetProgress.classList.remove('bg-gradient-to-r', 'from-red-500', 'to-pink-500', 'from-yellow-500', 'to-orange-500');
+                    elements.budgetProgress.classList.add('bg-gradient-to-r', 'from-indigo-500', 'to-purple-500');
+                }
+                
+                // Update categories table
+                updateCategoriesTable();
+                
+                // Update transactions table
+                updateTransactionsTable();
+                
+                // Update chart
+                updateChart();
+            }
+
+            function updateCategoriesTable() {
+                if (state.categories.length === 0) {
+                    elements.categoryTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">No categories added yet</td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                elements.categoryTableBody.innerHTML = '';
+                
+                state.categories.forEach(category => {
+                    const remaining = category.budget - category.spent;
+                    const progressPercentage = Math.min(100, (category.spent / category.budget) * 100);
+                    
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                                    <i class="fas fa-tag text-indigo-600"></i>
+                                </div>
+                                <div class="ml-4">
+                                    <div class="text-sm font-medium text-gray-900">${category.name}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            $${category.budget.toFixed(2)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            $${category.spent.toFixed(2)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm ${remaining < 0 ? 'text-red-500' : 'text-green-500'}">
+                            $${remaining.toFixed(2)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                                <div class="h-2.5 rounded-full ${progressPercentage > 90 ? 'bg-red-500' : progressPercentage > 70 ? 'bg-yellow-500' : 'bg-green-500'}" 
+                                     style="width: ${progressPercentage}%"></div>
+                            </div>
+                        </td>
+                    `;
+                    
+                    elements.categoryTableBody.appendChild(row);
+                });
+            }
+
+            function updateTransactionsTable() {
+                // Filter expenses based on time filter
+                let filteredExpenses = [...state.expenses];
+                const filterValue = elements.timeFilter.value;
+                
+                if (filterValue === 'month') {
+                    const now = new Date();
+                    const currentMonth = now.getMonth();
+                    const currentYear = now.getFullYear();
+                    
+                    filteredExpenses = filteredExpenses.filter(expense => {
+                        const expenseDate = new Date(expense.date);
+                        return expenseDate.getMonth() === currentMonth && 
+                               expenseDate.getFullYear() === currentYear;
+                    });
+                } else if (filterValue === 'week') {
+                    const now = new Date();
+                    const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                    
+                    filteredExpenses = filteredExpenses.filter(expense => {
+                        const expenseDate = new Date(expense.date);
+                        return expenseDate >= oneWeekAgo;
+                    });
+                }
+                
+                if (filteredExpenses.length === 0) {
+                    elements.transactionsTableBody.innerHTML = `
+                        <tr>
+                            <td colspan="5" class="px-6 py-4 text-center text-gray-500">No transactions found for selected period</td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                elements.transactionsTableBody.innerHTML = '';
+                
+                // Sort by date (newest first)
+                filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+                
+                filteredExpenses.forEach(expense => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-gray-50';
+                    
+                    const date = new Date(expense.date);
+                    const formattedDate = date.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${formattedDate}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-900">${expense.description}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <div class="text-sm text-gray-500">${expense.categoryName}</div>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-500">
+                            -$${expense.amount.toFixed(2)}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <button class="text-indigo-600 hover:text-indigo-900 mr-3" onclick="editExpense('${expense.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="text-red-600 hover:text-red-900" onclick="deleteExpense('${expense.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    
+                    elements.transactionsTableBody.appendChild(row);
+                });
+            }
+
+            function updateChart() {
+                // Prepare data for chart
+                const categories = state.categories.map(cat => cat.name);
+                const spentData = state.categories.map(cat => cat.spent);
+                const budgetData = state.categories.map(cat => cat.budget);
+                
+                // Get canvas context
+                const ctx = elements.expenseChart.getContext('2d');
+                
+                // Destroy previous chart if exists
+                if (expenseChart) {
+                    expenseChart.destroy();
+                }
+                
+                // Create new chart
+                expenseChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: categories,
+                        datasets: [
+                            {
+                                label: 'Budget',
+                                data: budgetData,
+                                backgroundColor: 'rgba(99, 102, 241, 0.2)',
+                                borderColor: 'rgba(99, 102, 241, 1)',
+                                borderWidth: 1
+                            },
+                            {
+                                label: 'Spent',
+                                data: spentData,
+                                backgroundColor: 'rgba(220, 38, 38, 0.2)',
+                                borderColor: 'rgba(220, 38, 38, 1)',
+                                borderWidth: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return '$' + value;
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.dataset.label + ': $' + context.raw.toFixed(2);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Data persistence
+            function saveData() {
+                localStorage.setItem('eventBudgetTracker', JSON.stringify({
+                    currentBudget: state.currentBudget,
+                    categories: state.categories,
+                    expenses: state.expenses,
+                    budgets: state.budgets
+                }));
+            }
+
+            function loadData() {
+                const savedData = localStorage.getItem('eventBudgetTracker');
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    state.currentBudget = parsedData.currentBudget;
+                    state.categories = parsedData.categories || [];
+                    state.expenses = parsedData.expenses || [];
+                    state.budgets = parsedData.budgets || [];
+                }
+            }
+
+            // Export to PDF
+            function exportToPdf() {
+                if (!state.currentBudget) {
+                    showNotification('No budget data to export', 'error');
+                    return;
+                }
+                
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Title
+                doc.setFontSize(20);
+                doc.text(`Event Budget Report: ${state.currentBudget.name}`, 14, 20);
+                
+                // Summary section
+                doc.setFontSize(14);
+                doc.text('Budget Summary', 14, 35);
+                
+                doc.setFontSize(12);
+                doc.text(`Total Budget: $${state.currentBudget.totalAmount.toFixed(2)}`, 20, 45);
+                
+                const totalSpent = state.expenses.reduce((sum, expense) => sum + expense.amount, 0);
+                doc.text(`Total Spent: $${totalSpent.toFixed(2)}`, 20, 55);
+                
+                const remaining = state.currentBudget.totalAmount - totalSpent;
+                doc.text(`Remaining: $${remaining.toFixed(2)}`, 20, 65);
+                
+                // Categories table
+                doc.setFontSize(14);
+                doc.text('Expense Categories', 14, 80);
+                
+                const categoryData = state.categories.map(cat => [
+                    cat.name,
+                    `$${cat.budget.toFixed(2)}`,
+                    `$${cat.spent.toFixed(2)}`,
+                    `$${(cat.budget - cat.spent).toFixed(2)}`,
+                    `${Math.min(100, (cat.spent / cat.budget) * 100).toFixed(1)}%`
+                ]);
+                
+                doc.autoTable({
+                    startY: 85,
+                    head: [['Category', 'Budget', 'Spent', 'Remaining', 'Progress']],
+                    body: categoryData,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [79, 70, 229]
+                    }
+                });
+                
+                // Recent transactions
+                doc.setFontSize(14);
+                doc.text('Recent Transactions', 14, doc.lastAutoTable.finalY + 15);
+                
+                const transactionData = state.expenses
+                    .sort((a, b) => new Date(b.date) - new Date(a.date))
+                    .slice(0, 10)
+                    .map(exp => [
+                        new Date(exp.date).toLocaleDateString(),
+                        exp.description,
+                        exp.categoryName,
+                        `-$${exp.amount.toFixed(2)}`
+                    ]);
+                
+                doc.autoTable({
+                    startY: doc.lastAutoTable.finalY + 20,
+                    head: [['Date', 'Description', 'Category', 'Amount']],
+                    body: transactionData,
+                    theme: 'grid',
+                    headStyles: {
+                        fillColor: [79, 70, 229]
+                    }
+                });
+                
+                // Save the PDF
+                doc.save(`EventBudget_${state.currentBudget.name.replace(/\s+/g, '_')}.pdf`);
+                showNotification('PDF report generated successfully!', 'success');
+            }
+
+            // Notification system
+            function showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.className = `notification px-4 py-3 rounded-lg shadow-md flex items-center ${type === 'error' ? 'bg-red-100 text-red-800' : type === 'warning' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`;
+                
+                let icon;
+                if (type === 'error') {
+                    icon = '<i class="fas fa-exclamation-circle mr-2"></i>';
+                } else if (type === 'warning') {
+                    icon = '<i class="fas fa-exclamation-triangle mr-2"></i>';
+                } else {
+                    icon = '<i class="fas fa-check-circle mr-2"></i>';
+                }
+                
+                notification.innerHTML = `${icon}${message}`;
+                elements.notificationContainer.appendChild(notification);
+                
+                // Auto remove after 5 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 5000);
+            }
+
+            // Global functions for inline event handlers
+            window.editExpense = function(id) {
+                const expense = state.expenses.find(exp => exp.id === id);
+                if (!expense) return;
+                
+                showNotification('Edit functionality coming soon!', 'info');
+            };
+
+            window.deleteExpense = function(id) {
+                if (!confirm('Are you sure you want to delete this expense?')) return;
+                
+                const expenseIndex = state.expenses.findIndex(exp => exp.id === id);
+                if (expenseIndex === -1) return;
+                
+                const expense = state.expenses[expenseIndex];
+                const category = state.categories.find(cat => cat.id === expense.categoryId);
+                
+                if (category) {
+                    category.spent -= expense.amount;
+                }
+                
+                state.expenses.splice(expenseIndex, 1);
+                saveData();
+                updateUI();
+                
+                showNotification('Expense deleted successfully', 'success');
+            };
+        });
+    </script>
+</body>
+</html>
