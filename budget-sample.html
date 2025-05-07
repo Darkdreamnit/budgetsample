@@ -30,24 +30,67 @@
                 transform: translateY(0);
             }
         }
+        .mobile-menu {
+            display: none;
+        }
+        @media (max-width: 768px) {
+            .mobile-menu {
+                display: block;
+            }
+            .desktop-menu {
+                display: none;
+            }
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <header class="bg-indigo-600 text-white shadow-lg">
+    <!-- Mobile Navbar -->
+    <nav class="bg-indigo-600 text-white shadow-lg lg:hidden">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-bold">EventBudget Pro</h1>
+                <button id="mobile-menu-button" class="text-white focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+            <div id="mobile-menu" class="hidden mt-2 pb-2">
+                <div class="flex flex-col space-y-2">
+                    <button onclick="filterTemplates('all')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-indigo-500 text-white font-medium transition">
+                        <i class="fas fa-layer-group mr-2"></i>All Templates
+                    </button>
+                    <button onclick="filterTemplates('wedding')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-indigo-500 text-white transition">
+                        <i class="fas fa-ring mr-2"></i>Weddings
+                    </button>
+                    <button onclick="filterTemplates('conference')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-indigo-500 text-white transition">
+                        <i class="fas fa-users mr-2"></i>Conferences
+                    </button>
+                    <button onclick="filterTemplates('fundraiser')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-indigo-500 text-white transition">
+                        <i class="fas fa-hand-holding-heart mr-2"></i>Fundraisers
+                    </button>
+                    <button onclick="filterTemplates('party')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-indigo-500 text-white transition">
+                        <i class="fas fa-glass-cheers mr-2"></i>Parties
+                    </button>
+                    <button onclick="openCustomBudgetModal()" class="w-full bg-indigo-700 text-white py-2 px-3 rounded-lg hover:bg-indigo-800 transition flex items-center justify-center">
+                        <i class="fas fa-plus mr-2"></i> Custom Budget
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Desktop Header -->
+    <header class="bg-indigo-600 text-white shadow-lg hidden lg:block">
         <div class="container mx-auto px-4 py-6">
             <div class="flex justify-between items-center">
                 <h1 class="text-3xl font-bold">EventBudget Pro</h1>
-                <button class="bg-white text-indigo-600 px-4 py-2 rounded-lg font-medium hover:bg-indigo-50 transition">
-                    <i class="fas fa-user mr-2"></i>My Account
-                </button>
             </div>
         </div>
     </header>
 
-    <main class="container mx-auto px-4 py-8">
+    <main class="container mx-auto px-4 py-4 lg:py-8">
         <div class="flex flex-col lg:flex-row gap-8">
-            <!-- Sidebar -->
-            <aside class="lg:w-1/4 bg-white p-6 rounded-xl shadow-md h-fit sticky top-8">
+            <!-- Desktop Sidebar -->
+            <aside class="lg:w-1/4 bg-white p-6 rounded-xl shadow-md h-fit lg:sticky lg:top-8 desktop-menu">
                 <h2 class="text-xl font-semibold mb-6 text-indigo-700">Budget Templates</h2>
                 <ul class="space-y-3">
                     <li>
@@ -89,11 +132,7 @@
             <div class="lg:w-3/4">
                 <div class="bg-white p-6 rounded-xl shadow-md mb-8">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-2xl font-bold text-gray-800">Find Your Perfect Budget Template</h2>
-                        <div class="relative">
-                            <input type="text" placeholder="Search templates..." class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
-                        </div>
+                        <h2 class="text-xl lg:text-2xl font-bold text-gray-800">Find Your Perfect Budget Template</h2>
                     </div>
                     
                     <div id="templates-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -103,7 +142,7 @@
                 
                 <div id="selected-template-container" class="hidden bg-white p-6 rounded-xl shadow-md slide-in">
                     <div class="flex justify-between items-center mb-6">
-                        <h2 id="template-title" class="text-2xl font-bold text-gray-800"></h2>
+                        <h2 id="template-title" class="text-xl lg:text-2xl font-bold text-gray-800"></h2>
                         <button onclick="closeTemplateView()" class="text-gray-500 hover:text-gray-700">
                             <i class="fas fa-times text-xl"></i>
                         </button>
@@ -135,9 +174,9 @@
                     <div class="flex justify-between items-center pt-4 border-t border-gray-200">
                         <div>
                             <p class="text-sm text-gray-500">Total Budget</p>
-                            <p id="total-budget" class="text-2xl font-bold">$0.00</p>
+                            <p id="total-budget" class="text-xl lg:text-2xl font-bold">$0.00</p>
                         </div>
-                        <button onclick="saveBudget()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+                        <button onclick="saveBudget()" class="bg-indigo-600 text-white px-4 lg:px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
                             <i class="fas fa-save mr-2"></i> Save Budget
                         </button>
                     </div>
@@ -148,7 +187,7 @@
 
     <!-- Custom Budget Modal -->
     <div id="custom-budget-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl p-6 w-full max-w-md slide-in">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 slide-in">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-bold">Create Custom Budget</h3>
                 <button onclick="closeCustomBudgetModal()" class="text-gray-500 hover:text-gray-700">
@@ -191,7 +230,7 @@
 
     <!-- Add Item Modal -->
     <div id="add-item-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-xl p-6 w-full max-w-md slide-in">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 slide-in">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-bold">Add Budget Item</h3>
                 <button onclick="closeAddItemModal()" class="text-gray-500 hover:text-gray-700">
@@ -284,7 +323,7 @@
                 totalBudget: 18000,
                 items: [
                     { name: "Ballroom Rental", category: "venue", cost: 6000, notes: "Includes basic setup" },
-                    { name: "Dinner Service", category: "food", cost: 5000, notes: "Plated dinner for 100" },
+                    { name: "D dinner Service", category: "food", cost: 5000, notes: "Plated dinner for 100" },
                     { name: "Auction Items", category: "miscellaneous", cost: 4000, notes: "Procurement budget" },
                     { name: "Entertainment", category: "entertainment", cost: 2000, notes: "Jazz quartet" },
                     { name: "Invitations", category: "marketing", cost: 1000, notes: "Printed and mailed" }
@@ -321,7 +360,7 @@
                     { name: "Gourmet Catering", category: "food", cost: 20000, notes: "5-course meal" },
                     { name: "Live Band", category: "entertainment", cost: 10000, notes: "12-piece orchestra" },
                     { name: "Premium Floral", category: "decorations", cost: 15000, notes: "Extensive floral arrangements" },
-                    { name: "Videography", category: "entertainment", cost: 5000, notes: "Cinematic coverage" },
+                    { name: "Videography", category: "ent entertainment", cost: 5000, notes: "Cinematic coverage" },
                     { name: "Wedding Planner", category: "staff", cost: 5000, notes: "Full service" }
                 ],
                 icon: "fas fa-ring",
@@ -356,6 +395,12 @@
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
             loadTemplates();
+            
+            // Mobile menu toggle
+            document.getElementById('mobile-menu-button').addEventListener('click', function() {
+                const menu = document.getElementById('mobile-menu');
+                menu.classList.toggle('hidden');
+            });
         });
 
         // Load templates based on filter
@@ -420,6 +465,9 @@
                     btn.classList.add('bg-indigo-50', 'font-medium');
                 }
             });
+            
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
         }
 
         // View template details
@@ -458,16 +506,16 @@
                 itemElement.className = 'budget-item bg-gray-50 p-4 rounded-lg flex justify-between items-center transition';
                 
                 itemElement.innerHTML = `
-                    <div>
-                        <h4 class="font-medium">${item.name}</h4>
+                    <div class="w-3/4">
+                        <h4 class="font-medium truncate">${item.name}</h4>
                         <div class="flex items-center mt-1">
                             <span class="text-xs px-2 py-1 rounded ${getCategoryColor(item.category)} mr-2">${formatCategory(item.category)}</span>
-                            <span class="text-sm text-gray-500">${item.notes || 'No notes'}</span>
+                            <span class="text-sm text-gray-500 truncate">${item.notes || 'No notes'}</span>
                         </div>
                     </div>
                     <div class="flex items-center">
-                        <span class="font-bold mr-4">$${item.cost.toLocaleString()}</span>
-                        <button onclick="editItem(${index})" class="text-gray-400 hover:text-indigo-600 mr-2">
+                        <span class="font-bold mr-2 lg:mr-4">$${item.cost.toLocaleString()}</span>
+                        <button onclick="editItem(${index})" class="text-gray-400 hover:text-indigo-600 mr-1 lg:mr-2">
                             <i class="fas fa-edit"></i>
                         </button>
                         <button onclick="removeItem(${index})" class="text-gray-400 hover:text-red-600">
@@ -575,6 +623,11 @@
             document.getElementById('item-category').value = 'venue';
             document.getElementById('item-cost').value = '';
             document.getElementById('item-notes').value = '';
+            
+            // Set button to add mode
+            const confirmBtn = document.querySelector('#add-item-modal button:last-child');
+            confirmBtn.textContent = 'Add Item';
+            confirmBtn.onclick = confirmAddItem;
         }
 
         // Close add item modal
@@ -649,11 +702,6 @@
             updateBudgetItems();
             updateProgressBar();
             closeAddItemModal();
-            
-            // Reset button to add
-            const confirmBtn = document.querySelector('#add-item-modal button:last-child');
-            confirmBtn.textContent = 'Add Item';
-            confirmBtn.onclick = confirmAddItem;
         }
 
         // Remove item
