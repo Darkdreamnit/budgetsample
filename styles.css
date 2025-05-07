@@ -1,12 +1,12 @@
         .gradient-bg {
-            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            background: linear-gradient(135deg, #0e4d52 0%, #520b5c 100%);
         }
         .card-hover:hover {
             transform: translateY(-5px);
             box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
         }
         .input-highlight:focus {
-            border-color: #4f46e5;
+            border-color: #386108;
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
         }
         .progress-bar {
@@ -19,7 +19,7 @@
         .tooltip .tooltip-text {
             visibility: hidden;
             width: 200px;
-            background-color: #4f46e5;
+            background-color: #3b0737;
             color: #fff;
             text-align: center;
             border-radius: 6px;
