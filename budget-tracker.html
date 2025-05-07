@@ -89,15 +89,20 @@
             <div class="bg-white rounded-xl shadow-md p-6 lg:col-span-2 order-2">
                 <div class="flex justify-between items-center mb-6">
                     <h2 class="text-xl font-semibold text-gray-800">Expense Categories</h2>
-                    <div class="relative">
-                        <select id="timeFilter" class="appearance-none bg-gray-100 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                            <option value="all">All Time</option>
-                            <option value="month">This Month</option>
-                            <option value="week">This Week</option>
-                        </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                            <i class="fas fa-chevron-down"></i>
+                    <div class="flex items-center space-x-3">
+                        <div class="relative">
+                            <select id="timeFilter" class="appearance-none bg-gray-100 border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                                <option value="all">All Time</option>
+                                <option value="month">This Month</option>
+                                <option value="week">This Week</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                <i class="fas fa-chevron-down"></i>
+                            </div>
                         </div>
+                        <button id="addCategoryBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center">
+                            <i class="fas fa-plus mr-2"></i>Add Category
+                        </button>
                     </div>
                 </div>
 
@@ -270,6 +275,7 @@
             const elements = {
                 newBudgetBtn: document.getElementById('newBudgetBtn'),
                 addExpenseBtn: document.getElementById('addExpenseBtn'),
+                addCategoryBtn: document.getElementById('addCategoryBtn'),
                 exportPdfBtn: document.getElementById('exportPdfBtn'),
                 newBudgetModal: document.getElementById('newBudgetModal'),
                 addCategoryModal: document.getElementById('addCategoryModal'),
@@ -299,6 +305,7 @@
             // Event listeners
             elements.newBudgetBtn.addEventListener('click', showNewBudgetModal);
             elements.addExpenseBtn.addEventListener('click', showAddExpenseModal);
+            elements.addCategoryBtn.addEventListener('click', showAddCategoryModal);
             elements.exportPdfBtn.addEventListener('click', exportToPdf);
             elements.closeBudgetModal.addEventListener('click', () => elements.newBudgetModal.classList.add('hidden'));
             elements.closeCategoryModal.addEventListener('click', () => elements.addCategoryModal.classList.add('hidden'));
@@ -320,6 +327,10 @@
             }
 
             function showAddCategoryModal() {
+                if (!state.currentBudget) {
+                    showNotification('Please create a budget first', 'error');
+                    return;
+                }
                 elements.addCategoryModal.classList.remove('hidden');
             }
 
