@@ -9,6 +9,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    <script src="https://apis.google.com/js/api.js?onload=onGAPILoad"></script>
     <style>
         .progress-bar {
             transition: width 0.5s ease-in-out;
@@ -28,6 +29,20 @@
         }
         .file-input {
             display: none;
+        }
+        .google-btn {
+            background-color: #4285F4;
+            color: white;
+        }
+        .google-btn:hover {
+            background-color: #357ABD;
+        }
+        .animate-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
     </style>
 </head>
@@ -94,7 +109,22 @@
                     </div>
 
                     <div class="bg-white border border-gray-200 p-4 rounded-lg">
-                        <h3 class="font-medium text-gray-700 mb-3">Data Management</h3>
+                        <h3 class="font-medium text-gray-700 mb-3">Cloud Sync</h3>
+                        <button id="connectGoogleBtn" class="w-full google-btn py-2 px-3 rounded-lg text-sm transition flex items-center justify-center mb-2">
+                            <i class="fab fa-google mr-2"></i>Connect Google Sheets
+                        </button>
+                        <div id="syncControls" class="hidden">
+                            <button id="syncToGoogleBtn" class="w-full bg-green-100 hover:bg-green-200 text-green-800 py-2 px-3 rounded-lg text-sm transition flex items-center justify-center mb-2">
+                                <i class="fas fa-cloud-upload-alt mr-2"></i>Sync to Google Sheets
+                            </button>
+                            <button id="syncFromGoogleBtn" class="w-full bg-blue-100 hover:bg-blue-200 text-blue-800 py-2 px-3 rounded-lg text-sm transition flex items-center justify-center">
+                                <i class="fas fa-cloud-download-alt mr-2"></i>Sync from Google Sheets
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="bg-white border border-gray-200 p-4 rounded-lg">
+                        <h3 class="fontmedium text-gray-700 mb-3">Data Management</h3>
                         <button id="clearDataBtn" class="w-full bg-red-100 hover:bg-red-200 text-red-700 py-2 px-3 rounded-lg text-sm transition flex items-center justify-center">
                             <i class="fas fa-trash-alt mr-2"></i>Clear All Data
                         </button>
@@ -190,15 +220,15 @@
             <form id="budgetForm" class="space-y-4">
                 <div>
                     <label for="budgetName" class="block text-sm font-medium text-gray-700 mb-1">Budget Name</label>
-                    <input type="text" id="budgetName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Wedding, Conference">
+                    <input type="text" id="budgetName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Wedding, Conference" required>
                 </div>
                 <div>
                     <label for="totalBudgetAmount" class="block text-sm font-medium text-gray-700 mb-1">Total Amount ($)</label>
-                    <input type="number" id="totalBudgetAmount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="0.00" min="0" step="0.01">
+                    <input type="number" id="totalBudgetAmount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="0.00" min="0" step="0.01" required>
                 </div>
                 <div>
                     <label for="eventDate" class="block text-sm font-medium text-gray-700 mb-1">Event Date</label>
-                    <input type="date" id="eventDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                    <input type="date" id="eventDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" required>
                 </div>
                 <div class="pt-2">
                     <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
@@ -221,11 +251,11 @@
             <form id="categoryForm" class="space-y-4">
                 <div>
                     <label for="categoryName" class="block text-sm font-medium text-gray-700 mb-1">Category Name</label>
-                    <input type="text" id="categoryName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Venue, Food">
+                    <input type="text" id="categoryName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="e.g. Venue, Food" required>
                 </div>
                 <div>
                     <label for="categoryBudget" class="block text-sm font-medium text-gray-700 mb-1">Allocated Amount ($)</label>
-                    <input type="number" id="categoryBudget" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="0.00" min="0" step="0.01">
+                    <input type="number" id="categoryBudget" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="0.00" min="0" step="0.01" required>
                 </div>
                 <div class="pt-2">
                     <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
@@ -336,6 +366,45 @@
         </div>
     </div>
 
+    <!-- Google Sheets Connection Modal -->
+    <div id="googleSheetsModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">Google Sheets Integration</h3>
+                <button id="closeGoogleSheetsModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="space-y-4">
+                <div id="googleAuthStatus" class="p-3 rounded-lg bg-gray-100">
+                    <p class="text-gray-700">Status: <span id="googleAuthStatusText">Not connected</span></p>
+                </div>
+                
+                <div id="googleSheetControls" class="hidden">
+                    <div class="mb-4">
+                        <label for="googleSheetName" class="block text-sm font-medium text-gray-700 mb-1">Spreadsheet Name</label>
+                        <input type="text" id="googleSheetName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="My Event Budget">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="googleSheetId" class="block text-sm font-medium text-gray-700 mb-1">Spreadsheet ID (optional)</label>
+                        <input type="text" id="googleSheetId" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" placeholder="Leave blank to create new">
+                        <p class="text-xs text-gray-500 mt-1">If you want to use an existing spreadsheet, enter its ID here</p>
+                    </div>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button id="disconnectGoogleBtn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-100 transition hidden">
+                        Disconnect
+                    </button>
+                    <button id="connectGoogleBtnModal" class="px-4 py-2 google-btn text-white rounded-lg hover:bg-blue-700 transition">
+                        <i class="fab fa-google mr-2"></i>Connect to Google
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Notification Container -->
     <div id="notificationContainer" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
 
@@ -348,7 +417,12 @@
                 currentBudget: null,
                 categories: [],
                 expenses: [],
-                budgets: []
+                budgets: [],
+                googleAuth: {
+                    isConnected: false,
+                    spreadsheetId: null,
+                    spreadsheetName: 'Event Budget Tracker'
+                }
             };
 
             // DOM elements
@@ -360,20 +434,33 @@
                 exportExcelBtn: document.getElementById('exportExcelBtn'),
                 importDataBtn: document.getElementById('importDataBtn'),
                 clearDataBtn: document.getElementById('clearDataBtn'),
+                connectGoogleBtn: document.getElementById('connectGoogleBtn'),
+                syncToGoogleBtn: document.getElementById('syncToGoogleBtn'),
+                syncFromGoogleBtn: document.getElementById('syncFromGoogleBtn'),
+                syncControls: document.getElementById('syncControls'),
                 newBudgetModal: document.getElementById('newBudgetModal'),
                 addCategoryModal: document.getElementById('addCategoryModal'),
                 addExpenseModal: document.getElementById('addExpenseModal'),
                 clearDataModal: document.getElementById('clearDataModal'),
                 importDataModal: document.getElementById('importDataModal'),
+                googleSheetsModal: document.getElementById('googleSheetsModal'),
                 closeBudgetModal: document.getElementById('closeBudgetModal'),
                 closeCategoryModal: document.getElementById('closeCategoryModal'),
                 closeExpenseModal: document.getElementById('closeExpenseModal'),
                 closeClearDataModal: document.getElementById('closeClearDataModal'),
                 closeImportDataModal: document.getElementById('closeImportDataModal'),
+                closeGoogleSheetsModal: document.getElementById('closeGoogleSheetsModal'),
                 cancelClearData: document.getElementById('cancelClearData'),
                 confirmClearData: document.getElementById('confirmClearData'),
                 cancelImportData: document.getElementById('cancelImportData'),
                 confirmImportData: document.getElementById('confirmImportData'),
+                connectGoogleBtnModal: document.getElementById('connectGoogleBtnModal'),
+                disconnectGoogleBtn: document.getElementById('disconnectGoogleBtn'),
+                googleAuthStatusText: document.getElementById('googleAuthStatusText'),
+                googleAuthStatus: document.getElementById('googleAuthStatus'),
+                googleSheetControls: document.getElementById('googleSheetControls'),
+                googleSheetName: document.getElementById('googleSheetName'),
+                googleSheetId: document.getElementById('googleSheetId'),
                 budgetForm: document.getElementById('budgetForm'),
                 categoryForm: document.getElementById('categoryForm'),
                 expenseForm: document.getElementById('expenseForm'),
@@ -390,12 +477,14 @@
                 expenseChart: document.getElementById('expenseChart'),
                 fileInput: document.getElementById('fileInput'),
                 fileInfo: document.getElementById('fileInfo'),
-                fileName: document.getElementById('fileName')
+                fileName: document.getElementById('fileName'),
+                viewAllBtn: document.getElementById('viewAllBtn')
             };
 
             // Chart instance
             let expenseChart = null;
             let selectedFile = null;
+            let googleAuthInstance = null;
 
             // Event listeners
             elements.newBudgetBtn.addEventListener('click', showNewBudgetModal);
@@ -405,13 +494,19 @@
             elements.exportExcelBtn.addEventListener('click', exportToExcel);
             elements.importDataBtn.addEventListener('click', showImportDataModal);
             elements.clearDataBtn.addEventListener('click', showClearDataModal);
+            elements.connectGoogleBtn.addEventListener('click', showGoogleSheetsModal);
+            elements.syncToGoogleBtn.addEventListener('click', syncToGoogleSheets);
+            elements.syncFromGoogleBtn.addEventListener('click', syncFromGoogleSheets);
             elements.closeBudgetModal.addEventListener('click', () => elements.newBudgetModal.classList.add('hidden'));
             elements.closeCategoryModal.addEventListener('click', () => elements.addCategoryModal.classList.add('hidden'));
             elements.closeExpenseModal.addEventListener('click', () => elements.addExpenseModal.classList.add('hidden'));
             elements.closeClearDataModal.addEventListener('click', () => elements.clearDataModal.classList.add('hidden'));
             elements.closeImportDataModal.addEventListener('click', () => elements.importDataModal.classList.add('hidden'));
+            elements.closeGoogleSheetsModal.addEventListener('click', () => elements.googleSheetsModal.classList.add('hidden'));
             elements.cancelClearData.addEventListener('click', () => elements.clearDataModal.classList.add('hidden'));
             elements.cancelImportData.addEventListener('click', () => elements.importDataModal.classList.add('hidden'));
+            elements.connectGoogleBtnModal.addEventListener('click', handleGoogleAuth);
+            elements.disconnectGoogleBtn.addEventListener('click', disconnectGoogle);
             elements.confirmClearData.addEventListener('click', clearAllData);
             elements.confirmImportData.addEventListener('click', importData);
             elements.budgetForm.addEventListener('submit', handleBudgetSubmit);
@@ -419,12 +514,427 @@
             elements.expenseForm.addEventListener('submit', handleExpenseSubmit);
             elements.timeFilter.addEventListener('change', updateUI);
             elements.fileInput.addEventListener('change', handleFileSelect);
+            elements.viewAllBtn.addEventListener('click', () => {
+                elements.timeFilter.value = 'all';
+                updateUI();
+            });
+
+            // Set default date for expense and budget forms
+            function setDefaultDates() {
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('expenseDate').value = today;
+                document.getElementById('eventDate').value = today;
+            }
 
             // Load data from localStorage if available
-            loadData();
+            function loadData() {
+                const savedData = localStorage.getItem('eventBudgetTracker');
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    state.currentBudget = parsedData.currentBudget;
+                    state.categories = parsedData.categories || [];
+                    state.expenses = parsedData.expenses || [];
+                    state.budgets = parsedData.budgets || [];
+                    state.googleAuth = parsedData.googleAuth || {
+                        isConnected: false,
+                        spreadsheetId: null,
+                        spreadsheetName: 'Event Budget Tracker'
+                    };
+                    
+                    // Update UI for Google connection status
+                    if (state.googleAuth.isConnected) {
+                        elements.connectGoogleBtn.innerHTML = '<i class="fab fa-google mr-2"></i>Google Sheets Connected';
+                        elements.connectGoogleBtn.classList.remove('google-btn');
+                        elements.connectGoogleBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                        elements.syncControls.classList.remove('hidden');
+                    }
+                }
+            }
 
             // Initialize UI
+            loadData();
             updateUI();
+            setDefaultDates();
+
+            // Initialize Google API client
+            function onGAPILoad() {
+                gapi.load('client:auth2', () => {
+                    gapi.client.init({
+                        apiKey: 'AIzaSyD9vxQz5q3J1J4J4J4J4J4J4J4J4J4J4', // Replace with your API key
+                        clientId: 'YOUR_CLIENT_ID.apps.googleusercontent.com', // Replace with your client ID
+                        discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
+                        scope: 'https://www.googleapis.com/auth/spreadsheets'
+                    }).then(() => {
+                        googleAuthInstance = gapi.auth2.getAuthInstance();
+                        
+                        // Listen for sign-in state changes
+                        googleAuthInstance.isSignedIn.listen(updateGoogleSigninStatus);
+                        
+                        // Handle initial sign-in state
+                        updateGoogleSigninStatus(googleAuthInstance.isSignedIn.get());
+                    }).catch(error => {
+                        console.error('Error initializing Google API client:', error);
+                        showNotification('Failed to initialize Google Sheets integration', 'error');
+                    });
+                });
+            }
+
+            // Update Google sign-in status
+            function updateGoogleSigninStatus(isSignedIn) {
+                state.googleAuth.isConnected = isSignedIn;
+                
+                if (isSignedIn) {
+                    // User is signed in
+                    elements.googleAuthStatusText.textContent = 'Connected';
+                    elements.googleAuthStatus.classList.remove('bg-gray-100');
+                    elements.googleAuthStatus.classList.add('bg-green-100');
+                    elements.connectGoogleBtnModal.classList.add('hidden');
+                    elements.disconnectGoogleBtn.classList.remove('hidden');
+                    elements.googleSheetControls.classList.remove('hidden');
+                    elements.syncControls.classList.remove('hidden');
+                    
+                    // Update the main button
+                    elements.connectGoogleBtn.innerHTML = '<i class="fab fa-google mr-2"></i>Google Sheets Connected';
+                    elements.connectGoogleBtn.classList.remove('google-btn');
+                    elements.connectGoogleBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                    
+                    // Get user info
+                    const profile = googleAuthInstance.currentUser.get().getBasicProfile();
+                    showNotification(`Connected to Google Sheets as ${profile.getName()}`, 'success');
+                } else {
+                    // User is signed out
+                    elements.googleAuthStatusText.textContent = 'Not connected';
+                    elements.googleAuthStatus.classList.remove('bg-green-100');
+                    elements.googleAuthStatus.classList.add('bg-gray-100');
+                    elements.connectGoogleBtnModal.classList.remove('hidden');
+                    elements.disconnectGoogleBtn.classList.add('hidden');
+                    elements.googleSheetControls.classList.add('hidden');
+                    elements.syncControls.classList.add('hidden');
+                    
+                    // Update the main button
+                    elements.connectGoogleBtn.innerHTML = '<i class="fab fa-google mr-2"></i>Connect Google Sheets';
+                    elements.connectGoogleBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    elements.connectGoogleBtn.classList.add('google-btn');
+                }
+                
+                saveData();
+            }
+
+            // Handle Google authentication
+            function handleGoogleAuth() {
+                if (state.googleAuth.isConnected) {
+                    return;
+                }
+                
+                googleAuthInstance.signIn().then(() => {
+                    // Update UI will be handled by the listener
+                }).catch(error => {
+                    console.error('Error signing in:', error);
+                    showNotification('Failed to sign in to Google', 'error');
+                });
+            }
+
+            // Disconnect Google account
+            function disconnectGoogle() {
+                googleAuthInstance.signOut().then(() => {
+                    // Update UI will be handled by the listener
+                    state.googleAuth.spreadsheetId = null;
+                    saveData();
+                }).catch(error => {
+                    console.error('Error signing out:', error);
+                    showNotification('Failed to disconnect Google account', 'error');
+                });
+            }
+
+            // Sync data to Google Sheets
+            function syncToGoogleSheets() {
+                if (!state.googleAuth.isConnected) {
+                    showNotification('Please connect to Google Sheets first', 'error');
+                    return;
+                }
+                
+                if (!state.currentBudget) {
+                    showNotification('No budget data to sync', 'error');
+                    return;
+                }
+                
+                showNotification('Syncing data to Google Sheets...', 'info');
+                
+                const spreadsheetName = elements.googleSheetName.value || state.googleAuth.spreadsheetName;
+                const spreadsheetId = elements.googleSheetId.value || state.googleAuth.spreadsheetId;
+                
+                // Prepare data for Google Sheets
+                const budgetData = [
+                    ['Budget Name', 'Total Amount', 'Event Date', 'Created At'],
+                    [state.currentBudget.name, state.currentBudget.totalAmount, state.currentBudget.eventDate, state.currentBudget.createdAt]
+                ];
+                
+                const categoriesData = [
+                    ['Category ID', 'Name', 'Budget', 'Spent']
+                ];
+                
+                state.categories.forEach(category => {
+                    categoriesData.push([
+                        category.id, 
+                        category.name, 
+                        category.budget, 
+                        category.spent
+                    ]);
+                });
+                
+                const expensesData = [
+                    ['Expense ID', 'Date', 'Category ID', 'Category Name', 'Description', 'Amount', 'Created At']
+                ];
+                
+                state.expenses.forEach(expense => {
+                    expensesData.push([
+                        expense.id,
+                        expense.date,
+                        expense.categoryId,
+                        expense.categoryName,
+                        expense.description,
+                        expense.amount,
+                        expense.createdAt
+                    ]);
+                });
+                
+                // Create or update spreadsheet
+                if (spreadsheetId) {
+                    // Update existing spreadsheet
+                    updateSpreadsheet(spreadsheetId, spreadsheetName, budgetData, categoriesData, expensesData);
+                } else {
+                    // Create new spreadsheet
+                    createSpreadsheet(spreadsheetName, budgetData, categoriesData, expensesData);
+                }
+            }
+
+            // Create new spreadsheet
+            function createSpreadsheet(name, budgetData, categoriesData, expensesData) {
+                gapi.client.sheets.spreadsheets.create({
+                    properties: {
+                        title: name
+                    }
+                }).then(response => {
+                    const spreadsheetId = response.result.spreadsheetId;
+                    state.googleAuth.spreadsheetId = spreadsheetId;
+                    state.googleAuth.spreadsheetName = name;
+                    saveData();
+                    
+                    // Update the spreadsheet with our data
+                    return updateSpreadsheet(spreadsheetId, name, budgetData, categoriesData, expensesData);
+                }).then(() => {
+                    showNotification('Spreadsheet created and data synced successfully!', 'success');
+                    elements.googleSheetId.value = state.googleAuth.spreadsheetId;
+                }).catch(error => {
+                    console.error('Error creating spreadsheet:', error);
+                    showNotification('Failed to create spreadsheet', 'error');
+                });
+            }
+
+            // Update existing spreadsheet
+            function updateSpreadsheet(spreadsheetId, name, budgetData, categoriesData, expensesData) {
+                const requests = [
+                    // Clear existing data
+                    {
+                        updateCells: {
+                            range: {
+                                sheetId: 0
+                            },
+                            fields: '*'
+                        }
+                    },
+                    // Add budget data to first sheet
+                    {
+                        updateCells: {
+                            start: {
+                                sheetId: 0,
+                                rowIndex: 0,
+                                columnIndex: 0
+                            },
+                            rows: budgetData.map(row => ({
+                                values: row.map(cell => ({
+                                    userEnteredValue: {
+                                        stringValue: typeof cell === 'string' ? cell : cell.toString()
+                                    }
+                                }))
+                            })),
+                            fields: '*'
+                        }
+                    },
+                    // Add categories data to second sheet (create if doesn't exist)
+                    {
+                        addSheet: {
+                            properties: {
+                                title: 'Categories'
+                            }
+                        }
+                    },
+                    {
+                        updateCells: {
+                            start: {
+                                sheetId: 1,
+                                rowIndex: 0,
+                                columnIndex: 0
+                            },
+                            rows: categoriesData.map(row => ({
+                                values: row.map(cell => ({
+                                    userEnteredValue: {
+                                        stringValue: typeof cell === 'string' ? cell : cell.toString()
+                                    }
+                                }))
+                            })),
+                            fields: '*'
+                        }
+                    },
+                    // Add expenses data to third sheet (create if doesn't exist)
+                    {
+                        addSheet: {
+                            properties: {
+                                title: 'Expenses'
+                            }
+                        }
+                    },
+                    {
+                        updateCells: {
+                            start: {
+                                sheetId: 2,
+                                rowIndex: 0,
+                                columnIndex: 0
+                            },
+                            rows: expensesData.map(row => ({
+                                values: row.map(cell => ({
+                                    userEnteredValue: {
+                                        stringValue: typeof cell === 'string' ? cell : cell.toString()
+                                    }
+                                }))
+                            })),
+                            fields: '*'
+                        }
+                    }
+                ];
+                
+                return gapi.client.sheets.spreadsheets.batchUpdate({
+                    spreadsheetId: spreadsheetId,
+                    resource: {
+                        requests: requests
+                    }
+                }).then(response => {
+                    state.googleAuth.spreadsheetId = spreadsheetId;
+                    state.googleAuth.spreadsheetName = name;
+                    saveData();
+                    return response;
+                });
+            }
+
+            // Sync data from Google Sheets
+            function syncFromGoogleSheets() {
+                if (!state.googleAuth.isConnected) {
+                    showNotification('Please connect to Google Sheets first', 'error');
+                    return;
+                }
+                
+                if (!state.googleAuth.spreadsheetId) {
+                    showNotification('No spreadsheet selected', 'error');
+                    return;
+                }
+                
+                showNotification('Syncing data from Google Sheets...', 'info');
+                
+                // Get data from all sheets
+                gapi.client.sheets.spreadsheets.get({
+                    spreadsheetId: state.googleAuth.spreadsheetId,
+                    includeGridData: true
+                }).then(response => {
+                    const sheets = response.result.sheets;
+                    let budgetData = [];
+                    let categoriesData = [];
+                    let expensesData = [];
+                    
+                    // Extract data from each sheet
+                    sheets.forEach(sheet => {
+                        const sheetTitle = sheet.properties.title;
+                        const rows = sheet.data[0].rowData || [];
+                        
+                        if (sheetTitle === 'Sheet1') {
+                            // Budget data
+                            budgetData = rows.slice(1).map(row => {
+                                return {
+                                    id: row.values[0]?.userEnteredValue?.stringValue || Date.now().toString(),
+                                    name: row.values[1]?.userEnteredValue?.stringValue || '',
+                                    totalAmount: parseFloat(row.values[2]?.userEnteredValue?.stringValue) || 0,
+                                    eventDate: row.values[3]?.userEnteredValue?.stringValue || new Date().toISOString().split('T')[0],
+                                    createdAt: row.values[4]?.userEnteredValue?.stringValue || new Date().toISOString()
+                                };
+                            });
+                        } else if (sheetTitle === 'Categories') {
+                            // Categories data
+                            categoriesData = rows.slice(1).map(row => {
+                                return {
+                                    id: row.values[0]?.userEnteredValue?.stringValue || Date.now().toString(),
+                                    name: row.values[1]?.userEnteredValue?.stringValue || '',
+                                    budget: parseFloat(row.values[2]?.userEnteredValue?.stringValue) || 0,
+                                    spent: parseFloat(row.values[3]?.userEnteredValue?.stringValue) || 0
+                                };
+                            });
+                        } else if (sheetTitle === 'Expenses') {
+                            // Expenses data
+                            expensesData = rows.slice(1).map(row => {
+                                return {
+                                    id: row.values[0]?.userEnteredValue?.stringValue || Date.now().toString(),
+                                    date: row.values[1]?.userEnteredValue?.stringValue || new Date().toISOString().split('T')[0],
+                                    categoryId: row.values[2]?.userEnteredValue?.stringValue || '',
+                                    categoryName: row.values[3]?.userEnteredValue?.stringValue || '',
+                                    description: row.values[4]?.userEnteredValue?.stringValue || '',
+                                    amount: parseFloat(row.values[5]?.userEnteredValue?.stringValue) || 0,
+                                    createdAt: row.values[6]?.userEnteredValue?.stringValue || new Date().toISOString()
+                                };
+                            });
+                        }
+                    });
+                    
+                    // Validate data
+                    if (budgetData.length === 0 || categoriesData.length === 0) {
+                        throw new Error('Invalid data format in spreadsheet');
+                    }
+                    
+                    // Ask for confirmation before overwriting
+                    if (!confirm('This will overwrite your current budget data. Continue?')) {
+                        return;
+                    }
+                    
+                    // Update state with imported data
+                    state.currentBudget = budgetData[0];
+                    state.categories = categoriesData;
+                    state.expenses = expensesData;
+                    
+                    saveData();
+                    updateUI();
+                    
+                    showNotification('Data synced from Google Sheets successfully!', 'success');
+                }).catch(error => {
+                    console.error('Error syncing from Google Sheets:', error);
+                    showNotification('Failed to sync data from Google Sheets', 'error');
+                });
+            }
+
+            // Show Google Sheets modal
+            function showGoogleSheetsModal() {
+                elements.googleSheetsModal.classList.remove('hidden');
+                
+                // Set default spreadsheet name
+                if (state.currentBudget) {
+                    elements.googleSheetName.value = `${state.currentBudget.name} Budget`;
+                } else {
+                    elements.googleSheetName.value = 'Event Budget Tracker';
+                }
+                
+                // Set spreadsheet ID if we have one
+                if (state.googleAuth.spreadsheetId) {
+                    elements.googleSheetId.value = state.googleAuth.spreadsheetId;
+                } else {
+                    elements.googleSheetId.value = '';
+                }
+            }
 
             // Modal functions
             function showNewBudgetModal() {
@@ -520,6 +1030,7 @@
                 saveData();
                 elements.newBudgetModal.classList.add('hidden');
                 elements.budgetForm.reset();
+                setDefaultDates();
                 
                 showNotification('Budget created successfully! Now add some categories.', 'success');
                 updateUI();
@@ -603,6 +1114,7 @@
                 saveData();
                 elements.addExpenseModal.classList.add('hidden');
                 elements.expenseForm.reset();
+                setDefaultDates();
                 
                 showNotification('Expense recorded successfully!', 'success');
                 updateUI();
@@ -1093,19 +1605,9 @@
                     currentBudget: state.currentBudget,
                     categories: state.categories,
                     expenses: state.expenses,
-                    budgets: state.budgets
+                    budgets: state.budgets,
+                    googleAuth: state.googleAuth
                 }));
-            }
-
-            function loadData() {
-                const savedData = localStorage.getItem('eventBudgetTracker');
-                if (savedData) {
-                    const parsedData = JSON.parse(savedData);
-                    state.currentBudget = parsedData.currentBudget;
-                    state.categories = parsedData.categories || [];
-                    state.expenses = parsedData.expenses || [];
-                    state.budgets = parsedData.budgets || [];
-                }
             }
 
             // Notification system
