@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskMaster Pro - Team Task Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+        .task-item:hover .task-actions {
+            opacity: 1;
+        }
+        
+        .priority-high {
+            border-left: 4px solid #ef4444;
+        }
+        
+        .priority-medium {
+            border-left: 4px solid #f59e0b;
+        }
+        
+        .priority-low {
+            border-left: 4px solid #10b981;
+        }
+        
+        .status-not-started {
+            background-color: #e5e7eb;
+        }
+        
+        .status-in-progress {
+            background-color: #93c5fd;
+        }
+        
+        .status-completed {
+            background-color: #86efac;
+        }
+        
+        .status-blocked {
+            background-color: #fca5a5;
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 10px;
+        }
+        
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+        
+        /* Animation for task completion */
+        @keyframes taskComplete {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .task-complete-animation {
+            animation: taskComplete 0.5s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8">
+            <div class="flex items-center mb-4 md:mb-0">
+                <i class="fas fa-tasks text-indigo-600 text-4xl mr-3"></i>
+                <h1 class="text-3xl font-bold text-gray-800">TaskMaster Pro</h1>
+            </div>
+            <div class="flex space-x-2">
+                <button id="importBtn" class="bg-white text-indigo-600 px-4 py-2 rounded-lg border border-indigo-600 hover:bg-indigo-50 transition flex items-center">
+                    <i class="fas fa-file-import mr-2"></i> Import
+                    <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xls,.csv">
+                </button>
+                <button id="exportBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center">
+                    <i class="fas fa-file-export mr-2"></i> Export
+                </button>
+                <button id="saveBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center">
+                    <i class="fas fa-save mr-2"></i> Save
+                </button>
+            </div>
+        </header>
+        
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-lg shadow">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-500">Total Tasks</p>
+                        <h3 class="text-2xl font-bold" id="totalTasks">0</h3>
+                    </div>
+                    <div class="bg-indigo-100 p-3 rounded-full">
+                        <i class="fas fa-tasks text-indigo-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-500">Completed</p>
+                        <h3 class="text-2xl font-bold" id="completedTasks">0</h3>
+                    </div>
+                    <div class="bg-green-100 p-3 rounded-full">
+                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-500">In Progress</p>
+                        <h3 class="text-2xl font-bold" id="inProgressTasks">0</h3>
+                    </div>
+                    <div class="bg-blue-100 p-3 rounded-full">
+                        <i class="fas fa-spinner text-blue-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="text-gray-500">Overdue</p>
+                        <h3 class="text-2xl font-bold" id="overdueTasks">0</h3>
+                    </div>
+                    <div class="bg-red-100 p-3 rounded-full">
+                        <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Progress Bar -->
+        <div class="bg-white p-4 rounded-lg shadow mb-8">
+            <div class="flex justify-between mb-2">
+                <span class="font-medium">Team Progress</span>
+                <span class="font-medium" id="progressPercentage">0%</span>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5">
+                <div id="progressBar" class="progress-bar bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Task List -->
+            <div class="lg:w-2/3">
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="flex justify-between items-center p-4 border-b">
+                        <h2 class="text-xl font-semibold text-gray-800">Team Tasks</h2>
+                        <button id="addTaskBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Add Task
+                        </button>
+                    </div>
+                    
+                    <!-- Filters -->
+                    <div class="p-4 border-b bg-gray-50">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
+                                <select id="statusFilter" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="all">All Statuses</option>
+                                    <option value="Not Started">Not Started</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Completed">Completed</option>
+                                    <option value="Blocked">Blocked</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Priority</label>
+                                <select id="priorityFilter" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="all">All Priorities</option>
+                                    <option value="High">High</option>
+                                    <option value="Medium">Medium</option>
+                                    <option value="Low">Low</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Assignee</label>
+                                <select id="assigneeFilter" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <option value="all">All Team Members</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Task Table -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assignee</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="taskList" class="bg-white divide-y divide-gray-200">
+                                <!-- Tasks will be dynamically added here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div id="emptyState" class="p-8 text-center">
+                        <i class="fas fa-tasks text-gray-300 text-5xl mb-4"></i>
+                        <h3 class="text-lg font-medium text-gray-900">No tasks yet</h3>
+                        <p class="text-gray-500 mt-1">Get started by adding a new task</p>
+                        <button id="emptyAddTaskBtn" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <i class="fas fa-plus mr-2"></i> Add Task
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Team Members -->
+            <div class="lg:w-1/3">
+                <div class="bg-white rounded-lg shadow overflow-hidden">
+                    <div class="flex justify-between items-center p-4 border-b">
+                        <h2 class="text-xl font-semibold text-gray-800">Team Members</h2>
+                        <button id="addMemberBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Add Member
+                        </button>
+                    </div>
+                    
+                    <div class="divide-y divide-gray-200 custom-scrollbar" style="max-height: 500px; overflow-y: auto;">
+                        <div id="teamMembersList">
+                            <!-- Team members will be dynamically added here -->
+                        </div>
+                    </div>
+                    
+                    <!-- Empty State for Team Members -->
+                    <div id="emptyTeamState" class="p-8 text-center">
+                        <i class="fas fa-users text-gray-300 text-5xl mb-4"></i>
+                        <h3 class="text-lg font-medium text-gray-900">No team members yet</h3>
+                        <p class="text-gray-500 mt-1">Add your first team member to assign tasks</p>
+                        <button id="emptyAddMemberBtn" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <i class="fas fa-plus mr-2"></i> Add Member
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Recent Activity -->
+                <div class="bg-white rounded-lg shadow overflow-hidden mt-8">
+                    <div class="p-4 border-b">
+                        <h2 class="text-xl font-semibold text-gray-800">Recent Activity</h2>
+                    </div>
+                    <div class="divide-y divide-gray-200 custom-scrollbar" style="max-height: 300px; overflow-y: auto;">
+                        <div id="activityFeed">
+                            <!-- Activity items will be dynamically added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Task Modal -->
+    <div id="taskModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="modalTitle">Add New Task</h3>
+                            <form id="taskForm" class="space-y-4">
+                                <input type="hidden" id="taskId">
+                                <div>
+                                    <label for="taskTitle" class="block text-sm font-medium text-gray-700">Task Title</label>
+                                    <input type="text" id="taskTitle" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                                </div>
+                                <div>
+                                    <label for="taskDescription" class="block text-sm font-medium text-gray-700">Description</label>
+                                    <textarea id="taskDescription" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="taskAssignee" class="block text-sm font-medium text-gray-700">Assignee</label>
+                                        <select id="taskAssignee" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                                            <option value="">Select Assignee</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="taskPriority" class="block text-sm font-medium text-gray-700">Priority</label>
+                                        <select id="taskPriority" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                                            <option value="">Select Priority</option>
+                                            <option value="High">High</option>
+                                            <option value="Medium">Medium</option>
+                                            <option value="Low">Low</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label for="taskDueDate" class="block text-sm font-medium text-gray-700">Due Date</label>
+                                        <input type="date" id="taskDueDate" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                                    </div>
+                                    <div>
+                                        <label for="taskStatus" class="block text-sm font-medium text-gray-700">Status</label>
+                                        <select id="taskStatus" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                                            <option value="Not Started">Not Started</option>
+                                            <option value="In Progress">In Progress</option>
+                                            <option value="Completed">Completed</option>
+                                            <option value="Blocked">Blocked</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="saveTaskBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Save
+                    </button>
+                    <button type="button" id="cancelTaskBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Add Team Member Modal -->
+    <div id="memberModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Add Team Member</h3>
+                            <form id="memberForm" class="space-y-4">
+                                <input type="hidden" id="memberId">
+                                <div>
+                                    <label for="memberName" class="block text-sm font-medium text-gray-700">Full Name</label>
+                                    <input type="text" id="memberName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                                </div>
+                                <div>
+                                    <label for="memberEmail" class="block text-sm font-medium text-gray-700">Email</label>
+                                    <input type="email" id="memberEmail" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                                </div>
+                                <div>
+                                    <label for="memberRole" class="block text-sm font-medium text-gray-700">Role</label>
+                                    <input type="text" id="memberRole" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="saveMemberBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Save
+                    </button>
+                    <button type="button" id="cancelMemberBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal -->
+    <div id="confirmModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-exclamation text-red-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="confirmTitle">Confirm Action</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500" id="confirmMessage">Are you sure you want to perform this action?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="confirmYesBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
+                        Yes
+                    </button>
+                    <button type="button" id="confirmNoBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Notification -->
+    <div id="successNotification" class="fixed bottom-4 right-4 hidden">
+        <div class="bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span id="successMessage">Operation completed successfully!</span>
+        </div>
+    </div>
+    
+    <!-- Error Notification -->
+    <div id="errorNotification" class="fixed bottom-4 right-4 hidden">
+        <div class="bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center">
+            <i class="fas fa-exclamation-circle mr-2"></i>
+            <span id="errorMessage">An error occurred!</span>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        let tasks = [];
+        let teamMembers = [];
+        let activities = [];
+        
+        // DOM Elements
+        const taskList = document.getElementById('taskList');
+        const teamMembersList = document.getElementById('teamMembersList');
+        const activityFeed = document.getElementById('activityFeed');
+        const emptyState = document.getElementById('emptyState');
+        const emptyTeamState = document.getElementById('emptyTeamState');
+        const totalTasksEl = document.getElementById('totalTasks');
+        const completedTasksEl = document.getElementById('completedTasks');
+        const inProgressTasksEl = document.getElementById('inProgressTasks');
+        const overdueTasksEl = document.getElementById('overdueTasks');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercentage = document.getElementById('progressPercentage');
+        
+        // Modal Elements
+        const taskModal = document.getElementById('taskModal');
+        const memberModal = document.getElementById('memberModal');
+        const confirmModal = document.getElementById('confirmModal');
+        
+        // Buttons
+        const addTaskBtn = document.getElementById('addTaskBtn');
+        const emptyAddTaskBtn = document.getElementById('emptyAddTaskBtn');
+        const addMemberBtn = document.getElementById('addMemberBtn');
+        const emptyAddMemberBtn = document.getElementById('emptyAddMemberBtn');
+        const saveTaskBtn = document.getElementById('saveTaskBtn');
+        const cancelTaskBtn = document.getElementById('cancelTaskBtn');
+        const saveMemberBtn = document.getElementById('saveMemberBtn');
+        const cancelMemberBtn = document.getElementById('cancelMemberBtn');
+        const confirmYesBtn = document.getElementById('confirmYesBtn');
+        const confirmNoBtn = document.getElementById('confirmNoBtn');
+        const importBtn = document.getElementById('importBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const fileInput = document.getElementById('fileInput');
+        
+        // Form Elements
+        const taskForm = document.getElementById('taskForm');
+        const memberForm = document.getElementById('memberForm');
+        const taskIdInput = document.getElementById('taskId');
+        const taskTitleInput = document.getElementById('taskTitle');
+        const taskDescriptionInput = document.getElementById('taskDescription');
+        const taskAssigneeInput = document.getElementById('taskAssignee');
+        const taskPriorityInput = document.getElementById('taskPriority');
+        const taskDueDateInput = document.getElementById('taskDueDate');
+        const taskStatusInput = document.getElementById('taskStatus');
+        const memberIdInput = document.getElementById('memberId');
+        const memberNameInput = document.getElementById('memberName');
+        const memberEmailInput = document.getElementById('memberEmail');
+        const memberRoleInput = document.getElementById('memberRole');
+        
+        // Filter Elements
+        const statusFilter = document.getElementById('statusFilter');
+        const priorityFilter = document.getElementById('priorityFilter');
+        const assigneeFilter = document.getElementById('assigneeFilter');
+        
+        // Notification Elements
+        const successNotification = document.getElementById('successNotification');
+        const errorNotification = document.getElementById('errorNotification');
+        const successMessageEl = document.getElementById('successMessage');
+        const errorMessageEl = document.getElementById('errorMessage');
+        
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load sample data if localStorage is empty
+            if (!localStorage.getItem('tasks') || !localStorage.getItem('teamMembers')) {
+                loadSampleData();
+            } else {
+                loadFromLocalStorage();
+            }
+            
+            renderTasks();
+            renderTeamMembers();
+            renderActivities();
+            updateStats();
+            updateProgressBar();
+            updateAssigneeFilter();
+            
+            // Event Listeners
+            addTaskBtn.addEventListener('click', () => openTaskModal());
+            emptyAddTaskBtn.addEventListener('click', () => openTaskModal());
+            addMemberBtn.addEventListener('click', () => openMemberModal());
+            emptyAddMemberBtn.addEventListener('click', () => openMemberModal());
+            saveTaskBtn.addEventListener('click', () => saveTask());
+            cancelTaskBtn.addEventListener('click', () => closeTaskModal());
+            saveMemberBtn.addEventListener('click', () => saveMember());
+            cancelMemberBtn.addEventListener('click', () => closeMemberModal());
+            confirmYesBtn.addEventListener('click', () => confirmAction());
+            confirmNoBtn.addEventListener('click', () => closeConfirmModal());
+            importBtn.addEventListener('click', () => fileInput.click());
+            exportBtn.addEventListener('click', () => exportToExcel());
+            saveBtn.addEventListener('click', () => saveToLocalStorage());
+            fileInput.addEventListener('change', (e) => importFromExcel(e));
+            
+            // Filter event listeners
+            statusFilter.addEventListener('change', () => renderTasks());
+            priorityFilter.addEventListener('change', () => renderTasks());
+            assigneeFilter.addEventListener('change', () => renderTasks());
+        });
+        
+        // Load sample data
+        function loadSampleData() {
+            teamMembers = [
+                { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Developer' },
+                { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'Designer' },
+                { id: 3, name: 'Mike Johnson', email: 'mike@example.com', role: 'Project Manager' }
+            ];
+            
+            tasks = [
+                { 
+                    id: 1, 
+                    title: 'Design Homepage', 
+                    description: 'Create wireframes and mockups for the homepage', 
+                    assignee: 2, 
+                    dueDate: '2023-06-15', 
+                    priority: 'High', 
+                    status: 'In Progress',
+                    createdAt: new Date().toISOString()
+                },
+                { 
+                    id: 2, 
+                    title: 'Implement User Authentication', 
+                    description: 'Develop login and registration functionality', 
+                    assignee: 1, 
+                    dueDate: '2023-06-20', 
+                    priority: 'High', 
+                    status: 'Not Started',
+                    createdAt: new Date().toISOString()
+                },
+                { 
+                    id: 3, 
+                    title: 'Create Project Documentation', 
+                    description: 'Write technical documentation for the API', 
+                    assignee: 3, 
+                    dueDate: '2023-06-10', 
+                    priority: 'Medium', 
+                    status: 'Completed',
+                    createdAt: new Date().toISOString()
+                }
+            ];
+            
+            activities = [
+                { id: 1, type: 'task', action: 'created', itemId: 3, memberId: 3, timestamp: new Date().toISOString() },
+                { id: 2, type: 'task', action: 'updated', itemId: 1, memberId: 2, timestamp: new Date(Date.now() - 3600000).toISOString() },
+                { id: 3, type: 'member', action: 'added', itemId: 2, memberId: 3, timestamp: new Date(Date.now() - 86400000).toISOString() }
+            ];
+            
+            saveToLocalStorage();
+        }
+        
+        // Load from localStorage
+        function loadFromLocalStorage() {
+            tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            teamMembers = JSON.parse(localStorage.getItem('teamMembers')) || [];
+            activities = JSON.parse(localStorage.getItem('activities')) || [];
+        }
+        
+        // Save to localStorage
+        function saveToLocalStorage() {
+            localStorage.setItem('tasks', JSON.stringify(tasks));
+            localStorage.setItem('teamMembers', JSON.stringify(teamMembers));
+            localStorage.setItem('activities', JSON.stringify(activities));
+            showSuccess('Data saved successfully!');
+        }
+        
+        // Render tasks
+        function renderTasks() {
+            const statusFilterValue = statusFilter.value;
+            const priorityFilterValue = priorityFilter.value;
+            const assigneeFilterValue = assigneeFilter.value;
+            
+            // Filter tasks
+            let filteredTasks = tasks;
+            
+            if (statusFilterValue !== 'all') {
+                filteredTasks = filteredTasks.filter(task => task.status === statusFilterValue);
+            }
+            
+            if (priorityFilterValue !== 'all') {
+                filteredTasks = filteredTasks.filter(task => task.priority === priorityFilterValue);
+            }
+            
+            if (assigneeFilterValue !== 'all') {
+                filteredTasks = filteredTasks.filter(task => task.assignee.toString() === assigneeFilterValue);
+            }
+            
+            // Clear the task list
+            taskList.innerHTML = '';
+            
+            // Show empty state if no tasks
+            if (filteredTasks.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyState.classList.add('hidden');
+            
+            // Add tasks to the list
+            filteredTasks.forEach(task => {
+                const assignee = teamMembers.find(member => member.id === task.assignee);
+                const assigneeName = assignee ? assignee.name : 'Unassigned';
+                
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const dueDate = new Date(task.dueDate);
+                const isOverdue = dueDate < today && task.status !== 'Completed';
+                
+                const taskRow = document.createElement('tr');
+                taskRow.className = `task-item hover:bg-gray-50 ${isOverdue ? 'bg-red-50' : ''}`;
+                taskRow.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                                <i class="fas fa-tasks"></i>
+                            </div>
+                            <div class="ml-4">
+                                <div class="text-sm font-medium text-gray-900">${task.title}</div>
+                                <div class="text-sm text-gray-500 truncate max-w-xs">${task.description || 'No description'}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm text-gray-900">${assigneeName}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <div class="text-sm ${isOverdue ? 'text-red-600 font-semibold' : 'text-gray-500'}">
+                            ${formatDate(task.dueDate)}
+                            ${isOverdue ? '<span class="ml-1 text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">Overdue</span>' : ''}
+                        </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            ${task.priority === 'High' ? 'bg-red-100 text-red-800' : ''}
+                            ${task.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : ''}
+                            ${task.priority === 'Low' ? 'bg-green-100 text-green-800' : ''}">
+                            ${task.priority}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                            ${task.status === 'Not Started' ? 'bg-gray-100 text-gray-800' : ''}
+                            ${task.status === 'In Progress' ? 'bg-blue-100 text-blue-800' : ''}
+                            ${task.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}
+                            ${task.status === 'Blocked' ? 'bg-red-100 text-red-800' : ''}">
+                            ${task.status}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium task-actions opacity-0 transition-opacity">
+                        <button class="text-indigo-600 hover:text-indigo-900 mr-3 edit-task" data-id="${task.id}">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="text-red-600 hover:text-red-900 delete-task" data-id="${task.id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                
+                taskList.appendChild(taskRow);
+            });
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-task').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const taskId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    openTaskModal(taskId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-task').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const taskId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    showConfirmModal(
+                        'Delete Task',
+                        'Are you sure you want to delete this task? This action cannot be undone.',
+                        () => deleteTask(taskId)
+                    );
+                });
+            });
+        }
+        
+        // Render team members
+        function renderTeamMembers() {
+            // Clear the team members list
+            teamMembersList.innerHTML = '';
+            
+            // Show empty state if no team members
+            if (teamMembers.length === 0) {
+                emptyTeamState.classList.remove('hidden');
+                return;
+            }
+            
+            emptyTeamState.classList.add('hidden');
+            
+            // Add team members to the list
+            teamMembers.forEach(member => {
+                const memberTasks = tasks.filter(task => task.assignee === member.id);
+                const completedTasks = memberTasks.filter(task => task.status === 'Completed').length;
+                const completionRate = memberTasks.length > 0 ? Math.round((completedTasks / memberTasks.length) * 100) : 0;
+                
+                const memberItem = document.createElement('div');
+                memberItem.className = 'p-4 flex items-center hover:bg-gray-50';
+                memberItem.innerHTML = `
+                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="ml-4 flex-1">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-sm font-medium text-gray-900">${member.name}</h3>
+                            <div class="flex space-x-2">
+                                <button class="text-indigo-600 hover:text-indigo-900 edit-member" data-id="${member.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="text-red-600 hover:text-red-900 delete-member" data-id="${member.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-500">${member.role}</p>
+                        <div class="mt-2">
+                            <div class="flex justify-between text-xs text-gray-500 mb-1">
+                                <span>${memberTasks.length} tasks assigned</span>
+                                <span>${completionRate}% completed</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-1.5">
+                                <div class="bg-indigo-600 h-1.5 rounded-full" style="width: ${completionRate}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                teamMembersList.appendChild(memberItem);
+            });
+            
+            // Add event listeners to edit and delete buttons
+            document.querySelectorAll('.edit-member').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const memberId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    openMemberModal(memberId);
+                });
+            });
+            
+            document.querySelectorAll('.delete-member').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const memberId = parseInt(e.currentTarget.getAttribute('data-id'));
+                    const memberTasks = tasks.filter(task => task.assignee === memberId);
+                    
+                    if (memberTasks.length > 0) {
+                        showError('Cannot delete member with assigned tasks. Reassign tasks first.');
+                        return;
+                    }
+                    
+                    showConfirmModal(
+                        'Delete Team Member',
+                        'Are you sure you want to delete this team member? This action cannot be undone.',
+                        () => deleteMember(memberId)
+                    );
+                });
+            });
+        }
+        
+        // Render activities
+        function renderActivities() {
+            // Clear the activity feed
+            activityFeed.innerHTML = '';
+            
+            // Sort activities by timestamp (newest first)
+            const sortedActivities = [...activities].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            
+            // Show only the 5 most recent activities
+            const recentActivities = sortedActivities.slice(0, 5);
+            
+            if (recentActivities.length === 0) {
+                activityFeed.innerHTML = '<div class="p-4 text-center text-gray-500">No recent activity</div>';
+                return;
+            }
+            
+            // Add activities to the feed
+            recentActivities.forEach(activity => {
+                const member = teamMembers.find(m => m.id === activity.memberId);
+                const memberName = member ? member.name : 'Unknown';
+                
+                let actionText = '';
+                let icon = '';
+                let iconColor = 'text-gray-500';
+                
+                if (activity.type === 'task') {
+                    const task = tasks.find(t => t.id === activity.itemId);
+                    const taskTitle = task ? task.title : 'Unknown Task';
+                    
+                    if (activity.action === 'created') {
+                        actionText = `created task "${taskTitle}"`;
+                        icon = 'fa-plus';
+                        iconColor = 'text-green-500';
+                    } else if (activity.action === 'updated') {
+                        actionText = `updated task "${taskTitle}"`;
+                        icon = 'fa-edit';
+                        iconColor = 'text-blue-500';
+                    } else if (activity.action === 'deleted') {
+                        actionText = `deleted task "${taskTitle}"`;
+                        icon = 'fa-trash';
+                        iconColor = 'text-red-500';
+                    } else if (activity.action === 'completed') {
+                        actionText = `completed task "${taskTitle}"`;
+                        icon = 'fa-check';
+                        iconColor = 'text-green-500';
+                    }
+                } else if (activity.type === 'member') {
+                    const member = teamMembers.find(m => m.id === activity.itemId);
+                    const memberName = member ? member.name : 'Unknown Member';
+                    
+                    if (activity.action === 'added') {
+                        actionText = `added team member "${memberName}"`;
+                        icon = 'fa-user-plus';
+                        iconColor = 'text-indigo-500';
+                    } else if (activity.action === 'updated') {
+                        actionText = `updated team member "${memberName}"`;
+                        icon = 'fa-user-edit';
+                        iconColor = 'text-blue-500';
+                    } else if (activity.action === 'deleted') {
+                        actionText = `deleted team member "${memberName}"`;
+                        icon = 'fa-user-minus';
+                        iconColor = 'text-red-500';
+                    }
+                }
+                
+                const activityItem = document.createElement('div');
+                activityItem.className = 'p-4 flex items-start';
+                activityItem.innerHTML = `
+                    <div class="flex-shrink-0">
+                        <div class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center ${iconColor}">
+                            <i class="fas ${icon}"></i>
+                        </div>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm font-medium text-gray-900">${memberName}</p>
+                        <p class="text-sm text-gray-500">${actionText}</p>
+                        <p class="text-xs text-gray-400">${formatDateTime(activity.timestamp)}</p>
+                    </div>
+                `;
+                
+                activityFeed.appendChild(activityItem);
+            });
+        }
+        
+        // Update stats
+        function updateStats() {
+            totalTasksEl.textContent = tasks.length;
+            completedTasksEl.textContent = tasks.filter(task => task.status === 'Completed').length;
+            inProgressTasksEl.textContent = tasks.filter(task => task.status === 'In Progress').length;
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            overdueTasksEl.textContent = tasks.filter(task => {
+                const dueDate = new Date(task.dueDate);
+                return dueDate < today && task.status !== 'Completed';
+            }).length;
+        }
+        
+        // Update progress bar
+        function updateProgressBar() {
+            const completedTasks = tasks.filter(task => task.status === 'Completed').length;
+            const totalTasks = tasks.length;
+            const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            
+            progressBar.style.width = `${percentage}%`;
+            progressPercentage.textContent = `${percentage}%`;
+        }
+        
+        // Update assignee filter dropdown
+        function updateAssigneeFilter() {
+            assigneeFilter.innerHTML = '<option value="all">All Team Members</option>';
+            
+            teamMembers.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member.id;
+                option.textContent = member.name;
+                assigneeFilter.appendChild(option);
+            });
+        }
+        
+        // Open task modal
+        function openTaskModal(taskId = null) {
+            // Reset form
+            taskForm.reset();
+            taskIdInput.value = '';
+            
+            // Populate assignee dropdown
+            taskAssigneeInput.innerHTML = '<option value="">Select Assignee</option>';
+            teamMembers.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member.id;
+                option.textContent = member.name;
+                taskAssigneeInput.appendChild(option);
+            });
+            
+            // If editing, populate form with task data
+            if (taskId) {
+                const task = tasks.find(t => t.id === taskId);
+                if (task) {
+                    document.getElementById('modalTitle').textContent = 'Edit Task';
+                    taskIdInput.value = task.id;
+                    taskTitleInput.value = task.title;
+                    taskDescriptionInput.value = task.description || '';
+                    taskAssigneeInput.value = task.assignee;
+                    taskPriorityInput.value = task.priority;
+                    taskDueDateInput.value = task.dueDate;
+                    taskStatusInput.value = task.status;
+                }
+            } else {
+                document.getElementById('modalTitle').textContent = 'Add New Task';
+                // Set default due date to tomorrow
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                taskDueDateInput.valueAsDate = tomorrow;
+            }
+            
+            // Show modal
+            taskModal.classList.remove('hidden');
+        }
+        
+        // Close task modal
+        function closeTaskModal() {
+            taskModal.classList.add('hidden');
+        }
+        
+        // Save task
+        function saveTask() {
+            if (!taskForm.checkValidity()) {
+                taskForm.reportValidity();
+                return;
+            }
+            
+            const taskId = taskIdInput.value ? parseInt(taskIdInput.value) : null;
+            const taskData = {
+                title: taskTitleInput.value,
+                description: taskDescriptionInput.value,
+                assignee: parseInt(taskAssigneeInput.value),
+                dueDate: taskDueDateInput.value,
+                priority: taskPriorityInput.value,
+                status: taskStatusInput.value,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (taskId) {
+                // Update existing task
+                const index = tasks.findIndex(t => t.id === taskId);
+                if (index !== -1) {
+                    tasks[index] = { ...tasks[index], ...taskData };
+                    
+                    // Add activity
+                    activities.push({
+                        id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
+                        type: 'task',
+                        action: 'updated',
+                        itemId: taskId,
+                        memberId: taskData.assignee,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    showSuccess('Task updated successfully!');
+                }
+            } else {
+                // Add new task
+                const newId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
+                const newTask = { id: newId, ...taskData };
+                tasks.push(newTask);
+                
+                // Add activity
+                activities.push({
+                    id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
+                    type: 'task',
+                    action: 'created',
+                    itemId: newId,
+                    memberId: taskData.assignee,
+                    timestamp: new Date().toISOString()
+                });
+                
+                showSuccess('Task added successfully!');
+            }
+            
+            // Update UI
+            renderTasks();
+            renderTeamMembers();
+            renderActivities();
+            updateStats();
+            updateProgressBar();
+            
+            // Close modal
+            closeTaskModal();
+        }
+        
+        // Delete task
+        function deleteTask(taskId) {
+            const index = tasks.findIndex(t => t.id === taskId);
+            if (index !== -1) {
+                const task = tasks[index];
+                
+                // Add activity
+                activities.push({
+                    id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
+                    type: 'task',
+                    action: 'deleted',
+                    itemId: taskId,
+                    memberId: task.assignee,
+                    timestamp: new Date().toISOString()
+                });
+                
+                tasks.splice(index, 1);
+                
+                // Update UI
+                renderTasks();
+                renderActivities();
+                updateStats();
+                updateProgressBar();
+                
+                showSuccess('Task deleted successfully!');
+            }
+            
+            closeConfirmModal();
+        }
+        
+        // Open member modal
+        function openMemberModal(memberId = null) {
+            // Reset form
+            memberForm.reset();
+            memberIdInput.value = '';
+            
+            // If editing, populate form with member data
+            if (memberId) {
+                const member = teamMembers.find(m => m.id === memberId);
+                if (member) {
+                    memberNameInput.value = member.name;
+                    memberEmailInput.value = member.email;
+                    memberRoleInput.value = member.role;
+                }
+            }
+            
+            // Show modal
+            memberModal.classList.remove('hidden');
+        }
+        
+        // Close member modal
+        function closeMemberModal() {
+            memberModal.classList.add('hidden');
+        }
+        
+        // Save member
+        function saveMember() {
+            if (!memberForm.checkValidity()) {
+                memberForm.reportValidity();
+                return;
+            }
+            
+            const memberId = memberIdInput.value ? parseInt(memberIdInput.value) : null;
+            const memberData = {
+                name: memberNameInput.value,
+                email: memberEmailInput.value,
+                role: memberRoleInput.value
+            };
+            
+            if (memberId) {
+                // Update existing member
+                const index = teamMembers.findIndex(m => m.id === memberId);
+                if (index !== -1) {
+                    teamMembers[index] = { ...teamMembers[index], ...memberData };
+                    
+                    // Add activity
+                    activities.push({
+                        id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
+                        type: 'member',
+                        action: 'updated',
+                        itemId: memberId,
+                        memberId: memberId,
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    showSuccess('Team member updated successfully!');
+                }
+            } else {
+                // Add new member
+                const newId = teamMembers.length > 0 ? Math.max(...teamMembers.map(m => m.id)) + 1 : 1;
+                const newMember = { id: newId, ...memberData };
+                teamMembers.push(newMember);
+                
+                // Add activity
+                activities.push({
+                    id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
+                    type: 'member',
+                    action: 'added',
+                    itemId: newId,
+                    memberId: newId,
+                    timestamp: new Date().toISOString()
+                });
+                
+                showSuccess('Team member added successfully!');
+            }
+            
+            // Update UI
+            renderTeamMembers();
+            renderActivities();
+            updateAssigneeFilter();
+            
+            // Close modal
+            closeMemberModal();
+        }
+        
+        // Delete member
+        function deleteMember(memberId) {
+            const index = teamMembers.findIndex(m => m.id === memberId);
+            if (index !== -1) {
+                const member = teamMembers[index];
+                
+                // Add activity
+                activities.push({
+                    id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
+                    type: 'member',
+                    action: 'deleted',
+                    itemId: memberId,
+                    memberId: memberId,
+                    timestamp: new Date().toISOString()
+                });
+                
+                teamMembers.splice(index, 1);
+                
+                // Update UI
+                renderTeamMembers();
+                renderActivities();
+                updateAssigneeFilter();
+                
+                showSuccess('Team member deleted successfully!');
+            }
+            
+            closeConfirmModal();
+        }
+        
+        // Show confirmation modal
+        function showConfirmModal(title, message, callback) {
+            document.getElementById('confirmTitle').textContent = title;
+            document.getElementById('confirmMessage').textContent = message;
+            
+            // Store callback in button
+            confirmYesBtn.onclick = callback;
+            
+            // Show modal
+            confirmModal.classList.remove('hidden');
+        }
+        
+        // Close confirmation modal
+        function closeConfirmModal() {
+            confirmModal.classList.add('hidden');
+        }
+        
+        // Confirm action
+        function confirmAction() {
+            // The actual action is bound to the confirmYesBtn.onclick
+            // This function just exists to match the confirmAction name in the modal
+        }
+        
+        // Show success notification
+        function showSuccess(message) {
+            successMessageEl.textContent = message;
+            successNotification.classList.remove('hidden');
+            
+            setTimeout(() => {
+                successNotification.classList.add('hidden');
+            }, 3000);
+        }
+        
+        // Show error notification
+        function showError(message) {
+            errorMessageEl.textContent = message;
+            errorNotification.classList.remove('hidden');
+            
+            setTimeout(() => {
+                errorNotification.classList.add('hidden');
+            }, 3000);
+        }
+        
+        // Export to Excel
+        function exportToExcel() {
+            // Prepare data for export
+            const exportData = tasks.map(task => {
+                const assignee = teamMembers.find(member => member.id === task.assignee);
+                const assigneeName = assignee ? assignee.name : 'Unassigned';
+                
+                return {
+                    'Task ID': task.id,
+                    'Title': task.title,
+                    'Description': task.description,
+                    'Assignee': assigneeName,
+                    'Due Date': formatDate(task.dueDate),
+                    'Priority': task.priority,
+                    'Status': task.status,
+                    'Created At': formatDateTime(task.createdAt)
+                };
+            });
+            
+            // Create worksheet
+            const ws = XLSX.utils.json_to_sheet(exportData);
+            
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Tasks');
+            
+            // Export to file
+            XLSX.writeFile(wb, 'tasks_export.xlsx');
+            
+            showSuccess('Tasks exported successfully!');
+        }
+        
+        // Import from Excel
+        function importFromExcel(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                // Get first worksheet
+                const worksheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[worksheetName];
+                
+                // Convert to JSON
+                const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                
+                // Process imported data
+                const importedTasks = [];
+                const newActivities = [];
+                
+                jsonData.forEach(row => {
+                    // Find or create assignee
+                    let assigneeId = null;
+                    const existingMember = teamMembers.find(member => 
+                        member.name === row['Assignee'] || member.email === row['Assignee']
+                    );
+                    
+                    if (existingMember) {
+                        assigneeId = existingMember.id;
+                    } else if (row['Assignee'] && row['Assignee'] !== 'Unassigned') {
+                        // Create new member
+                        const newMemberId = teamMembers.length > 0 ? Math.max(...teamMembers.map(m => m.id)) + 1 : 1;
+                        assigneeId = newMemberId;
+                        
+                        teamMembers.push({
+                            id: newMemberId,
+                            name: row['Assignee'],
+                            email: '',
+                            role: 'Team Member'
+                        });
+                        
+                        newActivities.push({
+                            id: activities.length + newActivities.length + 1,
+                            type: 'member',
+                            action: 'added',
+                            itemId: newMemberId,
+                            memberId: newMemberId,
+                            timestamp: new Date().toISOString()
+                        });
+                    }
+                    
+                    // Create task
+                    const newTaskId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
+                    
+                    // Parse due date (assuming format is either date string or Excel serial number)
+                    let dueDate = new Date();
+                    if (row['Due Date']) {
+                        if (typeof row['Due Date'] === 'number') {
+                            // Excel serial date (days since 1900)
+                            dueDate = XLSX.SSF.parse_date_code(row['Due Date']);
+                        } else {
+                            // Try to parse as date string
+                            dueDate = new Date(row['Due Date']);
+                        }
+                    }
+                    
+                    // Format date as YYYY-MM-DD
+                    const formattedDueDate = dueDate.toISOString().split('T')[0];
+                    
+                    importedTasks.push({
+                        id: newTaskId,
+                        title: row['Title'] || `Imported Task ${newTaskId}`,
+                        description: row['Description'] || '',
+                        assignee: assigneeId,
+                        dueDate: formattedDueDate,
+                        priority: row['Priority'] || 'Medium',
+                        status: row['Status'] || 'Not Started',
+                        createdAt: new Date().toISOString()
+                    });
+                    
+                    newActivities.push({
+                        id: activities.length + newActivities.length + 1,
+                        type: 'task',
+                        action: 'created',
+                        itemId: newTaskId,
+                        memberId: assigneeId,
+                        timestamp: new Date().toISOString()
+                    });
+                });
+                
+                // Add imported tasks and activities
+                tasks.push(...importedTasks);
+                activities.push(...newActivities);
+                
+                // Update UI
+                renderTasks();
+                renderTeamMembers();
+                renderActivities();
+                updateStats();
+                updateProgressBar();
+                updateAssigneeFilter();
+                
+                showSuccess(`Successfully imported ${importedTasks.length} tasks and added ${newActivities.filter(a => a.type === 'member').length} new team members!`);
+            };
+            
+            reader.readAsArrayBuffer(file);
+            
+            // Reset file input
+            event.target.value = '';
+        }
+        
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+        }
+        
+        // Format date and time
+        function formatDateTime(dateTimeString) {
+            if (!dateTimeString) return '';
+            
+            const date = new Date(dateTimeString);
+            return date.toLocaleString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+    </script>
+</body>
+</html>
