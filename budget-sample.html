@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Event Budget Planner - Customizable Templates</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .template-card:hover {
@@ -40,6 +42,12 @@
             .desktop-menu {
                 display: none;
             }
+        }
+        .download-btn {
+            transition: all 0.2s ease;
+        }
+        .download-btn:hover {
+            transform: translateY(-2px);
         }
     </style>
 </head>
@@ -83,6 +91,14 @@
         <div class="container mx-auto px-4 py-6">
             <div class="flex justify-between items-center">
                 <h1 class="text-3xl font-bold">EventBudget Pro</h1>
+                <div class="flex space-x-4">
+                    <button onclick="downloadAllTemplates('excel')" class="bg-white text-indigo-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition flex items-center">
+                        <i class="fas fa-file-excel mr-2"></i> Download All (Excel)
+                    </button>
+                    <button onclick="downloadAllTemplates('pdf')" class="bg-white text-indigo-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition flex items-center">
+                        <i class="fas fa-file-pdf mr-2"></i> Download All (PDF)
+                    </button>
+                </div>
             </div>
         </div>
     </header>
@@ -125,6 +141,18 @@
                     <button onclick="openCustomBudgetModal()" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition flex items-center justify-center">
                         <i class="fas fa-plus mr-2"></i> Custom Budget
                     </button>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-gray-200 lg:hidden">
+                    <h3 class="font-medium text-gray-700 mb-3">Download All</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="downloadAllTemplates('excel')" class="bg-green-600 text-white py-2 px-3 rounded-lg hover:bg-green-700 transition flex items-center justify-center text-sm">
+                            <i class="fas fa-file-excel mr-2"></i> Excel
+                        </button>
+                        <button onclick="downloadAllTemplates('pdf')" class="bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 transition flex items-center justify-center text-sm">
+                            <i class="fas fa-file-pdf mr-2"></i> PDF
+                        </button>
+                    </div>
                 </div>
             </aside>
 
@@ -171,14 +199,22 @@
                         </div>
                     </div>
                     
-                    <div class="flex justify-between items-center pt-4 border-t border-gray-200">
+                    <div class="flex flex-col md:flex-row justify-between items-center pt-4 border-t border-gray-200 space-y-4 md:space-y-0">
                         <div>
                             <p class="text-sm text-gray-500">Total Budget</p>
                             <p id="total-budget" class="text-xl lg:text-2xl font-bold">$0.00</p>
                         </div>
-                        <button onclick="saveBudget()" class="bg-indigo-600 text-white px-4 lg:px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
-                            <i class="fas fa-save mr-2"></i> Save Budget
-                        </button>
+                        <div class="flex space-x-3">
+                            <button onclick="downloadCurrentTemplate('excel')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center download-btn">
+                                <i class="fas fa-file-excel mr-2"></i> Excel
+                            </button>
+                            <button onclick="downloadCurrentTemplate('pdf')" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition flex items-center download-btn">
+                                <i class="fas fa-file-pdf mr-2"></i> PDF
+                            </button>
+                            <button onclick="saveBudget()" class="bg-indigo-600 text-white px-4 lg:px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+                                <i class="fas fa-save mr-2"></i> Save Budget
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -279,6 +315,9 @@
     </div>
 
     <script>
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+        
         // Sample template data
         const templates = [
             {
@@ -444,6 +483,14 @@
                             <span class="font-bold text-gray-800">$${template.totalBudget.toLocaleString()}</span>
                             <button class="text-indigo-600 hover:text-indigo-800 font-medium">
                                 Use Template <i class="fas fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                        <div class="mt-4 flex space-x-2">
+                            <button onclick="event.stopPropagation(); downloadTemplate(${template.id}, 'excel')" class="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition flex items-center text-sm download-btn">
+                                <i class="fas fa-file-excel mr-1"></i> Excel
+                            </button>
+                            <button onclick="event.stopPropagation(); downloadTemplate(${template.id}, 'pdf')" class="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition flex items-center text-sm download-btn">
+                                <i class="fas fa-file-pdf mr-1"></i> PDF
                             </button>
                         </div>
                     </div>
@@ -719,6 +766,211 @@
             // In a real app, this would save to a database
             alert('Budget saved successfully!');
             closeTemplateView();
+        }
+
+        // Download a single template
+        function downloadTemplate(templateId, format) {
+            const template = templates.find(t => t.id === templateId);
+            if (!template) return;
+            
+            if (format === 'excel') {
+                downloadTemplateExcel(template);
+            } else if (format === 'pdf') {
+                downloadTemplatePDF(template);
+            }
+        }
+
+        // Download current template being viewed
+        function downloadCurrentTemplate(format) {
+            if (!currentTemplate) return;
+            
+            if (format === 'excel') {
+                downloadTemplateExcel({
+                    ...currentTemplate,
+                    items: currentItems
+                });
+            } else if (format === 'pdf') {
+                downloadTemplatePDF({
+                    ...currentTemplate,
+                    items: currentItems
+                });
+            }
+        }
+
+        // Download all templates
+        function downloadAllTemplates(format) {
+            if (format === 'excel') {
+                downloadAllTemplatesExcel();
+            } else if (format === 'pdf') {
+                downloadAllTemplatesPDF();
+            }
+        }
+
+        // Download template as Excel
+        function downloadTemplateExcel(template) {
+            // Prepare data for Excel
+            const excelData = [
+                ["Item Name", "Category", "Cost", "Notes"],
+                ...template.items.map(item => [item.name, formatCategory(item.category), item.cost, item.notes || ''])
+            ];
+            
+            // Add summary row
+            excelData.push(["", "", "", ""]);
+            excelData.push(["Total Budget", "", template.totalBudget, ""]);
+            excelData.push(["Current Total", "", calculateTotal(template.items), ""]);
+            
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(excelData);
+            XLSX.utils.book_append_sheet(wb, ws, "Budget");
+            
+            // Generate file and download
+            XLSX.writeFile(wb, `${template.title.replace(/[^a-z0-9]/gi, '_')}_Budget.xlsx`);
+        }
+
+        // Download all templates as Excel
+        function downloadAllTemplatesExcel() {
+            // Create a new workbook
+            const wb = XLSX.utils.book_new();
+            
+            // Add each template as a separate sheet
+            templates.forEach(template => {
+                const excelData = [
+                    ["Item Name", "Category", "Cost", "Notes"],
+                    ...template.items.map(item => [item.name, formatCategory(item.category), item.cost, item.notes || ''])
+                ];
+                
+                // Add summary row
+                excelData.push(["", "", "", ""]);
+                excelData.push(["Total Budget", "", template.totalBudget, ""]);
+                excelData.push(["Current Total", "", calculateTotal(template.items), ""]);
+                
+                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                XLSX.utils.book_append_sheet(wb, ws, template.title.substring(0, 31)); // Sheet name max 31 chars
+            });
+            
+            // Generate file and download
+            XLSX.writeFile(wb, "All_Event_Budget_Templates.xlsx");
+        }
+
+        // Download template as PDF
+        function downloadTemplatePDF(template) {
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(18);
+            doc.text(template.title, 14, 20);
+            
+            // Add subtitle
+            doc.setFontSize(12);
+            doc.setTextColor(100);
+            doc.text(`Total Budget: $${template.totalBudget.toLocaleString()} | Items: ${template.items.length}`, 14, 30);
+            
+            // Add table header
+            doc.setFontSize(12);
+            doc.setTextColor(0);
+            doc.setFont(undefined, 'bold');
+            doc.text("Item", 14, 45);
+            doc.text("Category", 70, 45);
+            doc.text("Cost", 120, 45);
+            doc.text("Notes", 150, 45);
+            
+            // Add items
+            doc.setFont(undefined, 'normal');
+            let y = 55;
+            template.items.forEach(item => {
+                doc.text(item.name, 14, y);
+                doc.text(formatCategory(item.category), 70, y);
+                doc.text(`$${item.cost.toLocaleString()}`, 120, y);
+                doc.text(item.notes || '-', 150, y, { maxWidth: 50 });
+                y += 10;
+                
+                // Add new page if needed
+                if (y > 280) {
+                    doc.addPage();
+                    y = 20;
+                }
+            });
+            
+            // Add summary
+            y += 15;
+            doc.setFont(undefined, 'bold');
+            doc.text("Summary", 14, y);
+            y += 10;
+            doc.setFont(undefined, 'normal');
+            doc.text(`Total Budget: $${template.totalBudget.toLocaleString()}`, 14, y);
+            y += 7;
+            doc.text(`Current Total: $${calculateTotal(template.items).toLocaleString()}`, 14, y);
+            y += 7;
+            
+            const percentage = (calculateTotal(template.items) / template.totalBudget) * 100;
+            doc.text(`Budget Utilization: ${Math.round(percentage)}%`, 14, y);
+            
+            // Save the PDF
+            doc.save(`${template.title.replace(/[^a-z0-9]/gi, '_')}_Budget.pdf`);
+        }
+
+        // Download all templates as PDF
+        function downloadAllTemplatesPDF() {
+            const doc = new jsPDF();
+            
+            templates.forEach((template, index) => {
+                if (index > 0) {
+                    doc.addPage();
+                }
+                
+                // Add title
+                doc.setFontSize(18);
+                doc.text(template.title, 14, 20);
+                
+                // Add subtitle
+                doc.setFontSize(12);
+                doc.setTextColor(100);
+                doc.text(`Type: ${formatCategory(template.type)} | Total Budget: $${template.totalBudget.toLocaleString()}`, 14, 30);
+                
+                // Add table header
+                doc.setFontSize(12);
+                doc.setTextColor(0);
+                doc.setFont(undefined, 'bold');
+                doc.text("Item", 14, 45);
+                doc.text("Category", 70, 45);
+                doc.text("Cost", 120, 45);
+                doc.text("Notes", 150, 45);
+                
+                // Add items
+                doc.setFont(undefined, 'normal');
+                let y = 55;
+                template.items.forEach(item => {
+                    doc.text(item.name, 14, y);
+                    doc.text(formatCategory(item.category), 70, y);
+                    doc.text(`$${item.cost.toLocaleString()}`, 120, y);
+                    doc.text(item.notes || '-', 150, y, { maxWidth: 50 });
+                    y += 10;
+                    
+                    // Add new page if needed
+                    if (y > 280) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                });
+                
+                // Add summary
+                y += 15;
+                doc.setFont(undefined, 'bold');
+                doc.text("Summary", 14, y);
+                y += 10;
+                doc.setFont(undefined, 'normal');
+                doc.text(`Total Budget: $${template.totalBudget.toLocaleString()}`, 14, y);
+                y += 7;
+                doc.text(`Current Total: $${calculateTotal(template.items).toLocaleString()}`, 14, y);
+                y += 7;
+                
+                const percentage = (calculateTotal(template.items) / template.totalBudget) * 100;
+                doc.text(`Budget Utilization: ${Math.round(percentage)}%`, 14, y);
+            });
+            
+            // Save the PDF
+            doc.save("All_Event_Budget_Templates.pdf");
         }
     </script>
 </body>
