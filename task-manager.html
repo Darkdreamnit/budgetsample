@@ -3,1389 +3,1159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskMaster Pro - Team Task Management</title>
+    <title>Event Budget Sample | Professional Event Cost Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <style>
-        .task-item:hover .task-actions {
-            opacity: 1;
-        }
-        
-        .priority-high {
-            border-left: 4px solid #ef4444;
-        }
-        
-        .priority-medium {
-            border-left: 4px solid #f59e0b;
-        }
-        
-        .priority-low {
-            border-left: 4px solid #10b981;
-        }
-        
-        .status-not-started {
-            background-color: #e5e7eb;
-        }
-        
-        .status-in-progress {
-            background-color: #93c5fd;
-        }
-        
-        .status-completed {
-            background-color: #86efac;
-        }
-        
-        .status-blocked {
-            background-color: #fca5a5;
-        }
-        
-        .progress-bar {
-            transition: width 0.5s ease-in-out;
-        }
-        
-        /* Custom scrollbar */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e0;
-            border-radius: 10px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #a0aec0;
-        }
-        
-        /* Animation for task completion */
-        @keyframes taskComplete {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .task-complete-animation {
-            animation: taskComplete 0.5s ease;
-        }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="manifest" href="/site.webmanifest">
 </head>
 <body class="bg-gray-50 min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-        <!-- Header -->
-        <header class="flex flex-col md:flex-row justify-between items-center mb-8">
-            <div class="flex items-center mb-4 md:mb-0">
-                <i class="fas fa-tasks text-indigo-600 text-4xl mr-3"></i>
-                <h1 class="text-3xl font-bold text-gray-800">TaskMaster Pro</h1>
-            </div>
-            <div class="flex space-x-2">
-                <button id="importBtn" class="bg-white text-indigo-600 px-4 py-2 rounded-lg border border-indigo-600 hover:bg-indigo-50 transition flex items-center">
-                    <i class="fas fa-file-import mr-2"></i> Import
-                    <input type="file" id="fileInput" class="hidden" accept=".xlsx,.xls,.csv">
+   
+
+    <!-- Header -->
+    <header class="gradient-bg text-white">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-money-bill-wave text-3xl"></i>
+                    <h1 class="text-2xl font-bold">Event Budget Sample</h1>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="index.html" class="hover:text-indigo-200 transition">Home</a>
+                    <a href="calculator.html" class="hover:text-indigo-200 transition">Calculator</a>
+                    <a href="blog.html" class="hover:text-indigo-200 transition">Blog</a>
+                    <a href="resources.html" class="hover:text-indigo-200 transition">Resources</a>
+                    <a href="contact.html" class="hover:text-indigo-200 transition">Contact</a>
+                </nav>
+                <button id="mobileMenuButton" class="md:hidden text-xl">
+                    <i class="fas fa-bars"></i>
                 </button>
-                <button id="exportBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center">
-                    <i class="fas fa-file-export mr-2"></i> Export
-                </button>
-                <button id="saveBtn" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center">
-                    <i class="fas fa-save mr-2"></i> Save
-                </button>
             </div>
-        </header>
-        
-        <!-- Stats Overview -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="bg-white p-4 rounded-lg shadow">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-gray-500">Total Tasks</p>
-                        <h3 class="text-2xl font-bold" id="totalTasks">0</h3>
-                    </div>
-                    <div class="bg-indigo-100 p-3 rounded-full">
-                        <i class="fas fa-tasks text-indigo-600 text-xl"></i>
-                    </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="mobile-menu md:hidden bg-indigo-700 rounded-lg mt-4">
+                <div class="flex flex-col space-y-3 p-4">
+                    <a href="index.html" class="hover:text-indigo-200 transition">Home</a>
+                    <a href="calculator.html" class="hover:text-indigo-200 transition">Calculator</a>
+                    <a href="guest-list-manager.html" class="hover:text-indigo-200 transition">Guest List Manager</a>
+                    <a href="blog.html" class="hover:text-indigo-200 transition">Blog</a>
+                    <a href="resources.html" class="hover:text-indigo-200 transition">Resources</a>
+                    <a href="contact.html" class="hover:text-indigo-200 transition">Contact</a>
                 </div>
             </div>
-            <div class="bg-white p-4 rounded-lg shadow">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-gray-500">Completed</p>
-                        <h3 class="text-2xl font-bold" id="completedTasks">0</h3>
-                    </div>
-                    <div class="bg-green-100 p-3 rounded-full">
-                        <i class="fas fa-check-circle text-green-600 text-xl"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-gray-500">In Progress</p>
-                        <h3 class="text-2xl font-bold" id="inProgressTasks">0</h3>
-                    </div>
-                    <div class="bg-blue-100 p-3 rounded-full">
-                        <i class="fas fa-spinner text-blue-600 text-xl"></i>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white p-4 rounded-lg shadow">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <p class="text-gray-500">Overdue</p>
-                        <h3 class="text-2xl font-bold" id="overdueTasks">0</h3>
-                    </div>
-                    <div class="bg-red-100 p-3 rounded-full">
-                        <i class="fas fa-exclamation-triangle text-red-600 text-xl"></i>
-                    </div>
-                </div>
+
+            <div class="mt-16 mb-20 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Professional Event Budget Calculator</h2>
+                <p class="text-xl md:text-2xl max-w-3xl mx-auto">Use our calculator to plan with precision using our industry-standard budgeting tool</p>
             </div>
         </div>
-        
-        <!-- Progress Bar -->
-        <div class="bg-white p-4 rounded-lg shadow mb-8">
-            <div class="flex justify-between mb-2">
-                <span class="font-medium">Team Progress</span>
-                <span class="font-medium" id="progressPercentage">0%</span>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                <div id="progressBar" class="progress-bar bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
-            </div>
-        </div>
-        
-        <!-- Main Content -->
+    </header>
+
+    <main class="container mx-auto px-4 py-4 lg:py-8">
         <div class="flex flex-col lg:flex-row gap-8">
-            <!-- Task List -->
-            <div class="lg:w-2/3">
-                <div class="bg-white rounded-lg shadow overflow-hidden">
-                    <div class="flex justify-between items-center p-4 border-b">
-                        <h2 class="text-xl font-semibold text-gray-800">Team Tasks</h2>
-                        <button id="addTaskBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center">
-                            <i class="fas fa-plus mr-2"></i> Add Task
+            <!-- Desktop Sidebar -->
+            <aside class="lg:w-1/4 bg-white p-6 rounded-xl shadow-md h-fit lg:sticky lg:top-8 desktop-menu">
+                <h2 class="text-xl font-semibold mb-6 text-indigo-700">Quick Actions</h2>
+                <ul class="space-y-3">
+                    <li>
+                        <button onclick="showAllTasks()" class="w-full text-left px-4 py-2 rounded-lg hover:bg-indigo-50 text-indigo-600 font-medium transition">
+                            <i class="fas fa-tasks mr-2"></i>All Tasks
                         </button>
-                    </div>
-                    
-                    <!-- Filters -->
-                    <div class="p-4 border-b bg-gray-50">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Status</label>
-                                <select id="statusFilter" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    <option value="all">All Statuses</option>
-                                    <option value="Not Started">Not Started</option>
-                                    <option value="In Progress">In Progress</option>
-                                    <option value="Completed">Completed</option>
-                                    <option value="Blocked">Blocked</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Priority</label>
-                                <select id="priorityFilter" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    <option value="all">All Priorities</option>
-                                    <option value="High">High</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="Low">Low</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Filter by Assignee</label>
-                                <select id="assigneeFilter" class="w-full border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                    <option value="all">All Team Members</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Task Table -->
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Task</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Assignee</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Due Date</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priority</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="taskList" class="bg-white divide-y divide-gray-200">
-                                <!-- Tasks will be dynamically added here -->
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    <!-- Empty State -->
-                    <div id="emptyState" class="p-8 text-center">
-                        <i class="fas fa-tasks text-gray-300 text-5xl mb-4"></i>
-                        <h3 class="text-lg font-medium text-gray-900">No tasks yet</h3>
-                        <p class="text-gray-500 mt-1">Get started by adding a new task</p>
-                        <button id="emptyAddTaskBtn" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            <i class="fas fa-plus mr-2"></i> Add Task
+                    </li>
+                    <li>
+                        <button onclick="filterTasks('pending')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-indigo-50 text-indigo-600 transition">
+                            <i class="fas fa-hourglass-half mr-2"></i>Pending
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="filterTasks('in-progress')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-indigo-50 text-indigo-600 transition">
+                            <i class="fas fa-spinner mr-2"></i>In Progress
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="filterTasks('completed')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-indigo-50 text-indigo-600 transition">
+                            <i class="fas fa-check-circle mr-2"></i>Completed
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="filterTasks('overdue')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-indigo-50 text-indigo-600 transition">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>Overdue
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <h3 class="font-medium text-gray-700 mb-3">Team Members</h3>
+                    <button onclick="openAddMemberModal()" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition flex items-center justify-center">
+                        <i class="fas fa-user-plus mr-2"></i> Add Member
+                    </button>
+                </div>
+
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <h3 class="font-medium text-gray-700 mb-3">Data Management</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="exportData('excel')" class="bg-green-600 text-white py-2 px-3 rounded-lg hover:bg-green-700 transition flex items-center justify-center text-sm">
+                            <i class="fas fa-file-export mr-2"></i> Export
+                        </button>
+                        <button onclick="importData()" class="bg-blue-600 text-white py-2 px-3 rounded-lg hover:bg-blue-700 transition flex items-center justify-center text-sm">
+                            <i class="fas fa-file-import mr-2"></i> Import
+                        </button>
+                        <button onclick="confirmResetData()" class="bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 transition flex items-center justify-center text-sm col-span-2">
+                            <i class="fas fa-trash-alt mr-2"></i> Reset All Data
                         </button>
                     </div>
                 </div>
-            </div>
-            
-            <!-- Team Members -->
-            <div class="lg:w-1/3">
-                <div class="bg-white rounded-lg shadow overflow-hidden">
-                    <div class="flex justify-between items-center p-4 border-b">
-                        <h2 class="text-xl font-semibold text-gray-800">Team Members</h2>
-                        <button id="addMemberBtn" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center">
-                            <i class="fas fa-plus mr-2"></i> Add Member
+            </aside>
+
+            <!-- Main Content -->
+            <div class="lg:w-3/4">
+                <!-- Tasks Section -->
+                <div id="tasks-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl lg:text-2xl font-bold text-gray-800">Team Tasks</h2>
+                        <button onclick="openAddTaskModal()" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition flex items-center">
+                            <i class="fas fa-plus mr-2"></i> Add Task
                         </button>
                     </div>
-                    
-                    <div class="divide-y divide-gray-200 custom-scrollbar" style="max-height: 500px; overflow-y: auto;">
-                        <div id="teamMembersList">
-                            <!-- Team members will be dynamically added here -->
+
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-2">
+                            <span class="font-medium">Task Completion</span>
+                            <span id="completion-percentage" class="font-medium">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="progress-bar" class="progress-bar bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
                         </div>
                     </div>
-                    
-                    <!-- Empty State for Team Members -->
-                    <div id="emptyTeamState" class="p-8 text-center">
-                        <i class="fas fa-users text-gray-300 text-5xl mb-4"></i>
-                        <h3 class="text-lg font-medium text-gray-900">No team members yet</h3>
-                        <p class="text-gray-500 mt-1">Add your first team member to assign tasks</p>
-                        <button id="emptyAddMemberBtn" class="mt-4 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            <i class="fas fa-plus mr-2"></i> Add Member
-                        </button>
+
+                    <div id="task-filters" class="flex flex-wrap gap-2 mb-6">
+                        <button onclick="showAllTasks()" class="px-3 py-1 rounded-full bg-indigo-100 text-indigo-700 text-sm font-medium">All</button>
+                        <button onclick="filterTasks('pending')" class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-medium">Pending</button>
+                        <button onclick="filterTasks('in-progress')" class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-sm font-medium">In Progress</button>
+                        <button onclick="filterTasks('completed')" class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">Completed</button>
+                        <button onclick="filterTasks('overdue')" class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-medium">Overdue</button>
+                        <button onclick="filterTasks('high')" class="px-3 py-1 rounded-full bg-red-100 text-red-700 text-sm font-medium">High Priority</button>
+                        <button onclick="filterTasks('medium')" class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-sm font-medium">Medium Priority</button>
+                        <button onclick="filterTasks('low')" class="px-3 py-1 rounded-full bg-green-100 text-green-700 text-sm font-medium">Low Priority</button>
+                    </div>
+
+                    <div id="duplicate-warning" class="duplicate-warning hidden">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span id="warning-message"></span>
+                    </div>
+
+                    <div id="tasks-container" class="space-y-3">
+                        <!-- Tasks will be loaded here by JavaScript -->
                     </div>
                 </div>
-                
-                <!-- Recent Activity -->
-                <div class="bg-white rounded-lg shadow overflow-hidden mt-8">
-                    <div class="p-4 border-b">
-                        <h2 class="text-xl font-semibold text-gray-800">Recent Activity</h2>
-                    </div>
-                    <div class="divide-y divide-gray-200 custom-scrollbar" style="max-height: 300px; overflow-y: auto;">
-                        <div id="activityFeed">
-                            <!-- Activity items will be dynamically added here -->
+
+                <!-- Team Members Section -->
+                <div id="team-section" class="bg-white p-6 rounded-xl shadow-md mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl lg:text-2xl font-bold text-gray-800">Team Members</h2>
+                        <div class="text-gray-500">
+                            <span id="member-count">0</span> members
                         </div>
+                    </div>
+
+                    <div id="members-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- Team members will be loaded here by JavaScript -->
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-    
+    </main>
+
     <!-- Add Task Modal -->
-    <div id="taskModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    <div id="add-task-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold" id="task-modal-title">Add New Task</h3>
+                <button onclick="closeAddTaskModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4" id="modalTitle">Add New Task</h3>
-                            <form id="taskForm" class="space-y-4">
-                                <input type="hidden" id="taskId">
-                                <div>
-                                    <label for="taskTitle" class="block text-sm font-medium text-gray-700">Task Title</label>
-                                    <input type="text" id="taskTitle" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
-                                </div>
-                                <div>
-                                    <label for="taskDescription" class="block text-sm font-medium text-gray-700">Description</label>
-                                    <textarea id="taskDescription" rows="3" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="taskAssignee" class="block text-sm font-medium text-gray-700">Assignee</label>
-                                        <select id="taskAssignee" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
-                                            <option value="">Select Assignee</option>
-                                        </select>
-                                    </div>
-                                    <div>
-                                        <label for="taskPriority" class="block text-sm font-medium text-gray-700">Priority</label>
-                                        <select id="taskPriority" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
-                                            <option value="">Select Priority</option>
-                                            <option value="High">High</option>
-                                            <option value="Medium">Medium</option>
-                                            <option value="Low">Low</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <div>
-                                        <label for="taskDueDate" class="block text-sm font-medium text-gray-700">Due Date</label>
-                                        <input type="date" id="taskDueDate" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
-                                    </div>
-                                    <div>
-                                        <label for="taskStatus" class="block text-sm font-medium text-gray-700">Status</label>
-                                        <select id="taskStatus" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
-                                            <option value="Not Started">Not Started</option>
-                                            <option value="In Progress">In Progress</option>
-                                            <option value="Completed">Completed</option>
-                                            <option value="Blocked">Blocked</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </form>
-                        </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 mb-1">Task Name</label>
+                    <input type="text" id="task-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-1">Description</label>
+                    <textarea id="task-description" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="3"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-gray-700 mb-1">Due Date</label>
+                        <input type="date" id="task-due-date" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-gray-700 mb-1">Priority</label>
+                        <select id="task-priority" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="low">Low</option>
+                            <option value="medium">Medium</option>
+                            <option value="high">High</option>
+                        </select>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" id="saveTaskBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
-                        Save
-                    </button>
-                    <button type="button" id="cancelTaskBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Cancel
-                    </button>
+
+                <div>
+                    <label class="block text-gray-700 mb-1">Status</label>
+                    <select id="task-status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="pending">Pending</option>
+                        <option value="in-progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-1">Assigned To</label>
+                    <select id="task-assigned-to" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <!-- Members will be loaded here -->
+                    </select>
                 </div>
             </div>
-        </div>
-    </div>
-    
-    <!-- Add Team Member Modal -->
-    <div id="memberModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+
+            <div class="mt-6 flex justify-end space-x-3">
+                <button onclick="closeAddTaskModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                <button onclick="confirmAddTask()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">Save Task</button>
             </div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">Add Team Member</h3>
-                            <form id="memberForm" class="space-y-4">
-                                <input type="hidden" id="memberId">
-                                <div>
-                                    <label for="memberName" class="block text-sm font-medium text-gray-700">Full Name</label>
-                                    <input type="text" id="memberName" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
-                                </div>
-                                <div>
-                                    <label for="memberEmail" class="block text-sm font-medium text-gray-700">Email</label>
-                                    <input type="email" id="memberEmail" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
-                                </div>
-                                <div>
-                                    <label for="memberRole" class="block text-sm font-medium text-gray-700">Role</label>
-                                    <input type="text" id="memberRole" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" required>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" id="saveMemberBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:ml-3 sm:w-auto sm:text-sm">
-                        Save
-                    </button>
-                    <button type="button" id="cancelMemberBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Confirmation Modal -->
-    <div id="confirmModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <i class="fas fa-exclamation text-red-600"></i>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="confirmTitle">Confirm Action</h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500" id="confirmMessage">Are you sure you want to perform this action?</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <button type="button" id="confirmYesBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
-                        Yes
-                    </button>
-                    <button type="button" id="confirmNoBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Cancel
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Success Notification -->
-    <div id="successNotification" class="fixed bottom-4 right-4 hidden">
-        <div class="bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center">
-            <i class="fas fa-check-circle mr-2"></i>
-            <span id="successMessage">Operation completed successfully!</span>
-        </div>
-    </div>
-    
-    <!-- Error Notification -->
-    <div id="errorNotification" class="fixed bottom-4 right-4 hidden">
-        <div class="bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center">
-            <i class="fas fa-exclamation-circle mr-2"></i>
-            <span id="errorMessage">An error occurred!</span>
         </div>
     </div>
 
-    <script>
-        // Sample data
-        let tasks = [];
-        let teamMembers = [];
-        let activities = [];
-        
-        // DOM Elements
-        const taskList = document.getElementById('taskList');
-        const teamMembersList = document.getElementById('teamMembersList');
-        const activityFeed = document.getElementById('activityFeed');
-        const emptyState = document.getElementById('emptyState');
-        const emptyTeamState = document.getElementById('emptyTeamState');
-        const totalTasksEl = document.getElementById('totalTasks');
-        const completedTasksEl = document.getElementById('completedTasks');
-        const inProgressTasksEl = document.getElementById('inProgressTasks');
-        const overdueTasksEl = document.getElementById('overdueTasks');
-        const progressBar = document.getElementById('progressBar');
-        const progressPercentage = document.getElementById('progressPercentage');
-        
-        // Modal Elements
-        const taskModal = document.getElementById('taskModal');
-        const memberModal = document.getElementById('memberModal');
-        const confirmModal = document.getElementById('confirmModal');
-        
-        // Buttons
-        const addTaskBtn = document.getElementById('addTaskBtn');
-        const emptyAddTaskBtn = document.getElementById('emptyAddTaskBtn');
-        const addMemberBtn = document.getElementById('addMemberBtn');
-        const emptyAddMemberBtn = document.getElementById('emptyAddMemberBtn');
-        const saveTaskBtn = document.getElementById('saveTaskBtn');
-        const cancelTaskBtn = document.getElementById('cancelTaskBtn');
-        const saveMemberBtn = document.getElementById('saveMemberBtn');
-        const cancelMemberBtn = document.getElementById('cancelMemberBtn');
-        const confirmYesBtn = document.getElementById('confirmYesBtn');
-        const confirmNoBtn = document.getElementById('confirmNoBtn');
-        const importBtn = document.getElementById('importBtn');
-        const exportBtn = document.getElementById('exportBtn');
-        const saveBtn = document.getElementById('saveBtn');
-        const fileInput = document.getElementById('fileInput');
-        
-        // Form Elements
-        const taskForm = document.getElementById('taskForm');
-        const memberForm = document.getElementById('memberForm');
-        const taskIdInput = document.getElementById('taskId');
-        const taskTitleInput = document.getElementById('taskTitle');
-        const taskDescriptionInput = document.getElementById('taskDescription');
-        const taskAssigneeInput = document.getElementById('taskAssignee');
-        const taskPriorityInput = document.getElementById('taskPriority');
-        const taskDueDateInput = document.getElementById('taskDueDate');
-        const taskStatusInput = document.getElementById('taskStatus');
-        const memberIdInput = document.getElementById('memberId');
-        const memberNameInput = document.getElementById('memberName');
-        const memberEmailInput = document.getElementById('memberEmail');
-        const memberRoleInput = document.getElementById('memberRole');
-        
-        // Filter Elements
-        const statusFilter = document.getElementById('statusFilter');
-        const priorityFilter = document.getElementById('priorityFilter');
-        const assigneeFilter = document.getElementById('assigneeFilter');
-        
-        // Notification Elements
-        const successNotification = document.getElementById('successNotification');
-        const errorNotification = document.getElementById('errorNotification');
-        const successMessageEl = document.getElementById('successMessage');
-        const errorMessageEl = document.getElementById('errorMessage');
-        
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', () => {
-            // Load sample data if localStorage is empty
-            if (!localStorage.getItem('tasks') || !localStorage.getItem('teamMembers')) {
-                loadSampleData();
-            } else {
-                loadFromLocalStorage();
-            }
-            
-            renderTasks();
-            renderTeamMembers();
-            renderActivities();
-            updateStats();
-            updateProgressBar();
-            updateAssigneeFilter();
-            
-            // Event Listeners
-            addTaskBtn.addEventListener('click', () => openTaskModal());
-            emptyAddTaskBtn.addEventListener('click', () => openTaskModal());
-            addMemberBtn.addEventListener('click', () => openMemberModal());
-            emptyAddMemberBtn.addEventListener('click', () => openMemberModal());
-            saveTaskBtn.addEventListener('click', () => saveTask());
-            cancelTaskBtn.addEventListener('click', () => closeTaskModal());
-            saveMemberBtn.addEventListener('click', () => saveMember());
-            cancelMemberBtn.addEventListener('click', () => closeMemberModal());
-            confirmYesBtn.addEventListener('click', () => confirmAction());
-            confirmNoBtn.addEventListener('click', () => closeConfirmModal());
-            importBtn.addEventListener('click', () => fileInput.click());
-            exportBtn.addEventListener('click', () => exportToExcel());
-            saveBtn.addEventListener('click', () => saveToLocalStorage());
-            fileInput.addEventListener('change', (e) => importFromExcel(e));
-            
-            // Filter event listeners
-            statusFilter.addEventListener('change', () => renderTasks());
-            priorityFilter.addEventListener('change', () => renderTasks());
-            assigneeFilter.addEventListener('change', () => renderTasks());
-        });
-        
-        // Load sample data
-        function loadSampleData() {
-            teamMembers = [
-                { id: 1, name: 'John Doe', email: 'john@example.com', role: 'Developer' },
-                { id: 2, name: 'Jane Smith', email: 'jane@example.com', role: 'Designer' },
-                { id: 3, name: 'Mike Johnson', email: 'mike@example.com', role: 'Project Manager' }
-            ];
-            
-            tasks = [
-                { 
-                    id: 1, 
-                    title: 'Design Homepage', 
-                    description: 'Create wireframes and mockups for the homepage', 
-                    assignee: 2, 
-                    dueDate: '2023-06-15', 
-                    priority: 'High', 
-                    status: 'In Progress',
-                    createdAt: new Date().toISOString()
-                },
-                { 
-                    id: 2, 
-                    title: 'Implement User Authentication', 
-                    description: 'Develop login and registration functionality', 
-                    assignee: 1, 
-                    dueDate: '2023-06-20', 
-                    priority: 'High', 
-                    status: 'Not Started',
-                    createdAt: new Date().toISOString()
-                },
-                { 
-                    id: 3, 
-                    title: 'Create Project Documentation', 
-                    description: 'Write technical documentation for the API', 
-                    assignee: 3, 
-                    dueDate: '2023-06-10', 
-                    priority: 'Medium', 
-                    status: 'Completed',
-                    createdAt: new Date().toISOString()
-                }
-            ];
-            
-            activities = [
-                { id: 1, type: 'task', action: 'created', itemId: 3, memberId: 3, timestamp: new Date().toISOString() },
-                { id: 2, type: 'task', action: 'updated', itemId: 1, memberId: 2, timestamp: new Date(Date.now() - 3600000).toISOString() },
-                { id: 3, type: 'member', action: 'added', itemId: 2, memberId: 3, timestamp: new Date(Date.now() - 86400000).toISOString() }
-            ];
-            
-            saveToLocalStorage();
-        }
-        
-        // Load from localStorage
-        function loadFromLocalStorage() {
-            tasks = JSON.parse(localStorage.getItem('tasks')) || [];
-            teamMembers = JSON.parse(localStorage.getItem('teamMembers')) || [];
-            activities = JSON.parse(localStorage.getItem('activities')) || [];
-        }
-        
-        // Save to localStorage
-        function saveToLocalStorage() {
-            localStorage.setItem('tasks', JSON.stringify(tasks));
-            localStorage.setItem('teamMembers', JSON.stringify(teamMembers));
-            localStorage.setItem('activities', JSON.stringify(activities));
-            showSuccess('Data saved successfully!');
-        }
-        
-        // Render tasks
-        function renderTasks() {
-            const statusFilterValue = statusFilter.value;
-            const priorityFilterValue = priorityFilter.value;
-            const assigneeFilterValue = assigneeFilter.value;
-            
-            // Filter tasks
-            let filteredTasks = tasks;
-            
-            if (statusFilterValue !== 'all') {
-                filteredTasks = filteredTasks.filter(task => task.status === statusFilterValue);
-            }
-            
-            if (priorityFilterValue !== 'all') {
-                filteredTasks = filteredTasks.filter(task => task.priority === priorityFilterValue);
-            }
-            
-            if (assigneeFilterValue !== 'all') {
-                filteredTasks = filteredTasks.filter(task => task.assignee.toString() === assigneeFilterValue);
-            }
-            
-            // Clear the task list
-            taskList.innerHTML = '';
-            
-            // Show empty state if no tasks
-            if (filteredTasks.length === 0) {
-                emptyState.classList.remove('hidden');
-                return;
-            }
-            
-            emptyState.classList.add('hidden');
-            
-            // Add tasks to the list
-            filteredTasks.forEach(task => {
-                const assignee = teamMembers.find(member => member.id === task.assignee);
-                const assigneeName = assignee ? assignee.name : 'Unassigned';
-                
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const dueDate = new Date(task.dueDate);
-                const isOverdue = dueDate < today && task.status !== 'Completed';
-                
-                const taskRow = document.createElement('tr');
-                taskRow.className = `task-item hover:bg-gray-50 ${isOverdue ? 'bg-red-50' : ''}`;
-                taskRow.innerHTML = `
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
-                                <i class="fas fa-tasks"></i>
-                            </div>
-                            <div class="ml-4">
-                                <div class="text-sm font-medium text-gray-900">${task.title}</div>
-                                <div class="text-sm text-gray-500 truncate max-w-xs">${task.description || 'No description'}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm text-gray-900">${assigneeName}</div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <div class="text-sm ${isOverdue ? 'text-red-600 font-semibold' : 'text-gray-500'}">
-                            ${formatDate(task.dueDate)}
-                            ${isOverdue ? '<span class="ml-1 text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">Overdue</span>' : ''}
-                        </div>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            ${task.priority === 'High' ? 'bg-red-100 text-red-800' : ''}
-                            ${task.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' : ''}
-                            ${task.priority === 'Low' ? 'bg-green-100 text-green-800' : ''}">
-                            ${task.priority}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap">
-                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                            ${task.status === 'Not Started' ? 'bg-gray-100 text-gray-800' : ''}
-                            ${task.status === 'In Progress' ? 'bg-blue-100 text-blue-800' : ''}
-                            ${task.status === 'Completed' ? 'bg-green-100 text-green-800' : ''}
-                            ${task.status === 'Blocked' ? 'bg-red-100 text-red-800' : ''}">
-                            ${task.status}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium task-actions opacity-0 transition-opacity">
-                        <button class="text-indigo-600 hover:text-indigo-900 mr-3 edit-task" data-id="${task.id}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="text-red-600 hover:text-red-900 delete-task" data-id="${task.id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                
-                taskList.appendChild(taskRow);
-            });
-            
-            // Add event listeners to edit and delete buttons
-            document.querySelectorAll('.edit-task').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const taskId = parseInt(e.currentTarget.getAttribute('data-id'));
-                    openTaskModal(taskId);
-                });
-            });
-            
-            document.querySelectorAll('.delete-task').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const taskId = parseInt(e.currentTarget.getAttribute('data-id'));
-                    showConfirmModal(
-                        'Delete Task',
-                        'Are you sure you want to delete this task? This action cannot be undone.',
-                        () => deleteTask(taskId)
-                    );
-                });
-            });
-        }
-        
-        // Render team members
-        function renderTeamMembers() {
-            // Clear the team members list
-            teamMembersList.innerHTML = '';
-            
-            // Show empty state if no team members
-            if (teamMembers.length === 0) {
-                emptyTeamState.classList.remove('hidden');
-                return;
-            }
-            
-            emptyTeamState.classList.add('hidden');
-            
-            // Add team members to the list
-            teamMembers.forEach(member => {
-                const memberTasks = tasks.filter(task => task.assignee === member.id);
-                const completedTasks = memberTasks.filter(task => task.status === 'Completed').length;
-                const completionRate = memberTasks.length > 0 ? Math.round((completedTasks / memberTasks.length) * 100) : 0;
-                
-                const memberItem = document.createElement('div');
-                memberItem.className = 'p-4 flex items-center hover:bg-gray-50';
-                memberItem.innerHTML = `
-                    <div class="flex-shrink-0 h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
-                        <i class="fas fa-user"></i>
+    <!-- Add Member Modal -->
+    <div id="add-member-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold" id="member-modal-title">Add New Member</h3>
+                <button onclick="closeAddMemberModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-gray-700 mb-1">Full Name</label>
+                    <input type="text" id="member-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-1">Email</label>
+                    <input type="email" id="member-email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-1">Role</label>
+                    <select id="member-role" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="member">Member</option>
+                        <option value="manager">Manager</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-gray-700 mb-1">Profile Color</label>
+                    <div class="flex space-x-2">
+                        <div class="w-8 h-8 rounded-full bg-indigo-500 cursor-pointer border-2 border-transparent hover:border-gray-300" onclick="selectMemberColor('indigo')"></div>
+                        <div class="w-8 h-8 rounded-full bg-blue-500 cursor-pointer border-2 border-transparent hover:border-gray-300" onclick="selectMemberColor('blue')"></div>
+                        <div class="w-8 h-8 rounded-full bg-green-500 cursor-pointer border-2 border-transparent hover:border-gray-300" onclick="selectMemberColor('green')"></div>
+                        <div class="w-8 h-8 rounded-full bg-yellow-500 cursor-pointer border-2 border-transparent hover:border-gray-300" onclick="selectMemberColor('yellow')"></div>
+                        <div class="w-8 h-8 rounded-full bg-red-500 cursor-pointer border-2 border-transparent hover:border-gray-300" onclick="selectMemberColor('red')"></div>
+                        <div class="w-8 h-8 rounded-full bg-purple-500 cursor-pointer border-2 border-transparent hover:border-gray-300" onclick="selectMemberColor('purple')"></div>
                     </div>
-                    <div class="ml-4 flex-1">
-                        <div class="flex items-center justify-between">
-                            <h3 class="text-sm font-medium text-gray-900">${member.name}</h3>
-                            <div class="flex space-x-2">
-                                <button class="text-indigo-600 hover:text-indigo-900 edit-member" data-id="${member.id}">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button class="text-red-600 hover:text-red-900 delete-member" data-id="${member.id}">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <p class="text-sm text-gray-500">${member.role}</p>
-                        <div class="mt-2">
-                            <div class="flex justify-between text-xs text-gray-500 mb-1">
-                                <span>${memberTasks.length} tasks assigned</span>
-                                <span>${completionRate}% completed</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-1.5">
-                                <div class="bg-indigo-600 h-1.5 rounded-full" style="width: ${completionRate}%"></div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                
-                teamMembersList.appendChild(memberItem);
-            });
-            
-            // Add event listeners to edit and delete buttons
-            document.querySelectorAll('.edit-member').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const memberId = parseInt(e.currentTarget.getAttribute('data-id'));
-                    openMemberModal(memberId);
-                });
-            });
-            
-            document.querySelectorAll('.delete-member').forEach(button => {
-                button.addEventListener('click', (e) => {
-                    const memberId = parseInt(e.currentTarget.getAttribute('data-id'));
-                    const memberTasks = tasks.filter(task => task.assignee === memberId);
-                    
-                    if (memberTasks.length > 0) {
-                        showError('Cannot delete member with assigned tasks. Reassign tasks first.');
-                        return;
-                    }
-                    
-                    showConfirmModal(
-                        'Delete Team Member',
-                        'Are you sure you want to delete this team member? This action cannot be undone.',
-                        () => deleteMember(memberId)
-                    );
-                });
-            });
-        }
-        
-        // Render activities
-        function renderActivities() {
-            // Clear the activity feed
-            activityFeed.innerHTML = '';
-            
-            // Sort activities by timestamp (newest first)
-            const sortedActivities = [...activities].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            
-            // Show only the 5 most recent activities
-            const recentActivities = sortedActivities.slice(0, 5);
-            
-            if (recentActivities.length === 0) {
-                activityFeed.innerHTML = '<div class="p-4 text-center text-gray-500">No recent activity</div>';
-                return;
-            }
-            
-            // Add activities to the feed
-            recentActivities.forEach(activity => {
-                const member = teamMembers.find(m => m.id === activity.memberId);
-                const memberName = member ? member.name : 'Unknown';
-                
-                let actionText = '';
-                let icon = '';
-                let iconColor = 'text-gray-500';
-                
-                if (activity.type === 'task') {
-                    const task = tasks.find(t => t.id === activity.itemId);
-                    const taskTitle = task ? task.title : 'Unknown Task';
-                    
-                    if (activity.action === 'created') {
-                        actionText = `created task "${taskTitle}"`;
-                        icon = 'fa-plus';
-                        iconColor = 'text-green-500';
-                    } else if (activity.action === 'updated') {
-                        actionText = `updated task "${taskTitle}"`;
-                        icon = 'fa-edit';
-                        iconColor = 'text-blue-500';
-                    } else if (activity.action === 'deleted') {
-                        actionText = `deleted task "${taskTitle}"`;
-                        icon = 'fa-trash';
-                        iconColor = 'text-red-500';
-                    } else if (activity.action === 'completed') {
-                        actionText = `completed task "${taskTitle}"`;
-                        icon = 'fa-check';
-                        iconColor = 'text-green-500';
-                    }
-                } else if (activity.type === 'member') {
-                    const member = teamMembers.find(m => m.id === activity.itemId);
-                    const memberName = member ? member.name : 'Unknown Member';
-                    
-                    if (activity.action === 'added') {
-                        actionText = `added team member "${memberName}"`;
-                        icon = 'fa-user-plus';
-                        iconColor = 'text-indigo-500';
-                    } else if (activity.action === 'updated') {
-                        actionText = `updated team member "${memberName}"`;
-                        icon = 'fa-user-edit';
-                        iconColor = 'text-blue-500';
-                    } else if (activity.action === 'deleted') {
-                        actionText = `deleted team member "${memberName}"`;
-                        icon = 'fa-user-minus';
-                        iconColor = 'text-red-500';
-                    }
-                }
-                
-                const activityItem = document.createElement('div');
-                activityItem.className = 'p-4 flex items-start';
-                activityItem.innerHTML = `
+                    <input type="hidden" id="member-color" value="indigo">
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end space-x-3">
+                <button onclick="closeAddMemberModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                <button onclick="confirmAddMember()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">Save Member</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div id="confirm-delete-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Confirm Deletion</h3>
+                <button onclick="closeConfirmDeleteModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <p class="mb-6" id="delete-confirmation-message">Are you sure you want to delete this item?</p>
+
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeConfirmDeleteModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                <button onclick="executeDelete()" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Data Modal -->
+    <div id="import-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Import Data</h3>
+                <button onclick="closeImportModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-gray-700 mb-2">Select JSON file to import:</label>
+                <input type="file" id="import-file" accept=".json" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <div class="flex">
                     <div class="flex-shrink-0">
-                        <div class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center ${iconColor}">
-                            <i class="fas ${icon}"></i>
-                        </div>
+                        <i class="fas fa-exclamation-triangle text-yellow-400"></i>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm font-medium text-gray-900">${memberName}</p>
-                        <p class="text-sm text-gray-500">${actionText}</p>
-                        <p class="text-xs text-gray-400">${formatDateTime(activity.timestamp)}</p>
+                        <p class="text-sm text-yellow-700">
+                            Importing data will replace all current tasks and members. Make sure to export your current data first if you want to keep it.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-3">
+                <button onclick="closeImportModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                <button onclick="processImport()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">Import</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+     <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- Column 1 -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-money-bill-wave mr-2"></i>
+                        Event Budget Sample
+                    </h3>
+                    <p class="text-gray-400">Choice of professionals for accurate event budgeting since 2025.</p>
+                </div>
+
+                <!-- Column 2 -->
+                <div>
+                    <h4 class="font-bold mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="how-to-make-a-budget-for-an-event.html" class="text-gray-400 hover:text-white transition">How to make a budget for an event</a></li>
+                       
+                    </ul>
+                </div>
+
+                <!-- Column 3 -->
+                <div>
+                    <h4 class="font-bold mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="about-us.html" class="text-gray-400 hover:text-white transition">About Us</a></li>
+                       
+                    </ul>
+                </div>
+
+                <!-- Column 4 -->
+                <div>
+                    <h4 class="font-bold mb-4">Contact</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2 text-gray-400"></i>
+                            <a href="mailto:hello@eventbudgetpro.com" class="text-gray-400 hover:text-white transition">eventbudgetsample@gmail.com</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2 text-gray-400"></i>
+                            <a href="tel:+18005551234" class="text-gray-400 hover:text-white transition">(757) 949-4621</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">Virginia Beach, VA</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Event Budget Sample. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="index.js"></script>
+
+    <script>
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+
+        // Sample data structure
+        let tasks = [
+            {
+                id: 1,
+                name: "Design Homepage",
+                description: "Create wireframes and mockups for the new homepage design",
+                dueDate: "2023-12-15",
+                priority: "high",
+                status: "in-progress",
+                assignedTo: 1,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 2,
+                name: "Implement Authentication",
+                description: "Set up user authentication with JWT tokens",
+                dueDate: "2023-12-10",
+                priority: "medium",
+                status: "pending",
+                assignedTo: 2,
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 3,
+                name: "Write Documentation",
+                description: "Document API endpoints and usage examples",
+                dueDate: "2023-12-05",
+                priority: "low",
+                status: "completed",
+                assignedTo: 3,
+                createdAt: new Date().toISOString()
+            }
+        ];
+
+        let members = [
+            {
+                id: 1,
+                name: "John Doe",
+                email: "john@example.com",
+                role: "admin",
+                color: "indigo",
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 2,
+                name: "Jane Smith",
+                email: "jane@example.com",
+                role: "manager",
+                color: "blue",
+                createdAt: new Date().toISOString()
+            },
+            {
+                id: 3,
+                name: "Mike Johnson",
+                email: "mike@example.com",
+                role: "member",
+                color: "green",
+                createdAt: new Date().toISOString()
+            }
+        ];
+
+        // Current state
+        let currentFilter = 'all';
+        let currentlyEditingTaskId = null;
+        let currentlyEditingMemberId = null;
+        let deleteAction = null;
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTasks();
+            loadMembers();
+            updateCompletionPercentage();
+            
+            // Mobile menu toggle
+            document.getElementById('mobileMenuButton').addEventListener('click', function() {
+                const menu = document.getElementById('mobileMenu');
+                menu.classList.toggle('hidden');
+            });
+        });
+
+        // Load tasks based on filter
+        function loadTasks() {
+            const container = document.getElementById('tasks-container');
+            container.innerHTML = '';
+
+            let filteredTasks = [];
+            
+            switch(currentFilter) {
+                case 'all':
+                    filteredTasks = [...tasks];
+                    break;
+                case 'pending':
+                    filteredTasks = tasks.filter(t => t.status === 'pending');
+                    break;
+                case 'in-progress':
+                    filteredTasks = tasks.filter(t => t.status === 'in-progress');
+                    break;
+                case 'completed':
+                    filteredTasks = tasks.filter(t => t.status === 'completed');
+                    break;
+                case 'overdue':
+                    filteredTasks = tasks.filter(t => {
+                        if (t.status === 'completed') return false;
+                        const dueDate = new Date(t.dueDate);
+                        const today = new Date();
+                        today.setHours(0, 0, 0, 0);
+                        return dueDate < today;
+                    });
+                    break;
+                case 'high':
+                    filteredTasks = tasks.filter(t => t.priority === 'high');
+                    break;
+                case 'medium':
+                    filteredTasks = tasks.filter(t => t.priority === 'medium');
+                    break;
+                case 'low':
+                    filteredTasks = tasks.filter(t => t.priority === 'low');
+                    break;
+                default:
+                    filteredTasks = [...tasks];
+            }
+
+            if (filteredTasks.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center py-10">
+                        <i class="fas fa-tasks text-4xl text-gray-400 mb-4"></i>
+                        <h3 class="text-xl font-medium text-gray-600">No tasks found</h3>
+                        <p class="text-gray-500 mt-2">Try selecting a different filter or create a new task.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Sort tasks by due date (soonest first)
+            filteredTasks.sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+
+            filteredTasks.forEach(task => {
+                const taskElement = document.createElement('div');
+                taskElement.className = `task-item bg-white border border-gray-200 rounded-lg p-4 flex justify-between items-start task-priority-${task.priority}`;
+                
+                const assignedMember = members.find(m => m.id === task.assignedTo);
+                const memberColor = assignedMember ? `bg-${assignedMember.color}-500` : 'bg-gray-500';
+                
+                taskElement.innerHTML = `
+                    <div class="flex-1">
+                        <div class="flex items-start justify-between mb-2">
+                            <h3 class="font-medium text-gray-800">${task.name}</h3>
+                            <span class="text-xs px-2 py-1 rounded-full ${getPriorityClass(task.priority)} ml-2">
+                                ${formatPriority(task.priority)}
+                            </span>
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">${task.description || 'No description'}</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <i class="far fa-calendar-alt mr-1"></i>
+                            <span>Due: ${formatDate(task.dueDate)}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center ml-4">
+                        <div class="w-10 h-10 rounded-full ${memberColor} flex items-center justify-center text-white font-medium text-sm mr-3">
+                            ${assignedMember ? assignedMember.name.charAt(0).toUpperCase() : '?'}
+                        </div>
+                        <div class="flex flex-col space-y-1">
+                            <button onclick="editTask(${task.id})" class="text-gray-400 hover:text-indigo-600">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="confirmDeleteTask(${task.id})" class="text-gray-400 hover:text-red-600">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </div>
                 `;
                 
-                activityFeed.appendChild(activityItem);
+                container.appendChild(taskElement);
             });
         }
-        
-        // Update stats
-        function updateStats() {
-            totalTasksEl.textContent = tasks.length;
-            completedTasksEl.textContent = tasks.filter(task => task.status === 'Completed').length;
-            inProgressTasksEl.textContent = tasks.filter(task => task.status === 'In Progress').length;
-            
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            overdueTasksEl.textContent = tasks.filter(task => {
-                const dueDate = new Date(task.dueDate);
-                return dueDate < today && task.status !== 'Completed';
-            }).length;
+
+        // Load members
+        function loadMembers() {
+            const container = document.getElementById('members-container');
+            container.innerHTML = '';
+
+            document.getElementById('member-count').textContent = members.length;
+
+            if (members.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-10">
+                        <i class="fas fa-users text-4xl text-gray-400 mb-4"></i>
+                        <h3 class="text-xl font-medium text-gray-600">No team members</h3>
+                        <p class="text-gray-500 mt-2">Add your first team member to get started.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            members.forEach(member => {
+                const memberElement = document.createElement('div');
+                memberElement.className = `member-card bg-white border border-gray-200 rounded-lg p-4 shadow-sm`;
+                
+                memberElement.innerHTML = `
+                    <div class="flex items-start justify-between mb-3">
+                        <div class="flex items-center">
+                            <div class="w-12 h-12 rounded-full bg-${member.color}-500 flex items-center justify-center text-white font-medium text-lg mr-3">
+                                ${member.name.charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                                <h3 class="font-medium">${member.name}</h3>
+                                <p class="text-sm text-gray-500">${member.email}</p>
+                            </div>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded-full ${getRoleClass(member.role)}">
+                            ${formatRole(member.role)}
+                        </span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <div>
+                            <span class="font-medium">${countTasksAssigned(member.id)}</span>
+                            <span class="text-gray-500">tasks assigned</span>
+                        </div>
+                        <div class="flex space-x-2">
+                            <button onclick="editMember(${member.id})" class="text-gray-400 hover:text-indigo-600">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="confirmDeleteMember(${member.id})" class="text-gray-400 hover:text-red-600">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(memberElement);
+            });
         }
-        
-        // Update progress bar
-        function updateProgressBar() {
-            const completedTasks = tasks.filter(task => task.status === 'Completed').length;
+
+        // Count tasks assigned to a member
+        function countTasksAssigned(memberId) {
+            return tasks.filter(t => t.assignedTo === memberId).length;
+        }
+
+        // Get priority class
+        function getPriorityClass(priority) {
+            const classes = {
+                high: 'bg-red-100 text-red-800',
+                medium: 'bg-yellow-100 text-yellow-800',
+                low: 'bg-green-100 text-green-800'
+            };
+            return classes[priority] || classes.low;
+        }
+
+        // Format priority
+        function formatPriority(priority) {
+            const formats = {
+                high: 'High',
+                medium: 'Medium',
+                low: 'Low'
+            };
+            return formats[priority] || priority;
+        }
+
+        // Get role class
+        function getRoleClass(role) {
+            const classes = {
+                admin: 'bg-purple-100 text-purple-800',
+                manager: 'bg-blue-100 text-blue-800',
+                member: 'bg-gray-100 text-gray-800'
+            };
+            return classes[role] || classes.member;
+        }
+
+        // Format role
+        function formatRole(role) {
+            const formats = {
+                admin: 'Admin',
+                manager: 'Manager',
+                member: 'Member'
+            };
+            return formats[role] || role;
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString(undefined, options);
+        }
+
+        // Update completion percentage
+        function updateCompletionPercentage() {
             const totalTasks = tasks.length;
-            const percentage = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+            const completedTasks = tasks.filter(t => t.status === 'completed').length;
+            const percentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
             
-            progressBar.style.width = `${percentage}%`;
-            progressPercentage.textContent = `${percentage}%`;
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('completion-percentage').textContent = `${Math.round(percentage)}%`;
         }
-        
-        // Update assignee filter dropdown
-        function updateAssigneeFilter() {
-            assigneeFilter.innerHTML = '<option value="all">All Team Members</option>';
+
+        // Filter tasks
+        function filterTasks(filter) {
+            currentFilter = filter;
+            loadTasks();
+        }
+
+        // Show all tasks
+        function showAllTasks() {
+            currentFilter = 'all';
+            loadTasks();
+        }
+
+        // Open add task modal
+        function openAddTaskModal() {
+            document.getElementById('task-modal-title').textContent = 'Add New Task';
+            document.getElementById('add-task-modal').classList.remove('hidden');
             
-            teamMembers.forEach(member => {
-                const option = document.createElement('option');
-                option.value = member.id;
-                option.textContent = member.name;
-                assigneeFilter.appendChild(option);
-            });
-        }
-        
-        // Open task modal
-        function openTaskModal(taskId = null) {
             // Reset form
-            taskForm.reset();
-            taskIdInput.value = '';
+            document.getElementById('task-name').value = '';
+            document.getElementById('task-description').value = '';
             
-            // Populate assignee dropdown
-            taskAssigneeInput.innerHTML = '<option value="">Select Assignee</option>';
-            teamMembers.forEach(member => {
+            // Set default due date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('task-due-date').value = tomorrow.toISOString().split('T')[0];
+            
+            document.getElementById('task-priority').value = 'medium';
+            document.getElementById('task-status').value = 'pending';
+            
+            // Load members into assigned to dropdown
+            const assignedToSelect = document.getElementById('task-assigned-to');
+            assignedToSelect.innerHTML = '';
+            
+            members.forEach(member => {
                 const option = document.createElement('option');
                 option.value = member.id;
                 option.textContent = member.name;
-                taskAssigneeInput.appendChild(option);
+                assignedToSelect.appendChild(option);
             });
             
-            // If editing, populate form with task data
-            if (taskId) {
-                const task = tasks.find(t => t.id === taskId);
-                if (task) {
-                    document.getElementById('modalTitle').textContent = 'Edit Task';
-                    taskIdInput.value = task.id;
-                    taskTitleInput.value = task.title;
-                    taskDescriptionInput.value = task.description || '';
-                    taskAssigneeInput.value = task.assignee;
-                    taskPriorityInput.value = task.priority;
-                    taskDueDateInput.value = task.dueDate;
-                    taskStatusInput.value = task.status;
-                }
-            } else {
-                document.getElementById('modalTitle').textContent = 'Add New Task';
-                // Set default due date to tomorrow
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                taskDueDateInput.valueAsDate = tomorrow;
+            if (members.length > 0) {
+                assignedToSelect.value = members[0].id;
             }
             
-            // Show modal
-            taskModal.classList.remove('hidden');
+            currentlyEditingTaskId = null;
         }
-        
-        // Close task modal
-        function closeTaskModal() {
-            taskModal.classList.add('hidden');
+
+        // Close add task modal
+        function closeAddTaskModal() {
+            document.getElementById('add-task-modal').classList.add('hidden');
         }
-        
-        // Save task
-        function saveTask() {
-            if (!taskForm.checkValidity()) {
-                taskForm.reportValidity();
+
+        // Confirm add task
+        function confirmAddTask() {
+            const name = document.getElementById('task-name').value.trim();
+            const description = document.getElementById('task-description').value.trim();
+            const dueDate = document.getElementById('task-due-date').value;
+            const priority = document.getElementById('task-priority').value;
+            const status = document.getElementById('task-status').value;
+            const assignedTo = parseInt(document.getElementById('task-assigned-to').value);
+            
+            if (!name || !dueDate) {
+                alert('Please fill in all required fields');
                 return;
             }
             
-            const taskId = taskIdInput.value ? parseInt(taskIdInput.value) : null;
-            const taskData = {
-                title: taskTitleInput.value,
-                description: taskDescriptionInput.value,
-                assignee: parseInt(taskAssigneeInput.value),
-                dueDate: taskDueDateInput.value,
-                priority: taskPriorityInput.value,
-                status: taskStatusInput.value,
-                createdAt: new Date().toISOString()
-            };
-            
-            if (taskId) {
+            if (currentlyEditingTaskId !== null) {
                 // Update existing task
-                const index = tasks.findIndex(t => t.id === taskId);
-                if (index !== -1) {
-                    tasks[index] = { ...tasks[index], ...taskData };
-                    
-                    // Add activity
-                    activities.push({
-                        id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
-                        type: 'task',
-                        action: 'updated',
-                        itemId: taskId,
-                        memberId: taskData.assignee,
-                        timestamp: new Date().toISOString()
-                    });
-                    
-                    showSuccess('Task updated successfully!');
+                const taskIndex = tasks.findIndex(t => t.id === currentlyEditingTaskId);
+                if (taskIndex !== -1) {
+                    tasks[taskIndex] = {
+                        ...tasks[taskIndex],
+                        name,
+                        description,
+                        dueDate,
+                        priority,
+                        status,
+                        assignedTo
+                    };
                 }
             } else {
                 // Add new task
-                const newId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
-                const newTask = { id: newId, ...taskData };
+                const newTask = {
+                    id: tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1,
+                    name,
+                    description,
+                    dueDate,
+                    priority,
+                    status,
+                    assignedTo,
+                    createdAt: new Date().toISOString()
+                };
+                
                 tasks.push(newTask);
-                
-                // Add activity
-                activities.push({
-                    id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
-                    type: 'task',
-                    action: 'created',
-                    itemId: newId,
-                    memberId: taskData.assignee,
-                    timestamp: new Date().toISOString()
-                });
-                
-                showSuccess('Task added successfully!');
             }
             
-            // Update UI
-            renderTasks();
-            renderTeamMembers();
-            renderActivities();
-            updateStats();
-            updateProgressBar();
-            
-            // Close modal
-            closeTaskModal();
+            loadTasks();
+            updateCompletionPercentage();
+            closeAddTaskModal();
         }
-        
-        // Delete task
-        function deleteTask(taskId) {
-            const index = tasks.findIndex(t => t.id === taskId);
-            if (index !== -1) {
-                const task = tasks[index];
-                
-                // Add activity
-                activities.push({
-                    id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
-                    type: 'task',
-                    action: 'deleted',
-                    itemId: taskId,
-                    memberId: task.assignee,
-                    timestamp: new Date().toISOString()
-                });
-                
-                tasks.splice(index, 1);
-                
-                // Update UI
-                renderTasks();
-                renderActivities();
-                updateStats();
-                updateProgressBar();
-                
-                showSuccess('Task deleted successfully!');
-            }
+
+        // Edit task
+        function editTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
             
-            closeConfirmModal();
+            document.getElementById('task-modal-title').textContent = 'Edit Task';
+            document.getElementById('add-task-modal').classList.remove('hidden');
+            
+            // Fill form with task data
+            document.getElementById('task-name').value = task.name;
+            document.getElementById('task-description').value = task.description || '';
+            document.getElementById('task-due-date').value = task.dueDate;
+            document.getElementById('task-priority').value = task.priority;
+            document.getElementById('task-status').value = task.status;
+            
+            // Load members into assigned to dropdown
+            const assignedToSelect = document.getElementById('task-assigned-to');
+            assignedToSelect.innerHTML = '';
+            
+            members.forEach(member => {
+                const option = document.createElement('option');
+                option.value = member.id;
+                option.textContent = member.name;
+                assignedToSelect.appendChild(option);
+            });
+            
+            assignedToSelect.value = task.assignedTo;
+            
+            currentlyEditingTaskId = taskId;
         }
-        
-        // Open member modal
-        function openMemberModal(memberId = null) {
+
+        // Confirm delete task
+        function confirmDeleteTask(taskId) {
+            const task = tasks.find(t => t.id === taskId);
+            if (!task) return;
+            
+            document.getElementById('delete-confirmation-message').textContent = 
+                `Are you sure you want to delete the task "${task.name}"? This action cannot be undone.`;
+            
+            deleteAction = () => {
+                tasks = tasks.filter(t => t.id !== taskId);
+                loadTasks();
+                updateCompletionPercentage();
+                closeConfirmDeleteModal();
+            };
+            
+            document.getElementById('confirm-delete-modal').classList.remove('hidden');
+        }
+
+        // Open add member modal
+        function openAddMemberModal() {
+            document.getElementById('member-modal-title').textContent = 'Add New Member';
+            document.getElementById('add-member-modal').classList.remove('hidden');
+            
             // Reset form
-            memberForm.reset();
-            memberIdInput.value = '';
+            document.getElementById('member-name').value = '';
+            document.getElementById('member-email').value = '';
+            document.getElementById('member-role').value = 'member';
+            document.getElementById('member-color').value = 'indigo';
             
-            // If editing, populate form with member data
-            if (memberId) {
-                const member = teamMembers.find(m => m.id === memberId);
-                if (member) {
-                    memberNameInput.value = member.name;
-                    memberEmailInput.value = member.email;
-                    memberRoleInput.value = member.role;
-                }
-            }
+            // Highlight default color
+            document.querySelectorAll('#add-member-modal .rounded-full').forEach(el => {
+                el.classList.remove('border-indigo-500');
+                el.classList.add('border-transparent');
+            });
+            document.querySelector('#add-member-modal .bg-indigo-500').classList.remove('border-transparent');
+            document.querySelector('#add-member-modal .bg-indigo-500').classList.add('border-indigo-500');
             
-            // Show modal
-            memberModal.classList.remove('hidden');
+            currentlyEditingMemberId = null;
         }
-        
-        // Close member modal
-        function closeMemberModal() {
-            memberModal.classList.add('hidden');
+
+        // Close add member modal
+        function closeAddMemberModal() {
+            document.getElementById('add-member-modal').classList.add('hidden');
         }
-        
-        // Save member
-        function saveMember() {
-            if (!memberForm.checkValidity()) {
-                memberForm.reportValidity();
+
+        // Confirm add member
+        function confirmAddMember() {
+            const name = document.getElementById('member-name').value.trim();
+            const email = document.getElementById('member-email').value.trim();
+            const role = document.getElementById('member-role').value;
+            const color = document.getElementById('member-color').value;
+            
+            if (!name || !email) {
+                alert('Please fill in all required fields');
                 return;
             }
             
-            const memberId = memberIdInput.value ? parseInt(memberIdInput.value) : null;
-            const memberData = {
-                name: memberNameInput.value,
-                email: memberEmailInput.value,
-                role: memberRoleInput.value
-            };
+            // Simple email validation
+            if (!email.includes('@') || !email.includes('.')) {
+                alert('Please enter a valid email address');
+                return;
+            }
             
-            if (memberId) {
+            if (currentlyEditingMemberId !== null) {
                 // Update existing member
-                const index = teamMembers.findIndex(m => m.id === memberId);
-                if (index !== -1) {
-                    teamMembers[index] = { ...teamMembers[index], ...memberData };
-                    
-                    // Add activity
-                    activities.push({
-                        id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
-                        type: 'member',
-                        action: 'updated',
-                        itemId: memberId,
-                        memberId: memberId,
-                        timestamp: new Date().toISOString()
-                    });
-                    
-                    showSuccess('Team member updated successfully!');
+                const memberIndex = members.findIndex(m => m.id === currentlyEditingMemberId);
+                if (memberIndex !== -1) {
+                    members[memberIndex] = {
+                        ...members[memberIndex],
+                        name,
+                        email,
+                        role,
+                        color
+                    };
                 }
             } else {
                 // Add new member
-                const newId = teamMembers.length > 0 ? Math.max(...teamMembers.map(m => m.id)) + 1 : 1;
-                const newMember = { id: newId, ...memberData };
-                teamMembers.push(newMember);
+                const newMember = {
+                    id: members.length > 0 ? Math.max(...members.map(m => m.id)) + 1 : 1,
+                    name,
+                    email,
+                    role,
+                    color,
+                    createdAt: new Date().toISOString()
+                };
                 
-                // Add activity
-                activities.push({
-                    id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
-                    type: 'member',
-                    action: 'added',
-                    itemId: newId,
-                    memberId: newId,
-                    timestamp: new Date().toISOString()
+                members.push(newMember);
+            }
+            
+            loadMembers();
+            
+            // Update assigned to dropdown in task modal if open
+            if (!document.getElementById('add-task-modal').classList.contains('hidden')) {
+                const assignedToSelect = document.getElementById('task-assigned-to');
+                assignedToSelect.innerHTML = '';
+                
+                members.forEach(member => {
+                    const option = document.createElement('option');
+                    option.value = member.id;
+                    option.textContent = member.name;
+                    assignedToSelect.appendChild(option);
                 });
                 
-                showSuccess('Team member added successfully!');
+                if (members.length > 0) {
+                    assignedToSelect.value = members[0].id;
+                }
             }
+            
+            closeAddMemberModal();
+        }
+
+        // Edit member
+        function editMember(memberId) {
+            const member = members.find(m => m.id === memberId);
+            if (!member) return;
+            
+            document.getElementById('member-modal-title').textContent = 'Edit Member';
+            document.getElementById('add-member-modal').classList.remove('hidden');
+            
+            // Fill form with member data
+            document.getElementById('member-name').value = member.name;
+            document.getElementById('member-email').value = member.email;
+            document.getElementById('member-role').value = member.role;
+            document.getElementById('member-color').value = member.color;
+            
+            // Highlight selected color
+            document.querySelectorAll('#add-member-modal .rounded-full').forEach(el => {
+                el.classList.remove('border-indigo-500');
+                el.classList.add('border-transparent');
+            });
+            document.querySelector(`#add-member-modal .bg-${member.color}-500`).classList.remove('border-transparent');
+            document.querySelector(`#add-member-modal .bg-${member.color}-500`).classList.add('border-indigo-500');
+            
+            currentlyEditingMemberId = memberId;
+        }
+
+        // Select member color
+        function selectMemberColor(color) {
+            document.getElementById('member-color').value = color;
             
             // Update UI
-            renderTeamMembers();
-            renderActivities();
-            updateAssigneeFilter();
-            
-            // Close modal
-            closeMemberModal();
+            document.querySelectorAll('#add-member-modal .rounded-full').forEach(el => {
+                el.classList.remove('border-indigo-500');
+                el.classList.add('border-transparent');
+            });
+            document.querySelector(`#add-member-modal .bg-${color}-500`).classList.remove('border-transparent');
+            document.querySelector(`#add-member-modal .bg-${color}-500`).classList.add('border-indigo-500');
         }
-        
-        // Delete member
-        function deleteMember(memberId) {
-            const index = teamMembers.findIndex(m => m.id === memberId);
-            if (index !== -1) {
-                const member = teamMembers[index];
+
+        // Confirm delete member
+        function confirmDeleteMember(memberId) {
+            const member = members.find(m => m.id === memberId);
+            if (!member) return;
+            
+            const tasksAssigned = tasks.filter(t => t.assignedTo === memberId).length;
+            
+            document.getElementById('delete-confirmation-message').textContent = 
+                `Are you sure you want to delete the member "${member.name}"? ` + 
+                (tasksAssigned > 0 ? `This member has ${tasksAssigned} task(s) assigned. These tasks will become unassigned. ` : '') +
+                `This action cannot be undone.`;
+            
+            deleteAction = () => {
+                // Remove member
+                members = members.filter(m => m.id !== memberId);
                 
-                // Add activity
-                activities.push({
-                    id: activities.length > 0 ? Math.max(...activities.map(a => a.id)) + 1 : 1,
-                    type: 'member',
-                    action: 'deleted',
-                    itemId: memberId,
-                    memberId: memberId,
-                    timestamp: new Date().toISOString()
+                // Unassign tasks from this member
+                tasks.forEach(task => {
+                    if (task.assignedTo === memberId) {
+                        task.assignedTo = null;
+                    }
                 });
                 
-                teamMembers.splice(index, 1);
-                
-                // Update UI
-                renderTeamMembers();
-                renderActivities();
-                updateAssigneeFilter();
-                
-                showSuccess('Team member deleted successfully!');
+                loadMembers();
+                loadTasks();
+                closeConfirmDeleteModal();
+            };
+            
+            document.getElementById('confirm-delete-modal').classList.remove('hidden');
+        }
+
+        // Close confirm delete modal
+        function closeConfirmDeleteModal() {
+            document.getElementById('confirm-delete-modal').classList.add('hidden');
+            deleteAction = null;
+        }
+
+        // Execute delete
+        function executeDelete() {
+            if (deleteAction) {
+                deleteAction();
             }
+        }
+
+        // Confirm reset all data
+        function confirmResetData() {
+            document.getElementById('delete-confirmation-message').textContent = 
+                `Are you sure you want to reset ALL data? This will delete all tasks and members and cannot be undone.`;
             
-            closeConfirmModal();
-        }
-        
-        // Show confirmation modal
-        function showConfirmModal(title, message, callback) {
-            document.getElementById('confirmTitle').textContent = title;
-            document.getElementById('confirmMessage').textContent = message;
+            deleteAction = () => {
+                tasks = [];
+                members = [];
+                loadTasks();
+                loadMembers();
+                updateCompletionPercentage();
+                closeConfirmDeleteModal();
+            };
             
-            // Store callback in button
-            confirmYesBtn.onclick = callback;
+            document.getElementById('confirm-delete-modal').classList.remove('hidden');
+        }
+
+        // Export data
+        function exportData(format) {
+            const data = {
+                tasks: tasks,
+                members: members,
+                exportedAt: new Date().toISOString()
+            };
             
-            // Show modal
-            confirmModal.classList.remove('hidden');
+            if (format === 'excel') {
+                exportToExcel(data);
+            } else {
+                exportToJSON(data);
+            }
         }
-        
-        // Close confirmation modal
-        function closeConfirmModal() {
-            confirmModal.classList.add('hidden');
-        }
-        
-        // Confirm action
-        function confirmAction() {
-            // The actual action is bound to the confirmYesBtn.onclick
-            // This function just exists to match the confirmAction name in the modal
-        }
-        
-        // Show success notification
-        function showSuccess(message) {
-            successMessageEl.textContent = message;
-            successNotification.classList.remove('hidden');
-            
-            setTimeout(() => {
-                successNotification.classList.add('hidden');
-            }, 3000);
-        }
-        
-        // Show error notification
-        function showError(message) {
-            errorMessageEl.textContent = message;
-            errorNotification.classList.remove('hidden');
-            
-            setTimeout(() => {
-                errorNotification.classList.add('hidden');
-            }, 3000);
-        }
-        
+
         // Export to Excel
-        function exportToExcel() {
-            // Prepare data for export
-            const exportData = tasks.map(task => {
-                const assignee = teamMembers.find(member => member.id === task.assignee);
-                const assigneeName = assignee ? assignee.name : 'Unassigned';
-                
-                return {
-                    'Task ID': task.id,
-                    'Title': task.title,
-                    'Description': task.description,
-                    'Assignee': assigneeName,
-                    'Due Date': formatDate(task.dueDate),
-                    'Priority': task.priority,
-                    'Status': task.status,
-                    'Created At': formatDateTime(task.createdAt)
-                };
-            });
-            
-            // Create worksheet
-            const ws = XLSX.utils.json_to_sheet(exportData);
-            
+        function exportToExcel(data) {
             // Create workbook
             const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Tasks');
             
-            // Export to file
-            XLSX.writeFile(wb, 'tasks_export.xlsx');
+            // Add tasks sheet
+            const tasksData = [
+                ["ID", "Name", "Description", "Due Date", "Priority", "Status", "Assigned To", "Created At"],
+                ...data.tasks.map(task => [
+                    task.id,
+                    task.name,
+                    task.description,
+                    task.dueDate,
+                    task.priority,
+                    task.status,
+                    task.assignedTo,
+                    task.createdAt
+                ])
+            ];
             
-            showSuccess('Tasks exported successfully!');
+            const tasksWs = XLSX.utils.aoa_to_sheet(tasksData);
+            XLSX.utils.book_append_sheet(wb, tasksWs, "Tasks");
+            
+            // Add members sheet
+            const membersData = [
+                ["ID", "Name", "Email", "Role", "Color", "Created At"],
+                ...data.members.map(member => [
+                    member.id,
+                    member.name,
+                    member.email,
+                    member.role,
+                    member.color,
+                    member.createdAt
+                ])
+            ];
+            
+            const membersWs = XLSX.utils.aoa_to_sheet(membersData);
+            XLSX.utils.book_append_sheet(wb, membersWs, "Members");
+            
+            // Generate file and download
+            XLSX.writeFile(wb, `TaskManager_Export_${new Date().toISOString().split('T')[0]}.xlsx`);
         }
-        
-        // Import from Excel
-        function importFromExcel(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+
+        // Export to JSON
+        function exportToJSON(data) {
+            const jsonStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([jsonStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `TaskManager_Export_${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Import data
+        function importData() {
+            document.getElementById('import-modal').classList.remove('hidden');
+        }
+
+        // Close import modal
+        function closeImportModal() {
+            document.getElementById('import-modal').classList.add('hidden');
+        }
+
+        // Process import
+        function processImport() {
+            const fileInput = document.getElementById('import-file');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file to import');
+                return;
+            }
             
             const reader = new FileReader();
             reader.onload = function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                
-                // Get first worksheet
-                const worksheetName = workbook.SheetNames[0];
-                const worksheet = workbook.Sheets[worksheetName];
-                
-                // Convert to JSON
-                const jsonData = XLSX.utils.sheet_to_json(worksheet);
-                
-                // Process imported data
-                const importedTasks = [];
-                const newActivities = [];
-                
-                jsonData.forEach(row => {
-                    // Find or create assignee
-                    let assigneeId = null;
-                    const existingMember = teamMembers.find(member => 
-                        member.name === row['Assignee'] || member.email === row['Assignee']
-                    );
+                try {
+                    const data = JSON.parse(e.target.result);
                     
-                    if (existingMember) {
-                        assigneeId = existingMember.id;
-                    } else if (row['Assignee'] && row['Assignee'] !== 'Unassigned') {
-                        // Create new member
-                        const newMemberId = teamMembers.length > 0 ? Math.max(...teamMembers.map(m => m.id)) + 1 : 1;
-                        assigneeId = newMemberId;
-                        
-                        teamMembers.push({
-                            id: newMemberId,
-                            name: row['Assignee'],
-                            email: '',
-                            role: 'Team Member'
-                        });
-                        
-                        newActivities.push({
-                            id: activities.length + newActivities.length + 1,
-                            type: 'member',
-                            action: 'added',
-                            itemId: newMemberId,
-                            memberId: newMemberId,
-                            timestamp: new Date().toISOString()
-                        });
+                    if (!data.tasks || !data.members) {
+                        throw new Error('Invalid data format');
                     }
                     
-                    // Create task
-                    const newTaskId = tasks.length > 0 ? Math.max(...tasks.map(t => t.id)) + 1 : 1;
+                    // Replace current data with imported data
+                    tasks = data.tasks;
+                    members = data.members;
                     
-                    // Parse due date (assuming format is either date string or Excel serial number)
-                    let dueDate = new Date();
-                    if (row['Due Date']) {
-                        if (typeof row['Due Date'] === 'number') {
-                            // Excel serial date (days since 1900)
-                            dueDate = XLSX.SSF.parse_date_code(row['Due Date']);
-                        } else {
-                            // Try to parse as date string
-                            dueDate = new Date(row['Due Date']);
-                        }
-                    }
+                    loadTasks();
+                    loadMembers();
+                    updateCompletionPercentage();
                     
-                    // Format date as YYYY-MM-DD
-                    const formattedDueDate = dueDate.toISOString().split('T')[0];
-                    
-                    importedTasks.push({
-                        id: newTaskId,
-                        title: row['Title'] || `Imported Task ${newTaskId}`,
-                        description: row['Description'] || '',
-                        assignee: assigneeId,
-                        dueDate: formattedDueDate,
-                        priority: row['Priority'] || 'Medium',
-                        status: row['Status'] || 'Not Started',
-                        createdAt: new Date().toISOString()
-                    });
-                    
-                    newActivities.push({
-                        id: activities.length + newActivities.length + 1,
-                        type: 'task',
-                        action: 'created',
-                        itemId: newTaskId,
-                        memberId: assigneeId,
-                        timestamp: new Date().toISOString()
-                    });
-                });
-                
-                // Add imported tasks and activities
-                tasks.push(...importedTasks);
-                activities.push(...newActivities);
-                
-                // Update UI
-                renderTasks();
-                renderTeamMembers();
-                renderActivities();
-                updateStats();
-                updateProgressBar();
-                updateAssigneeFilter();
-                
-                showSuccess(`Successfully imported ${importedTasks.length} tasks and added ${newActivities.filter(a => a.type === 'member').length} new team members!`);
+                    closeImportModal();
+                    alert('Data imported successfully!');
+                } catch (error) {
+                    console.error('Error importing data:', error);
+                    alert('Error importing data. Please make sure you selected a valid JSON file.');
+                }
             };
-            
-            reader.readAsArrayBuffer(file);
-            
-            // Reset file input
-            event.target.value = '';
-        }
-        
-        // Format date
-        function formatDate(dateString) {
-            if (!dateString) return '';
-            
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric' 
-            });
-        }
-        
-        // Format date and time
-        function formatDateTime(dateTimeString) {
-            if (!dateTimeString) return '';
-            
-            const date = new Date(dateTimeString);
-            return date.toLocaleString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
+            reader.readAsText(file);
         }
     </script>
+    
 </body>
 </html>
