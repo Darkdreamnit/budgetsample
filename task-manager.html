@@ -3,83 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskMaster Pro - Team Task Management</title>
+    <title>Event Budget Sample | Professional Event Cost Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
-    <style>
-        .task-item:hover .task-actions {
-            opacity: 1;
-        }
-        
-        .priority-high {
-            border-left: 4px solid #ef4444;
-        }
-        
-        .priority-medium {
-            border-left: 4px solid #f59e0b;
-        }
-        
-        .priority-low {
-            border-left: 4px solid #10b981;
-        }
-        
-        .status-not-started {
-            background-color: #e5e7eb;
-        }
-        
-        .status-in-progress {
-            background-color: #93c5fd;
-        }
-        
-        .status-completed {
-            background-color: #86efac;
-        }
-        
-        .status-blocked {
-            background-color: #fca5a5;
-        }
-        
-        .progress-bar {
-            transition: width 0.5s ease-in-out;
-        }
-        
-        /* Custom scrollbar */
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 10px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e0;
-            border-radius: 10px;
-        }
-        
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #a0aec0;
-        }
-        
-        /* Animation for task completion */
-        @keyframes taskComplete {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        .task-complete-animation {
-            animation: taskComplete 0.5s ease;
-        }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body class="bg-gray-50 min-h-screen">
+
     <div class="container mx-auto px-4 py-8">
         <!-- Header -->
+        <header class="gradient-bg text-white">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-money-bill-wave text-3xl"></i>
+                    <h1 class="text-2xl font-bold">Event Budget Sample</h1>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="index.html" class="hover:text-indigo-200 transition">Home</a>
+                    <a href="calculator.html" class="hover:text-indigo-200 transition">Calculator</a>
+                    <a href="blog.html" class="hover:text-indigo-200 transition">Blog</a>
+                    <a href="resources.html" class="hover:text-indigo-200 transition">Resources</a>
+                    <a href="contact.html" class="hover:text-indigo-200 transition">Contact</a>
+                </nav>
+                <button id="mobileMenuButton" class="md:hidden text-xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="mobile-menu md:hidden bg-indigo-700 rounded-lg mt-4">
+                <div class="flex flex-col space-y-3 p-4">
+                    <a href="index.html" class="hover:text-indigo-200 transition">Home</a>
+                    <a href="calculator.html" class="hover:text-indigo-200 transition">Calculator</a>
+                    <a href="guest-list-manager.html" class="hover:text-indigo-200 transition">Guest List Manager</a>
+                    <a href="blog.html" class="hover:text-indigo-200 transition">Blog</a>
+                    <a href="resources.html" class="hover:text-indigo-200 transition">Resources</a>
+                    <a href="contact.html" class="hover:text-indigo-200 transition">Contact</a>
+                </div>
+            </div>
+
+            <div class="mt-16 mb-20 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Professional Event Budget Calculator</h2>
+                <p class="text-xl md:text-2xl max-w-3xl mx-auto">Use our calculator to plan with precision using our industry-standard budgeting tool</p>
+            </div>
+        </div>
         <header class="flex flex-col md:flex-row justify-between items-center mb-8">
             <div class="flex items-center mb-4 md:mb-0">
                 <i class="fas fa-tasks text-indigo-600 text-4xl mr-3"></i>
