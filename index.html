@@ -275,111 +275,163 @@
     const { jsPDF } = window.jspdf;
             
     // Sample template data
-    const templates = [
-        {
-            id: 1,
-            title: "Elegant Wedding",
-            type: "wedding",
-            description: "Comprehensive budget for a medium-scale wedding with 100-150 guests.",
-            totalBudget: 25000,
-            items: [
-                { name: "Venue Rental", category: "venue", cost: 8000, notes: "Includes ceremony and reception" },
-                { name: "Catering", category: "food", cost: 7000, notes: "Buffet style for 120 guests" },
-                { name: "Photography", category: "entertainment", cost: 2500, notes: "8 hours coverage" },
-                { name: "Floral Decor", category: "decorations", cost: 3000, notes: "Bridal bouquet, centerpieces" },
-                { name: "Wedding Dress", category: "miscellaneous", cost: 1500, notes: "" }
-            ],
-            icon: "fas fa-ring",
-            color: "bg-pink-100",
-            textColor: "text-pink-800"
-        },
-        {
-            id: 2,
-            title: "Corporate Conference",
-            type: "conference",
-            description: "Budget template for a 2-day professional conference with 200 attendees.",
-            totalBudget: 35000,
-            items: [
-                { name: "Conference Hall", category: "venue", cost: 12000, notes: "Includes AV equipment" },
-                { name: "Catering", category: "food", cost: 8000, notes: "Coffee breaks and lunches" },
-                { name: "Keynote Speaker", category: "entertainment", cost: 7000, notes: "Plus travel expenses" },
-                { name: "Marketing Materials", category: "marketing", cost: 3000, notes: "Brochures, banners" },
-                { name: "Staffing", category: "staff", cost: 5000, notes: "Event coordinators" }
-            ],
-            icon: "fas fa-users",
-            color: "bg-blue-100",
-            textColor: "text-blue-800"
-        },
-        {
-            id: 3,
-            title: "Charity Gala",
-            type: "fundraiser",
-            description: "Budget for a formal fundraising event with silent auction and dinner.",
-            totalBudget: 18000,
-            items: [
-                { name: "Ballroom Rental", category: "venue", cost: 6000, notes: "Includes basic setup" },
-                { name: "D dinner Service", category: "food", cost: 5000, notes: "Plated dinner for 100" },
-                { name: "Auction Items", category: "miscellaneous", cost: 4000, notes: "Procurement budget" },
-                { name: "Entertainment", category: "entertainment", cost: 2000, notes: "Jazz quartet" },
-                { name: "Invitations", category: "marketing", cost: 1000, notes: "Printed and mailed" }
-            ],
-            icon: "fas fa-hand-holding-heart",
-            color: "bg-purple-100",
-            textColor: "text-purple-800"
-        },
-        {
-            id: 4,
-            title: "Birthday Party",
-            type: "party",
-            description: "Budget for a fun birthday celebration with 30-50 guests.",
-            totalBudget: 1500,
-            items: [
-                { name: "Backyard Setup", category: "venue", cost: 200, notes: "Tent rental" },
-                { name: "Food & Drinks", category: "food", cost: 600, notes: "BBQ and beverages" },
-                { name: "Cake", category: "food", cost: 150, notes: "Custom design" },
-                { name: "Decorations", category: "decorations", cost: 200, notes: "Balloons, banners" },
-                { name: "Entertainment", category: "ent entertainment", cost: 350, notes: "DJ for 4 hours" }
-            ],
-            icon: "fas fa-glass-cheers",
-            color: "bg-yellow-100",
-            textColor: "text-yellow-800"
-        },
-        {
-            id: 5,
-            title: "Luxury Wedding",
-            type: "wedding",
-            description: "Premium wedding budget for a lavish celebration with all the extras.",
-            totalBudget: 80000,
-            items: [
-                { name: "Luxury Venue", category: "venue", cost: 25000, notes: "Exclusive resort" },
-                { name: "Gourmet Catering", category: "food", cost: 20000, notes: "5-course meal" },
-                { name: "Live Band", category: "entertainment", cost: 10000, notes: "12-piece orchestra" },
-                { name: "Premium Floral", category: "decorations", cost: 15000, notes: "Extensive floral arrangements" },
-                { name: "Videography", category: "ent entertainment", cost: 5000, notes: "Cinematic coverage" },
-                { name: "Wedding Planner", category: "staff", cost: 5000, notes: "Full service" }
-            ],
-            icon: "fas fa-ring",
-            color: "bg-pink-100",
-            textColor: "text-pink-800"
-        },
-        {
-            id: 6,
-            title: "Tech Conference",
-            type: "conference",
-            description: "Budget for a technology-focused conference with workshops.",
-            totalBudget: 50000,
-            items: [
-                { name: "Convention Center", category: "venue", cost: 18000, notes: "3-day rental" },
-                { name: "Speaker Fees", category: "entertainment", cost: 15000, notes: "5 keynote speakers" },
-                { name: "Tech Equipment", category: "miscellaneous", cost: 8000, notes: "AV, streaming setup" },
-                { name: "Swag Bags", category: "marketing", cost: 5000, notes: "For 300 attendees" },
-                { name: "Volunteer Lunch", category: "food", cost: 4000, notes: "For 50 volunteers" }
-            ],
-            icon: "fas fa-users",
-            color: "bg-blue-100",
-            textColor: "text-blue-800"
-        }
-    ];
+        const templates = [
+            {
+                id: 1,
+                title: "Elegant Wedding",
+                type: "wedding",
+                description: "Comprehensive budget for a medium-scale wedding with 100-150 guests.",
+                totalBudget: 25000,
+                items: [
+                    { name: "Venue Rental", category: "venue", cost: 8000, notes: "Includes ceremony and reception" },
+                    { name: "Catering", category: "food", cost: 7000, notes: "Buffet style for 120 guests" },
+                    { name: "Photography", category: "entertainment", cost: 2500, notes: "8 hours coverage" },
+                    { name: "Floral Decor", category: "decorations", cost: 3000, notes: "Bridal bouquet, centerpieces" },
+                    { name: "Wedding Dress", category: "miscellaneous", cost: 1500, notes: "" }
+                ],
+                icon: "fas fa-ring",
+                color: "bg-pink-100",
+                textColor: "text-pink-800"
+            },
+            {
+                id: 2,
+                title: "Corporate Conference",
+                type: "conference",
+                description: "Budget template for a 2-day professional conference with 200 attendees.",
+                totalBudget: 35000,
+                items: [
+                    { name: "Conference Hall", category: "venue", cost: 12000, notes: "Includes AV equipment" },
+                    { name: "Catering", category: "food", cost: 8000, notes: "Coffee breaks and lunches" },
+                    { name: "Keynote Speaker", category: "entertainment", cost: 7000, notes: "Plus travel expenses" },
+                    { name: "Marketing Materials", category: "marketing", cost: 3000, notes: "Brochures, banners" },
+                    { name: "Staffing", category: "staff", cost: 5000, notes: "Event coordinators" }
+                ],
+                icon: "fas fa-users",
+                color: "bg-blue-100",
+                textColor: "text-blue-800"
+            },
+            {
+                id: 3,
+                title: "Charity Gala",
+                type: "fundraiser",
+                description: "Budget for a formal fundraising event with silent auction and dinner.",
+                totalBudget: 18000,
+                items: [
+                    { name: "Ballroom Rental", category: "venue", cost: 6000, notes: "Includes basic setup" },
+                    { name: "D dinner Service", category: "food", cost: 5000, notes: "Plated dinner for 100" },
+                    { name: "Auction Items", category: "miscellaneous", cost: 4000, notes: "Procurement budget" },
+                    { name: "Entertainment", category: "entertainment", cost: 2000, notes: "Jazz quartet" },
+                    { name: "Invitations", category: "marketing", cost: 1000, notes: "Printed and mailed" }
+                ],
+                icon: "fas fa-hand-holding-heart",
+                color: "bg-purple-100",
+                textColor: "text-purple-800"
+            },
+            {
+                id: 4,
+                title: "Birthday Party",
+                type: "party",
+                description: "Budget for a fun birthday celebration with 30-50 guests.",
+                totalBudget: 1500,
+                items: [
+                    { name: "Backyard Setup", category: "venue", cost: 200, notes: "Tent rental" },
+                    { name: "Food & Drinks", category: "food", cost: 600, notes: "BBQ and beverages" },
+                    { name: "Cake", category: "food", cost: 150, notes: "Custom design" },
+                    { name: "Decorations", category: "decorations", cost: 200, notes: "Balloons, banners" },
+                    { name: "Entertainment", category: "ent entertainment", cost: 350, notes: "DJ for 4 hours" }
+                ],
+                icon: "fas fa-glass-cheers",
+                color: "bg-yellow-100",
+                textColor: "text-yellow-800"
+            },
+            {
+                id: 5,
+                title: "Luxury Wedding",
+                type: "wedding",
+                description: "Premium wedding budget for a lavish celebration with all the extras.",
+                totalBudget: 80000,
+                items: [
+                    { name: "Luxury Venue", category: "venue", cost: 25000, notes: "Exclusive resort" },
+                    { name: "Gourmet Catering", category: "food", cost: 20000, notes: "5-course meal" },
+                    { name: "Live Band", category: "entertainment", cost: 10000, notes: "12-piece orchestra" },
+                    { name: "Premium Floral", category: "decorations", cost: 15000, notes: "Extensive floral arrangements" },
+                    { name: "Videography", category: "ent entertainment", cost: 5000, notes: "Cinematic coverage" },
+                    { name: "Wedding Planner", category: "staff", cost: 5000, notes: "Full service" }
+                ],
+                icon: "fas fa-ring",
+                color: "bg-pink-100",
+                textColor: "text-pink-800"
+            },
+            {
+                id: 6,
+                title: "Tech Conference",
+                type: "conference",
+                description: "Budget for a technology-focused conference with workshops.",
+                totalBudget: 50000,
+                items: [
+                    { name: "Convention Center", category: "venue", cost: 18000, notes: "3-day rental" },
+                    { name: "Speaker Fees", category: "entertainment", cost: 15000, notes: "5 keynote speakers" },
+                    { name: "Tech Equipment", category: "miscellaneous", cost: 8000, notes: "AV, streaming setup" },
+                    { name: "Swag Bags", category: "marketing", cost: 5000, notes: "For 300 attendees" },
+                    { name: "Volunteer Lunch", category: "food", cost: 4000, notes: "For 50 volunteers" }
+                ],
+                icon: "fas fa-users",
+                color: "bg-blue-100",
+                textColor: "text-blue-800"
+            },
+            // New wedding templates
+            {
+                id: 7,
+                title: "Intimate Wedding",
+                type: "wedding",
+                description: "Budget for a small, intimate wedding with 20-50 guests.",
+                totalBudget: 10000,
+                items: [
+                    { name: "Small Venue", category: "venue", cost: 3000, notes: "Boutique hotel or garden venue" },
+                    { name: "Catering", category: "food", cost: 2500, notes: "Plated dinner for 40 guests" },
+                    { name: "Photography", category: "entertainment", cost: 1500, notes: "4 hours coverage" },
+                    { name: "Simple Decor", category: "decorations", cost: 1000, notes: "Minimalist floral arrangements" },
+                    { name: "Wedding Attire", category: "miscellaneous", cost: 2000, notes: "Bride and groom outfits" }
+                ],
+                icon: "fas fa-heart",
+                color: "bg-pink-100",
+                textColor: "text-pink-800"
+            },
+            {
+                id: 8,
+                title: "Private Wedding",
+                type: "wedding",
+                description: "Budget for an exclusive private wedding ceremony with close family.",
+                totalBudget: 5000,
+                items: [
+                    { name: "Private Venue", category: "venue", cost: 1500, notes: "Family home or small chapel" },
+                    { name: "Intimate Dinner", category: "food", cost: 1200, notes: "Gourmet meal for 20" },
+                    { name: "Officiant", category: "staff", cost: 500, notes: "Marriage license included" },
+                    { name: "Photographer", category: "entertainment", cost: 1000, notes: "2 hours coverage" },
+                    { name: "Simple Attire", category: "miscellaneous", cost: 800, notes: "" }
+                ],
+                icon: "fas fa-user-secret",
+                color: "bg-pink-100",
+                textColor: "text-pink-800"
+            },
+            {
+                id: 9,
+                title: "Low Cost Wedding",
+                type: "wedding",
+                description: "Budget-friendly wedding options for couples on a tight budget.",
+                totalBudget: 3000,
+                items: [
+                    { name: "Community Venue", category: "venue", cost: 500, notes: "Local park or community center" },
+                    { name: "DIY Catering", category: "food", cost: 800, notes: "Potluck or self-catered" },
+                    { name: "Friend Photographer", category: "entertainment", cost: 300, notes: "Gift for photography services" },
+                    { name: "DIY Decor", category: "decorations", cost: 400, notes: "Handmade decorations" },
+                    { name: "Simple Attire", category: "miscellaneous", cost: 1000, notes: "Budget-friendly options" }
+                ],
+                icon: "fas fa-piggy-bank",
+                color: "bg-pink-100",
+                textColor: "text-pink-800"
+            }
+        ];
 
     // Current state
     let currentTemplate = null;
