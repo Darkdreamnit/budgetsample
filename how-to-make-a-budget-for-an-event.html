@@ -6,16 +6,22 @@
     <title>Event Budget Sample | Professional Event Cost Calculator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-gray-50 min-h-screen">
+   
+
     <!-- Header -->
     <header class="gradient-bg text-white">
         <div class="container mx-auto px-4 py-8">
             <div class="flex justify-between items-center">
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-money-bill-wave text-3xl"></i>
-                    <h1 class="text-2xl font-bold">Event Budget Sample</h1>
+                    <h2 class="text-2xl font-bold">Event Budget Sample</h2>
                 </div>
                 <nav class="hidden md:flex space-x-6">
                     <a href="index.html" class="hover:text-indigo-200 transition">Home</a>
@@ -42,17 +48,10 @@
             </div>
 
             <div class="mt-16 mb-20 text-center">
-                 <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-white leading-tight">
-      The Ultimate Guide to Event Budgeting
-    </h1>
-    <p class="text-lg sm:text-xl text-white mb-6">
-      Expert strategies on how to make a budget for an event.
-    </p>
+                <h1 class="text-4xl md:text-5xl font-bold mb-4">The Ultimate Guide To Event Budgeting</h1>
+                <p class="text-xl md:text-2xl max-w-3xl mx-auto">Expert strategies on how to make a budget for an event.</p>
             </div>
         </div>
-    </header>
-
-           
     </header>
 
     
