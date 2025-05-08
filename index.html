@@ -12,7 +12,41 @@
     <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-gray-50 font-sans">
+<body class="bg-gray-50 min-h-screen">
+    <!-- Mobile Navbar -->
+    <nav class="bg-indigo-600 text-white shadow-lg lg:hidden">
+        <div class="container mx-auto px-4 py-3">
+            <div class="flex justify-between items-center">
+                <h1 class="text-xl font-bold">EventBudget Pro</h1>
+                <button id="mobile-menu-button" class="text-white focus:outline-none">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+            <div id="mobile-menu" class="hidden mt-2 pb-2">
+                <div class="flex flex-col space-y-2">
+                    <button onclick="filterTemplates('all')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-indigo-500 text-white font-medium transition">
+                        <i class="fas fa-layer-group mr-2"></i>All Templates
+                    </button>
+                    <button onclick="filterTemplates('wedding')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-indigo-500 text-white transition">
+                        <i class="fas fa-ring mr-2"></i>Weddings
+                    </button>
+                    <button onclick="filterTemplates('conference')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-indigo-500 text-white transition">
+                        <i class="fas fa-users mr-2"></i>Conferences
+                    </button>
+                    <button onclick="filterTemplates('fundraiser')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-indigo-500 text-white transition">
+                        <i class="fas fa-hand-holding-heart mr-2"></i>Fundraisers
+                    </button>
+                    <button onclick="filterTemplates('party')" class="w-full text-left px-3 py-2 rounded-lg hover:bg-indigo-500 text-white transition">
+                        <i class="fas fa-glass-cheers mr-2"></i>Parties
+                    </button>
+                    <button onclick="openCustomBudgetModal()" class="w-full bg-indigo-700 text-white py-2 px-3 rounded-lg hover:bg-indigo-800 transition flex items-center justify-center">
+                        <i class="fas fa-plus mr-2"></i> Custom Budget
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
     <!-- Header -->
     <header class="gradient-bg text-white">
         <div class="container mx-auto px-4 py-8">
@@ -52,580 +86,876 @@
         </div>
     </header>
 
-    <!-- Main Calculator -->
-    <main class="container mx-auto px-4 py-12 -mt-10">
-        <div class="bg-white rounded-xl shadow-xl overflow-hidden">
-            <div class="md:flex">
-                <!-- Calculator Form -->
-                <div class="md:w-1/2 p-8">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Event Details</h3>
+    <main class="container mx-auto px-4 py-4 lg:py-8">
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Desktop Sidebar -->
+            <aside class="lg:w-1/4 bg-white p-6 rounded-xl shadow-md h-fit lg:sticky lg:top-8 desktop-menu">
+                <h2 class="text-xl font-semibold mb-6 text-indigo-700">Budget Templates</h2>
+                <ul class="space-y-3">
+                    <li>
+                        <button onclick="filterTemplates('all')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-indigo-50 text-indigo-600 font-medium transition">
+                            <i class="fas fa-layer-group mr-2"></i>All Templates
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="filterTemplates('wedding')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-indigo-50 text-indigo-600 transition">
+                            <i class="fas fa-ring mr-2"></i>Weddings
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="filterTemplates('conference')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-indigo-50 text-indigo-600 transition">
+                            <i class="fas fa-users mr-2"></i>Conferences
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="filterTemplates('fundraiser')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-indigo-50 text-indigo-600 transition">
+                            <i class="fas fa-hand-holding-heart mr-2"></i>Fundraisers
+                        </button>
+                    </li>
+                    <li>
+                        <button onclick="filterTemplates('party')" class="w-full text-left px-4 py-2 rounded-lg hover:bg-indigo-50 text-indigo-600 transition">
+                            <i class="fas fa-glass-cheers mr-2"></i>Parties
+                        </button>
+                    </li>
+                </ul>
+                
+                <div class="mt-8 pt-6 border-t border-gray-200">
+                    <h3 class="font-medium text-gray-700 mb-3">Create New Budget</h3>
+                    <button onclick="openCustomBudgetModal()" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition flex items-center justify-center">
+                        <i class="fas fa-plus mr-2"></i> Custom Budget
+                    </button>
+                </div>
 
-                    <div class="space-y-6">
-                        <!-- Event Type -->
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2 flex items-center">
-                                Event Type
-                                <span class="tooltip ml-2">
-                                    <i class="fas fa-info-circle text-gray-400"></i>
-                                    <span class="tooltip-text">Different event types have different have different cost structures. Weddings usually cost more per-guest costs than say for instance corporate events or birthday parties.</span>
-                                </span>
-                            </label>
-                            <select id="eventType" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
-                                <option value="">Select event type</option>
-                                <option value="wedding">Wedding</option>
-                                <option value="corporate">Corporate Event</option>
-                                <option value="conference">Conference</option>
-                                <option value="birthday">Birthday Party</option>
-                                <option value="charity">Charity Gala</option>
-                                <option value="trade">Trade Show</option>
-                            </select>
-                        </div>
-
-                        <!-- Guest Count -->
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2 flex items-center">
-                                Number of Guests
-                                <span class="tooltip ml-2">
-                                    <i class="fas fa-info-circle text-gray-400"></i>
-                                    <span class="tooltip-text">Guest count impacts nearly all budget items. Most venues charge per person, and catering costs scale directly with attendance.</span>
-                                </span>
-                            </label>
-                            <input id="guestCount" type="number" min="1" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="e.g. 150">
-                        </div>
-
-                        <!-- Event Duration -->
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2 flex items-center">
-                                Event Duration (hours)
-                                <span class="tooltip ml-2">
-                                    <i class="fas fa-info-circle text-gray-400"></i>
-                                    <span class="tooltip-text">Longer events require more staff hours, extended venue rentals, and potentially additional food/beverage service.</span>
-                                </span>
-                            </label>
-                            <input id="duration" type="number" min="1" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none" placeholder="e.g. 5">
-                        </div>
-
-                        <!-- Date Picker -->
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2 flex items-center">
-                                Event Date
-                                <span class="tooltip ml-2">
-                                    <i class="fas fa-info-circle text-gray-400"></i>
-                                    <span class="tooltip-text">Peak season dates (these include summer weekends, holidays) often carry 20-30% premium pricing for venues and vendors.</span>
-                                </span>
-                            </label>
-                            <input id="eventDate" type="date" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
-                        </div>
-
-                        <!-- Location -->
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2 flex items-center">
-                                Location Type
-                                <span class="tooltip ml-2">
-                                    <i class="fas fa-info-circle text-gray-400"></i>
-                                    <span class="tooltip-text">Urban venues typically cost 15-25% more than suburban locations. Outdoor events may require tent rentals and weather contingencies.</span>
-                                </span>
-                            </label>
-                            <select id="locationType" class="w-full px-4 py-3 rounded-lg border border-gray-300 input-highlight focus:outline-none">
-                                <option value="">Select location type</option>
-                                <option value="urban">Urban Indoor</option>
-                                <option value="suburban">Suburban Indoor</option>
-                                <option value="outdoor">Outdoor</option>
-                                <option value="hotel">Hotel Ballroom</option>
-                                <option value="unique">Unique Venue</option>
-                            </select>
-                        </div>
-
-                        <!-- Budget Slider -->
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2 flex items-center">
-                                Your Budget Range
-                                <span class="tooltip ml-2">
-                                    <i class="fas fa-info-circle text-gray-400"></i>
-                                    <span class="tooltip-text">Setting a realistic budget range helps us provide targeted recommendations for cost-saving opportunities.</span>
-                                </span>
-                            </label>
-                            <div class="flex items-center space-x-4">
-                                <span class="text-gray-500">$1K</span>
-                                <input id="budgetRange" type="range" min="1000" max="50000" step="1000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
-                                <span id="budgetValue" class="text-gray-700 font-medium">$25K</span>
-                            </div>
-                        </div>
-
-                        <!-- Calculate Button -->
-                        <button id="calculateBtn" class="w-full gradient-bg text-white py-3 px-6 rounded-lg font-medium hover:opacity-90 transition flex items-center justify-center space-x-2">
-                            <i class="fas fa-calculator"></i>
-                            <span>Generate Detailed Budget</span>
+                <div class="mt-8 pt-6 border-t border-gray-200 lg:hidden">
+                    <h3 class="font-medium text-gray-700 mb-3">Download All</h3>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button onclick="downloadAllTemplates('excel')" class="bg-green-600 text-white py-2 px-3 rounded-lg hover:bg-green-700 transition flex items-center justify-center text-sm">
+                            <i class="fas fa-file-excel mr-2"></i> Excel
+                        </button>
+                        <button onclick="downloadAllTemplates('pdf')" class="bg-red-600 text-white py-2 px-3 rounded-lg hover:bg-red-700 transition flex items-center justify-center text-sm">
+                            <i class="fas fa-file-pdf mr-2"></i> PDF
                         </button>
                     </div>
                 </div>
+            </aside>
 
-                <!-- Results Section -->
-                <div id="resultsSection" class="md:w-1/2 bg-gray-50 p-8 hidden">
+            <!-- Main Content -->
+            <div class="lg:w-3/4">
+                <div class="bg-white p-6 rounded-xl shadow-md mb-8">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-2xl font-bold text-gray-800">Budget Breakdown</h3>
-                        <button id="resetBtn" class="text-indigo-600 hover:text-indigo-800 transition">
-                            <i class="fas fa-redo mr-1"></i> Reset
-                        </button>
+                        <h2 class="text-xl lg:text-2xl font-bold text-gray-800">Find Your Perfect Budget Template</h2>
                     </div>
-
-                    <!-- Download Buttons -->
-                    <div class="flex flex-wrap gap-3 mb-6">
-                        <button id="downloadPngBtn" class="download-btn bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-50 transition flex items-center">
-                            <i class="fas fa-image mr-2 text-indigo-600"></i> PNG
-                        </button>
-                        <button id="downloadPdfBtn" class="download-btn bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-50 transition flex items-center">
-                            <i class="fas fa-file-pdf mr-2 text-red-600"></i> PDF
-                        </button>
-                        <button id="downloadExcelBtn" class="download-btn bg-white border border-gray-300 text-gray-700 py-2 px-4 rounded-lg font-medium hover:bg-gray-50 transition flex items-center">
-                            <i class="fas fa-file-excel mr-2 text-green-600"></i> Excel
-                        </button>
-                    </div>
-
-                    <!-- Budget Summary -->
-                    <div class="bg-white rounded-lg shadow p-6 mb-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h4 class="font-bold text-lg">Total Estimated Cost</h4>
-                            <span id="totalCost" class="text-3xl font-bold text-indigo-600">$0</span>
-                        </div>
-
-                        <div class="mb-4">
-                            <div class="flex justify-between text-sm text-gray-600 mb-1">
-                                <span>Budget Utilization</span>
-                                <span id="budgetPercentage">0%</span>
-                            </div>
-                            <div class="w-full bg-gray-200 rounded-full h-2.5">
-                                <div id="progressBar" class="progress-bar bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
-                            </div>
-                        </div>
-
-                        <!-- Budget Breakdown with Explanations -->
-                        <div class="space-y-4">
-                            <!-- Venue -->
-                            <div class="p-3 bg-indigo-50 rounded-lg">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <h5 class="font-medium">Venue Rental</h5>
-                                        <p class="text-xs text-gray-600">Includes space rental, basic setup, and staff</p>
-                                    </div>
-                                    <span id="venueCost" class="font-medium">$0</span>
-                                </div>
-                                <div class="mt-2 text-xs text-indigo-700 bg-white p-2 rounded">
-                                    <i class="fas fa-info-circle mr-1"></i> Venues typically account for 25-35% of total budget. Consider weekday discounts or off-season rates.
-                                </div>
-                            </div>
-
-                            <!-- Catering -->
-                            <div class="p-3 bg-indigo-50 rounded-lg">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <h5 class="font-medium">Food & Beverage</h5>
-                                        <p class="text-xs text-gray-600">Per person costs including service staff</p>
-                                    </div>
-                                    <span id="cateringCost" class="font-medium">$0</span>
-                                </div>
-                                <div class="mt-2 text-xs text-indigo-700 bg-white p-2 rounded">
-                                    <i class="fas fa-info-circle mr-1"></i> Catering averages $35-$150 per person. Buffets are 20-30% cheaper than plated meals.
-                                </div>
-                            </div>
-
-                            <!-- AV/Tech -->
-                            <div class="p-3 bg-indigo-50 rounded-lg">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <h5 class="font-medium">AV & Technology</h5>
-                                        <p class="text-xs text-gray-600">Sound, lighting, screens, and technical support</p>
-                                    </div>
-                                    <span id="avCost" class="font-medium">$0</span>
-                                </div>
-                                <div class="mt-2 text-xs text-indigo-700 bg-white p-2 rounded">
-                                    <i class="fas fa-info-circle mr-1"></i> AV costs vary widely. Package deals with the venue can save 15-20%.
-                                </div>
-                            </div>
-
-                            <!-- Decor -->
-                            <div class="p-3 bg-indigo-50 rounded-lg">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <h5 class="font-medium">Decor & Floral</h5>
-                                        <p class="text-xs text-gray-600">Centerpieces, linens, lighting, and floral arrangements</p>
-                                    </div>
-                                    <span id="decorCost" class="font-medium">$0</span>
-                                </div>
-                                <div class="mt-2 text-xs text-indigo-700 bg-white p-2 rounded">
-                                    <i class="fas fa-info-circle mr-1"></i> Seasonal flowers can reduce costs by 30%. Consider reusable decor elements.
-                                </div>
-                            </div>
-
-                            <!-- Staffing -->
-                            <div class="p-3 bg-indigo-50 rounded-lg">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <h5 class="font-medium">Staffing</h5>
-                                        <p class="text-xs text-gray-600">Security, servers, bartenders, and coordinators</p>
-                                    </div>
-                                    <span id="staffCost" class="font-medium">$0</span>
-                                </div>
-                                <div class="mt-2 text-xs text-indigo-700 bg-white p-2 rounded">
-                                    <i class="fas fa-info-circle mr-1"></i> Typically 1 staff per 25 guests. Overtime rates apply after 8 hours.
-                                </div>
-                            </div>
-
-                            <!-- Marketing -->
-                            <div class="p-3 bg-indigo-50 rounded-lg">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <h5 class="font-medium">Marketing & Invitations</h5>
-                                        <p class="text-xs text-gray-600">Printed materials, digital ads, and invitations</p>
-                                    </div>
-                                    <span id="marketingCost" class="font-medium">$0</span>
-                                </div>
-                                <div class="mt-2 text-xs text-indigo-700 bg-white p-2 rounded">
-                                    <i class="fas fa-info-circle mr-1"></i> Digital invitations can save 80% vs. printed. Early RSVP discounts improve planning.
-                                </div>
-                            </div>
-
-                            <!-- Misc -->
-                            <div class="p-3 bg-indigo-50 rounded-lg">
-                                <div class="flex justify-between items-center">
-                                    <div>
-                                        <h5 class="font-medium">Miscellaneous</h5>
-                                        <p class="text-xs text-gray-600">Permits, insurance, gifts, and contingencies</p>
-                                    </div>
-                                    <span id="miscCost" class="font-medium">$0</span>
-                                </div>
-                                <div class="mt-2 text-xs text-indigo-700 bg-white p-2 rounded">
-                                    <i class="fas fa-info-circle mr-1"></i> Always allocate 5-10% for unexpected expenses and last-minute needs.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Budget Optimization Tips -->
-                    <div class="bg-white rounded-lg p-6 shadow mb-6">
-                        <h4 class="font-bold text-lg mb-4 flex items-center">
-                            <i class="fas fa-chart-line text-indigo-600 mr-2"></i>
-                            Optimization Recommendations
-                        </h4>
-                        <div id="optimizationTips" class="space-y-3">
-                            <div class="flex items-start">
-                                <div class="bg-indigo-100 p-2 rounded-full mr-3">
-                                    <i class="fas fa-lightbulb text-indigo-600"></i>
-                                </div>
-                                <p class="text-sm text-gray-700">Select an event type and calculate your budget to receive personalized recommendations.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Budget Timeline -->
-                    <div class="bg-white rounded-lg p-6 shadow">
-                        <h4 class="font-bold text-lg mb-4 flex items-center">
-                            <i class="fas fa-calendar-alt text-indigo-600 mr-2"></i>
-                            Payment Timeline
-                        </h4>
-                        <div class="space-y-4">
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
-                                    <span class="text-indigo-600 font-bold">1</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium">Initial Deposits (30-50%)</p>
-                                    <p class="text-xs text-gray-500">Due upon booking vendors</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
-                                    <span class="text-indigo-600 font-bold">2</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium">Second Payments (30-40%)</p>
-                                    <p class="text-xs text-gray-500">Due 30-60 days before event</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center">
-                                <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
-                                    <span class="text-indigo-600 font-bold">3</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-medium">Final Balances (10-30%)</p>
-                                    <p class="text-xs text-gray-500">Due on or before event day</p>
-                                </div>
-                            </div>
-                        </div>
+                    
+                    <div id="templates-container" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Templates will be loaded here by JavaScript -->
                     </div>
                 </div>
-
-                <!-- Placeholder before calculation -->
-                <div id="placeholderSection" class="md:w-1/2 bg-gray-50 p-8 flex flex-col items-center justify-center">
-                    <div class="text-center max-w-xs">
-                        <i class="fas fa-calculator text-5xl text-gray-300 mb-4"></i>
-                        <h4 class="text-xl font-medium text-gray-600 mb-2">Your Custom Budget Awaits</h4>
-                        <p class="text-gray-500">Complete the form to generate a detailed budget breakdown with industry-standard cost estimates and money-saving tips.</p>
+                
+                <div id="selected-template-container" class="hidden bg-white p-6 rounded-xl shadow-md slide-in">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 id="template-title" class="text-xl lg:text-2xl font-bold text-gray-800"></h2>
+                        <button onclick="closeTemplateView()" class="text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div class="flex justify-between mb-2">
+                            <span class="font-medium">Budget Progress</span>
+                            <span id="budget-percentage" class="font-medium">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="progress-bar" class="progress-bar bg-indigo-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center">
+                            <h3 class="text-lg font-semibold">Budget Items</h3>
+                            <button onclick="addNewItem()" class="text-indigo-600 hover:text-indigo-800 flex items-center">
+                                <i class="fas fa-plus mr-1"></i> Add Item
+                            </button>
+                        </div>
+                        
+                        <div id="budget-items" class="mt-4 space-y-3">
+                            <!-- Budget items will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div class="flex flex-col md:flex-row justify-between items-center pt-4 border-t border-gray-200 space-y-4 md:space-y-0">
+                        <div>
+                            <p class="text-sm text-gray-500">Total Budget</p>
+                            <p id="total-budget" class="text-xl lg:text-2xl font-bold">$0.00</p>
+                        </div>
+                        <div class="flex space-x-3">
+                            <button onclick="downloadCurrentTemplate('excel')" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition flex items-center download-btn">
+                                <i class="fas fa-file-excel mr-2"></i> Excel
+                            </button>
+                            <button onclick="downloadCurrentTemplate('pdf')" class="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700 transition flex items-center download-btn">
+                                <i class="fas fa-file-pdf mr-2"></i> PDF
+                            </button>
+                            <button onclick="saveBudget()" class="bg-indigo-600 text-white px-4 lg:px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+                                <i class="fas fa-save mr-2"></i> Save Budget
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Budget Comparison Tool -->
-    <section class="bg-gray-100 py-16">
-        <div class="container mx-auto px-4">
-            <h2 class="text-3xl font-bold text-center mb-12">Budget Comparison Tool</h2>
-            <p>This budget comparison tool is based on the going rate for country wide prices based in the United States. These values are not 100% accurate and can be incorrect depending on the state or city you live in.
-                </p>
-                <p>
-                    Below this comparison, you will find another tool that can be used to enter different offerings and get a detailed breakdown of the amount you can save based on the different prices and charges you enter.
-                    </p>
-
-                    <p>
-                        Just click the option that says Create Your Custom Comparison.
-                        </p>
-
-
-            <div class="bg-white rounded-xl shadow-lg p-6 max-w-4xl mx-auto">
-                <div class="grid md:grid-cols-2 gap-8">
-                    <!-- Option 1 -->
-                    <div>
-                        <h3 class="text-xl font-bold mb-4 text-center">Premium Package</h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span>Venue</span>
-                                <span class="font-medium">$8,000</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span>Catering</span>
-                                <span class="font-medium">$12,000</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span>Entertainment</span>
-                                <span class="font-medium">$5,000</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span>Decor</span>
-                                <span class="font-medium">$3,500</span>
-                            </div>
-                            <div class="border-t border-gray-200 pt-3 mt-2">
-                                <div class="flex justify-between font-bold">
-                                    <span>Total</span>
-                                    <span>$28,500</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Option 2 -->
-                    <div>
-                        <h3 class="text-xl font-bold mb-4 text-center">Value Package</h3>
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span>Venue</span>
-                                <span class="font-medium">$5,000</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span>Catering</span>
-                                <span class="font-medium">$8,000</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span>Entertainment</span>
-                                <span class="font-medium">$3,000</span>
-                            </div>
-                            <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                                <span>Decor</span>
-                                <span class="font-medium">$2,000</span>
-                            </div>
-                            <div class="border-t border-gray-200 pt-3 mt-2">
-                                <div class="flex justify-between font-bold">
-                                    <span>Total</span>
-                                    <span>$18,000</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="mt-8 text-center">
-                    <p class="text-gray-600 mb-4">Compare different budget scenarios to find the right choice that fits your needs</p>
-                    <button id="customComparisonBtn" class="gradient-bg text-white py-2 px-6 rounded-lg font-medium hover:opacity-90 transition">
-                        Create Your Custom Comparison
-                    </button>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Comparison Modal -->
-    <div id="comparisonModal" class="comparison-modal">
-        <div class="comparison-modal-content">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold">Custom Budget Comparison</h3>
-                
-                <button id="closeComparisonModal" class="text-gray-500 hover:text-gray-700">
+    <!-- Custom Budget Modal -->
+    <div id="custom-budget-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Create Custom Budget</h3>
+                <button onclick="closeCustomBudgetModal()" class="text-gray-500 hover:text-gray-700">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             
-            <div class="mb-6">
-                <label class="block text-gray-700 font-medium mb-2">Comparison Name</label>
-                <input type="text" id="comparisonName" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. Summer vs Winter Wedding">
-            </div>
-            
-            <div class="grid md:grid-cols-2 gap-6 mb-6">
-                <div>
-                    <label class="block text-gray-700 font-medium mb-2">Option 1 Name</label>
-                    <input type="text" id="option1Name" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. Premium Package">
-                </div>
-                <div>
-                    <label class="block text-gray-700 font-medium mb-2">Option 2 Name</label>
-                    <input type="text" id="option2Name" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="e.g. Budget Package">
-                </div>
-            </div>
-            
             <div class="space-y-4">
-                <div class="flex items-center justify-between">
-                    <span class="font-medium">Venue Cost</span>
-                    <div class="flex items-center space-x-4">
-                        <input type="number" id="option1Venue" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
-                        <input type="number" id="option2Venue" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
-                    </div>
+                <div>
+                    <label class="block text-gray-700 mb-1">Budget Name</label>
+                    <input type="text" id="custom-budget-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                 </div>
-                <div class="flex items-center justify-between">
-                    <span class="font-medium">Catering Cost</span>
-                    <div class="flex items-center space-x-4">
-                        <input type="number" id="option1Catering" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
-                        <input type="number" id="option2Catering" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
-                    </div>
+                
+                <div>
+                    <label class="block text-gray-700 mb-1">Budget Type</label>
+                    <select id="custom-budget-type" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="custom">Custom</option>
+                        <option value="wedding">Wedding</option>
+                        <option value="conference">Conference</option>
+                        <option value="fundraiser">Fundraiser</option>
+                        <option value="party">Party</option>
+                    </select>
                 </div>
-                <div class="flex items-center justify-between">
-                    <span class="font-medium">Entertainment</span>
-                    <div class="flex items-center space-x-4">
-                        <input type="number" id="option1Entertainment" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
-                        <input type="number" id="option2Entertainment" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
-                    </div>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="font-medium">Decor</span>
-                    <div class="flex items-center space-x-4">
-                        <input type="number" id="option1Decor" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
-                        <input type="number" id="option2Decor" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
-                    </div>
-                </div>
-                <div class="flex items-center justify-between">
-                    <span class="font-medium">Staffing</span>
-                    <div class="flex items-center space-x-4">
-                        <input type="number" id="option1Staffing" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
-                        <input type="number" id="option2Staffing" class="w-32 px-3 py-1 rounded border border-gray-300" placeholder="$">
+                
+                <div>
+                    <label class="block text-gray-700 mb-1">Total Budget Amount</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-3">$</span>
+                        <input type="number" id="custom-budget-amount" class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                 </div>
             </div>
             
-            <div class="mt-8 flex justify-center">
-                <button id="generateComparisonBtn" class="gradient-bg text-white py-2 px-6 rounded-lg font-medium hover:opacity-90 transition">
-                    Generate Comparison
-                </button>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button onclick="closeCustomBudgetModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                <button onclick="createCustomBudget()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">Create</button>
             </div>
         </div>
     </div>
 
-    <!-- Comparison Results -->
-    <div id="comparisonResults" class="hidden container mx-auto px-4 py-8">
-        <div class="bg-white rounded-xl shadow-lg p-6 max-w-4xl mx-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h3 id="comparisonResultsTitle" class="text-2xl font-bold">Comparison Results</h3>
-                <button id="downloadComparisonPdf" class="bg-indigo-600 text-white py-1 px-3 rounded text-sm hover:bg-indigo-700 transition">
-                    <i class="fas fa-file-pdf mr-1"></i> Export as PDF
+    <!-- Add Item Modal -->
+    <div id="add-item-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md mx-4 slide-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Add Budget Item</h3>
+                <button onclick="closeAddItemModal()" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
                 </button>
             </div>
             
-            <div class="grid md:grid-cols-2 gap-8">
+            <div class="space-y-4">
                 <div>
-                    <h4 id="option1ResultsTitle" class="text-xl font-bold mb-4 text-center">Option 1</h4>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <span>Venue</span>
-                            <span id="option1VenueResult" class="font-medium">$0</span>
-                        </div>
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <span>Catering</span>
-                            <span id="option1CateringResult" class="font-medium">$0</span>
-                        </div>
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <span>Entertainment</span>
-                            <span id="option1EntertainmentResult" class="font-medium">$0</span>
-                        </div>
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <span>Decor</span>
-                            <span id="option1DecorResult" class="font-medium">$0</span>
-                        </div>
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <span>Staffing</span>
-                            <span id="option1StaffingResult" class="font-medium">$0</span>
-                        </div>
-                        <div class="border-t border-gray-200 pt-3 mt-2">
-                            <div class="flex justify-between font-bold">
-                                <span>Total</span>
-                                <span id="option1TotalResult">$0</span>
-                            </div>
-                        </div>
+                    <label class="block text-gray-700 mb-1">Item Name</label>
+                    <input type="text" id="item-name" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 mb-1">Category</label>
+                    <select id="item-category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <option value="venue">Venue</option>
+                        <option value="food">Food & Beverage</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="decorations">Decorations</option>
+                        <option value="staff">Staff</option>
+                        <option value="marketing">Marketing</option>
+                        <option value="miscellaneous">Miscellaneous</option>
+                    </select>
+                </div>
+                
+                <div>
+                    <label class="block text-gray-700 mb-1">Estimated Cost</label>
+                    <div class="relative">
+                        <span class="absolute left-3 top-3">$</span>
+                        <input type="number" id="item-cost" class="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
                     </div>
                 </div>
                 
                 <div>
-                    <h4 id="option2ResultsTitle" class="text-xl font-bold mb-4 text-center">Option 2</h4>
-                    <div class="space-y-4">
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <span>Venue</span>
-                            <span id="option2VenueResult" class="font-medium">$0</span>
-                        </div>
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <span>Catering</span>
-                            <span id="option2CateringResult" class="font-medium">$0</span>
-                        </div>
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <span>Entertainment</span>
-                            <span id="option2EntertainmentResult" class="font-medium">$0</span>
-                        </div>
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <span>Decor</span>
-                            <span id="option2DecorResult" class="font-medium">$0</span>
-                        </div>
-                        <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
-                            <span>Staffing</span>
-                            <span id="option2StaffingResult" class="font-medium">$0</span>
-                        </div>
-                        <div class="border-t border-gray-200 pt-3 mt-2">
-                            <div class="flex justify-between font-bold">
-                                <span>Total</span>
-                                <span id="option2TotalResult">$0</span>
-                            </div>
-                        </div>
-                    </div>
+                    <label class="block text-gray-700 mb-1">Notes (Optional)</label>
+                    <textarea id="item-notes" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" rows="2"></textarea>
                 </div>
             </div>
             
-            <div class="mt-8 bg-indigo-50 p-4 rounded-lg">
-                <h4 class="font-bold text-lg mb-2">Savings Analysis</h4>
-                <p id="savingsAnalysis" class="text-sm">Option 2 saves you <span id="savingsAmount" class="font-bold">$0</span> compared to Option 1, which is a <span id="savingsPercentage" class="font-bold">0%</span> reduction in costs.</p>
-            </div>
-            
-            <div class="mt-6 text-center">
-                <button id="newComparisonBtn" class="gradient-bg text-white py-2 px-6 rounded-lg font-medium hover:opacity-90 transition">
-                    Create New Comparison
-                </button>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button onclick="closeAddItemModal()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                <button onclick="confirmAddItem()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">Add Item</button>
             </div>
         </div>
     </div>
 
-    
-    <!-- CTA Section -->
-    <section class="py-16 gradient-bg text-white">
-        <div class="container mx-auto px-4 text-center">
-            <h2 class="text-3xl font-bold mb-6">Ready to Plan Your Event With Confidence?</h2>
-            <p class="text-xl max-w-2xl mx-auto mb-8">Our budget calculator is used by thousands of professional event planners to create accurate financial plans.</p>
-            <button class="bg-white text-indigo-600 py-3 px-8 rounded-lg font-medium hover:bg-gray-100 transition text-lg">
-                Start Your Budget Now
-            </button>
-        </div>
-    </section>
+    <script>
+        // Initialize jsPDF
+        const { jsPDF } = window.jspdf;
+        
+        // Sample template data
+        const templates = [
+            {
+                id: 1,
+                title: "Elegant Wedding",
+                type: "wedding",
+                description: "Comprehensive budget for a medium-scale wedding with 100-150 guests.",
+                totalBudget: 25000,
+                items: [
+                    { name: "Venue Rental", category: "venue", cost: 8000, notes: "Includes ceremony and reception" },
+                    { name: "Catering", category: "food", cost: 7000, notes: "Buffet style for 120 guests" },
+                    { name: "Photography", category: "entertainment", cost: 2500, notes: "8 hours coverage" },
+                    { name: "Floral Decor", category: "decorations", cost: 3000, notes: "Bridal bouquet, centerpieces" },
+                    { name: "Wedding Dress", category: "miscellaneous", cost: 1500, notes: "" }
+                ],
+                icon: "fas fa-ring",
+                color: "bg-pink-100",
+                textColor: "text-pink-800"
+            },
+            {
+                id: 2,
+                title: "Corporate Conference",
+                type: "conference",
+                description: "Budget template for a 2-day professional conference with 200 attendees.",
+                totalBudget: 35000,
+                items: [
+                    { name: "Conference Hall", category: "venue", cost: 12000, notes: "Includes AV equipment" },
+                    { name: "Catering", category: "food", cost: 8000, notes: "Coffee breaks and lunches" },
+                    { name: "Keynote Speaker", category: "entertainment", cost: 7000, notes: "Plus travel expenses" },
+                    { name: "Marketing Materials", category: "marketing", cost: 3000, notes: "Brochures, banners" },
+                    { name: "Staffing", category: "staff", cost: 5000, notes: "Event coordinators" }
+                ],
+                icon: "fas fa-users",
+                color: "bg-blue-100",
+                textColor: "text-blue-800"
+            },
+            {
+                id: 3,
+                title: "Charity Gala",
+                type: "fundraiser",
+                description: "Budget for a formal fundraising event with silent auction and dinner.",
+                totalBudget: 18000,
+                items: [
+                    { name: "Ballroom Rental", category: "venue", cost: 6000, notes: "Includes basic setup" },
+                    { name: "D dinner Service", category: "food", cost: 5000, notes: "Plated dinner for 100" },
+                    { name: "Auction Items", category: "miscellaneous", cost: 4000, notes: "Procurement budget" },
+                    { name: "Entertainment", category: "entertainment", cost: 2000, notes: "Jazz quartet" },
+                    { name: "Invitations", category: "marketing", cost: 1000, notes: "Printed and mailed" }
+                ],
+                icon: "fas fa-hand-holding-heart",
+                color: "bg-purple-100",
+                textColor: "text-purple-800"
+            },
+            {
+                id: 4,
+                title: "Birthday Party",
+                type: "party",
+                description: "Budget for a fun birthday celebration with 30-50 guests.",
+                totalBudget: 1500,
+                items: [
+                    { name: "Backyard Setup", category: "venue", cost: 200, notes: "Tent rental" },
+                    { name: "Food & Drinks", category: "food", cost: 600, notes: "BBQ and beverages" },
+                    { name: "Cake", category: "food", cost: 150, notes: "Custom design" },
+                    { name: "Decorations", category: "decorations", cost: 200, notes: "Balloons, banners" },
+                    { name: "Entertainment", category: "entertainment", cost: 350, notes: "DJ for 4 hours" }
+                ],
+                icon: "fas fa-glass-cheers",
+                color: "bg-yellow-100",
+                textColor: "text-yellow-800"
+            },
+            {
+                id: 5,
+                title: "Luxury Wedding",
+                type: "wedding",
+                description: "Premium wedding budget for a lavish celebration with all the extras.",
+                totalBudget: 80000,
+                items: [
+                    { name: "Luxury Venue", category: "venue", cost: 25000, notes: "Exclusive resort" },
+                    { name: "Gourmet Catering", category: "food", cost: 20000, notes: "5-course meal" },
+                    { name: "Live Band", category: "entertainment", cost: 10000, notes: "12-piece orchestra" },
+                    { name: "Premium Floral", category: "decorations", cost: 15000, notes: "Extensive floral arrangements" },
+                    { name: "Videography", category: "ent entertainment", cost: 5000, notes: "Cinematic coverage" },
+                    { name: "Wedding Planner", category: "staff", cost: 5000, notes: "Full service" }
+                ],
+                icon: "fas fa-ring",
+                color: "bg-pink-100",
+                textColor: "text-pink-800"
+            },
+            {
+                id: 6,
+                title: "Tech Conference",
+                type: "conference",
+                description: "Budget for a technology-focused conference with workshops.",
+                totalBudget: 50000,
+                items: [
+                    { name: "Convention Center", category: "venue", cost: 18000, notes: "3-day rental" },
+                    { name: "Speaker Fees", category: "entertainment", cost: 15000, notes: "5 keynote speakers" },
+                    { name: "Tech Equipment", category: "miscellaneous", cost: 8000, notes: "AV, streaming setup" },
+                    { name: "Swag Bags", category: "marketing", cost: 5000, notes: "For 300 attendees" },
+                    { name: "Volunteer Lunch", category: "food", cost: 4000, notes: "For 50 volunteers" }
+                ],
+                icon: "fas fa-users",
+                color: "bg-blue-100",
+                textColor: "text-blue-800"
+            }
+        ];
+
+        // Current state
+        let currentTemplate = null;
+        let currentItems = [];
+        let currentTotal = 0;
+        let currentFilter = 'all';
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadTemplates();
+            
+            // Mobile menu toggle
+            document.getElementById('mobile-menu-button').addEventListener('click', function() {
+                const menu = document.getElementById('mobile-menu');
+                menu.classList.toggle('hidden');
+            });
+        });
+
+        // Load templates based on filter
+        function loadTemplates() {
+            const container = document.getElementById('templates-container');
+            container.innerHTML = '';
+            
+            const filteredTemplates = currentFilter === 'all' 
+                ? templates 
+                : templates.filter(t => t.type === currentFilter);
+            
+            if (filteredTemplates.length === 0) {
+                container.innerHTML = `
+                    <div class="col-span-full text-center py-10">
+                        <i class="fas fa-folder-open text-4xl text-gray-400 mb-4"></i>
+                        <h3 class="text-xl font-medium text-gray-600">No templates found</h3>
+                        <p class="text-gray-500 mt-2">Try selecting a different category or create a custom budget.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredTemplates.forEach(template => {
+                const templateCard = document.createElement('div');
+                templateCard.className = `template-card bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 transition duration-300 cursor-pointer hover:border-indigo-200`;
+                templateCard.onclick = () => viewTemplate(template);
+                
+                templateCard.innerHTML = `
+                    <div class="p-6">
+                        <div class="flex items-start justify-between">
+                            <div class="${template.color} ${template.textColor} w-12 h-12 rounded-full flex items-center justify-center mb-4">
+                                <i class="${template.icon} text-xl"></i>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-xs font-medium ${template.color} ${template.textColor}">
+                                ${template.type.charAt(0).toUpperCase() + template.type.slice(1)}
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">${template.title}</h3>
+                        <p class="text-gray-600 mb-4">${template.description}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-gray-800">$${template.totalBudget.toLocaleString()}</span>
+                            <button class="text-indigo-600 hover:text-indigo-800 font-medium">
+                                Use Template <i class="fas fa-arrow-right ml-1"></i>
+                            </button>
+                        </div>
+                        <div class="mt-4 flex space-x-2">
+                            <button onclick="event.stopPropagation(); downloadTemplate(${template.id}, 'excel')" class="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 transition flex items-center text-sm download-btn">
+                                <i class="fas fa-file-excel mr-1"></i> Excel
+                            </button>
+                            <button onclick="event.stopPropagation(); downloadTemplate(${template.id}, 'pdf')" class="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 transition flex items-center text-sm download-btn">
+                                <i class="fas fa-file-pdf mr-1"></i> PDF
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                container.appendChild(templateCard);
+            });
+        }
+
+        // Filter templates by type
+        function filterTemplates(type) {
+            currentFilter = type;
+            loadTemplates();
+            
+            // Update active state in sidebar
+            document.querySelectorAll('aside button').forEach(btn => {
+                btn.classList.remove('bg-indigo-50', 'font-medium');
+                if (btn.getAttribute('onclick').includes(type) || (type === 'all' && btn.getAttribute('onclick').includes('all'))) {
+                    btn.classList.add('bg-indigo-50', 'font-medium');
+                }
+            });
+            
+            // Close mobile menu if open
+            document.getElementById('mobile-menu').classList.add('hidden');
+        }
+
+        // View template details
+        function viewTemplate(template) {
+            currentTemplate = template;
+            currentItems = [...template.items];
+            currentTotal = calculateTotal(currentItems);
+            
+            document.getElementById('template-title').textContent = template.title;
+            document.getElementById('total-budget').textContent = `$${template.totalBudget.toLocaleString()}`;
+            updateBudgetItems();
+            updateProgressBar();
+            
+            document.getElementById('templates-container').classList.add('hidden');
+            document.getElementById('selected-template-container').classList.remove('hidden');
+        }
+
+        // Close template view
+        function closeTemplateView() {
+            document.getElementById('templates-container').classList.remove('hidden');
+            document.getElementById('selected-template-container').classList.add('hidden');
+        }
+
+        // Calculate total from items
+        function calculateTotal(items) {
+            return items.reduce((sum, item) => sum + item.cost, 0);
+        }
+
+        // Update budget items display
+        function updateBudgetItems() {
+            const container = document.getElementById('budget-items');
+            container.innerHTML = '';
+            
+            currentItems.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'budget-item bg-gray-50 p-4 rounded-lg flex justify-between items-center transition';
+                
+                itemElement.innerHTML = `
+                    <div class="w-3/4">
+                        <h4 class="font-medium truncate">${item.name}</h4>
+                        <div class="flex items-center mt-1">
+                            <span class="text-xs px-2 py-1 rounded ${getCategoryColor(item.category)} mr-2">${formatCategory(item.category)}</span>
+                            <span class="text-sm text-gray-500 truncate">${item.notes || 'No notes'}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="font-bold mr-2 lg:mr-4">$${item.cost.toLocaleString()}</span>
+                        <button onclick="editItem(${index})" class="text-gray-400 hover:text-indigo-600 mr-1 lg:mr-2">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button onclick="removeItem(${index})" class="text-gray-400 hover:text-red-600">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(itemElement);
+            });
+        }
+
+        // Get category color class
+        function getCategoryColor(category) {
+            const colors = {
+                venue: 'bg-blue-100 text-blue-800',
+                food: 'bg-green-100 text-green-800',
+                entertainment: 'bg-purple-100 text-purple-800',
+                decorations: 'bg-pink-100 text-pink-800',
+                staff: 'bg-yellow-100 text-yellow-800',
+                marketing: 'bg-indigo-100 text-indigo-800',
+                miscellaneous: 'bg-gray-100 text-gray-800'
+            };
+            return colors[category] || colors.miscellaneous;
+        }
+
+        // Format category name
+        function formatCategory(category) {
+            return category.charAt(0).toUpperCase() + category.slice(1);
+        }
+
+        // Update progress bar
+        function updateProgressBar() {
+            const percentage = (currentTotal / currentTemplate.totalBudget) * 100;
+            const cappedPercentage = Math.min(percentage, 100);
+            
+            document.getElementById('progress-bar').style.width = `${cappedPercentage}%`;
+            document.getElementById('budget-percentage').textContent = `${Math.round(cappedPercentage)}%`;
+            
+            if (percentage > 100) {
+                document.getElementById('progress-bar').classList.add('bg-red-500');
+                document.getElementById('progress-bar').classList.remove('bg-indigo-600');
+            } else {
+                document.getElementById('progress-bar').classList.remove('bg-red-500');
+                document.getElementById('progress-bar').classList.add('bg-indigo-600');
+            }
+        }
+
+        // Open custom budget modal
+        function openCustomBudgetModal() {
+            document.getElementById('custom-budget-modal').classList.remove('hidden');
+        }
+
+        // Close custom budget modal
+        function closeCustomBudgetModal() {
+            document.getElementById('custom-budget-modal').classList.add('hidden');
+        }
+
+        // Create custom budget
+        function createCustomBudget() {
+            const name = document.getElementById('custom-budget-name').value.trim();
+            const type = document.getElementById('custom-budget-type').value;
+            const amount = parseFloat(document.getElementById('custom-budget-amount').value);
+            
+            if (!name || isNaN(amount) || amount <= 0) {
+                alert('Please enter valid budget details');
+                return;
+            }
+            
+            const newTemplate = {
+                id: templates.length + 1,
+                title: name,
+                type: type,
+                description: "Your custom budget template",
+                totalBudget: amount,
+                items: [],
+                icon: type === 'wedding' ? 'fas fa-ring' : 
+                      type === 'conference' ? 'fas fa-users' : 
+                      type === 'fundraiser' ? 'fas fa-hand-holding-heart' : 
+                      type === 'party' ? 'fas fa-glass-cheers' : 'fas fa-file-alt',
+                color: type === 'wedding' ? 'bg-pink-100' : 
+                      type === 'conference' ? 'bg-blue-100' : 
+                      type === 'fundraiser' ? 'bg-purple-100' : 
+                      type === 'party' ? 'bg-yellow-100' : 'bg-gray-100',
+                textColor: type === 'wedding' ? 'text-pink-800' : 
+                          type === 'conference' ? 'text-blue-800' : 
+                          type === 'fundraiser' ? 'text-purple-800' : 
+                          type === 'party' ? 'text-yellow-800' : 'text-gray-800'
+            };
+            
+            templates.push(newTemplate);
+            closeCustomBudgetModal();
+            filterTemplates(type);
+            
+            // Reset form
+            document.getElementById('custom-budget-name').value = '';
+            document.getElementById('custom-budget-amount').value = '';
+        }
+
+        // Add new item
+        function addNewItem() {
+            document.getElementById('add-item-modal').classList.remove('hidden');
+            // Reset form
+            document.getElementById('item-name').value = '';
+            document.getElementById('item-category').value = 'venue';
+            document.getElementById('item-cost').value = '';
+            document.getElementById('item-notes').value = '';
+            
+            // Set button to add mode
+            const confirmBtn = document.querySelector('#add-item-modal button:last-child');
+            confirmBtn.textContent = 'Add Item';
+            confirmBtn.onclick = confirmAddItem;
+        }
+
+        // Close add item modal
+        function closeAddItemModal() {
+            document.getElementById('add-item-modal').classList.add('hidden');
+        }
+
+        // Confirm adding new item
+        function confirmAddItem() {
+            const name = document.getElementById('item-name').value.trim();
+            const category = document.getElementById('item-category').value;
+            const cost = parseFloat(document.getElementById('item-cost').value);
+            const notes = document.getElementById('item-notes').value.trim();
+            
+            if (!name || isNaN(cost) || cost <= 0) {
+                alert('Please enter valid item details');
+                return;
+            }
+            
+            const newItem = {
+                name: name,
+                category: category,
+                cost: cost,
+                notes: notes
+            };
+            
+            currentItems.push(newItem);
+            currentTotal = calculateTotal(currentItems);
+            updateBudgetItems();
+            updateProgressBar();
+            closeAddItemModal();
+        }
+
+        // Edit item
+        function editItem(index) {
+            const item = currentItems[index];
+            document.getElementById('item-name').value = item.name;
+            document.getElementById('item-category').value = item.category;
+            document.getElementById('item-cost').value = item.cost;
+            document.getElementById('item-notes').value = item.notes || '';
+            
+            document.getElementById('add-item-modal').classList.remove('hidden');
+            
+            // Change button to update
+            const confirmBtn = document.querySelector('#add-item-modal button:last-child');
+            confirmBtn.textContent = 'Update Item';
+            confirmBtn.onclick = function() {
+                updateItem(index);
+            };
+        }
+
+        // Update item
+        function updateItem(index) {
+            const name = document.getElementById('item-name').value.trim();
+            const category = document.getElementById('item-category').value;
+            const cost = parseFloat(document.getElementById('item-cost').value);
+            const notes = document.getElementById('item-notes').value.trim();
+            
+            if (!name || isNaN(cost) || cost <= 0) {
+                alert('Please enter valid item details');
+                return;
+            }
+            
+            currentItems[index] = {
+                name: name,
+                category: category,
+                cost: cost,
+                notes: notes
+            };
+            
+            currentTotal = calculateTotal(currentItems);
+            updateBudgetItems();
+            updateProgressBar();
+            closeAddItemModal();
+        }
+
+        // Remove item
+        function removeItem(index) {
+            if (confirm('Are you sure you want to remove this item?')) {
+                currentItems.splice(index, 1);
+                currentTotal = calculateTotal(currentItems);
+                updateBudgetItems();
+                updateProgressBar();
+            }
+        }
+
+        // Save budget
+        function saveBudget() {
+            // In a real app, this would save to a database
+            alert('Budget saved successfully!');
+            closeTemplateView();
+        }
+
+        // Download a single template
+        function downloadTemplate(templateId, format) {
+            const template = templates.find(t => t.id === templateId);
+            if (!template) return;
+            
+            if (format === 'excel') {
+                downloadTemplateExcel(template);
+            } else if (format === 'pdf') {
+                downloadTemplatePDF(template);
+            }
+        }
+
+        // Download current template being viewed
+        function downloadCurrentTemplate(format) {
+            if (!currentTemplate) return;
+            
+            if (format === 'excel') {
+                downloadTemplateExcel({
+                    ...currentTemplate,
+                    items: currentItems
+                });
+            } else if (format === 'pdf') {
+                downloadTemplatePDF({
+                    ...currentTemplate,
+                    items: currentItems
+                });
+            }
+        }
+
+        // Download all templates
+        function downloadAllTemplates(format) {
+            if (format === 'excel') {
+                downloadAllTemplatesExcel();
+            } else if (format === 'pdf') {
+                downloadAllTemplatesPDF();
+            }
+        }
+
+        // Download template as Excel
+        function downloadTemplateExcel(template) {
+            // Prepare data for Excel
+            const excelData = [
+                ["Item Name", "Category", "Cost", "Notes"],
+                ...template.items.map(item => [item.name, formatCategory(item.category), item.cost, item.notes || ''])
+            ];
+            
+            // Add summary row
+            excelData.push(["", "", "", ""]);
+            excelData.push(["Total Budget", "", template.totalBudget, ""]);
+            excelData.push(["Current Total", "", calculateTotal(template.items), ""]);
+            
+            // Create workbook
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.aoa_to_sheet(excelData);
+            XLSX.utils.book_append_sheet(wb, ws, "Budget");
+            
+            // Generate file and download
+            XLSX.writeFile(wb, `${template.title.replace(/[^a-z0-9]/gi, '_')}_Budget.xlsx`);
+        }
+
+        // Download all templates as Excel
+        function downloadAllTemplatesExcel() {
+            // Create a new workbook
+            const wb = XLSX.utils.book_new();
+            
+            // Add each template as a separate sheet
+            templates.forEach(template => {
+                const excelData = [
+                    ["Item Name", "Category", "Cost", "Notes"],
+                    ...template.items.map(item => [item.name, formatCategory(item.category), item.cost, item.notes || ''])
+                ];
+                
+                // Add summary row
+                excelData.push(["", "", "", ""]);
+                excelData.push(["Total Budget", "", template.totalBudget, ""]);
+                excelData.push(["Current Total", "", calculateTotal(template.items), ""]);
+                
+                const ws = XLSX.utils.aoa_to_sheet(excelData);
+                XLSX.utils.book_append_sheet(wb, ws, template.title.substring(0, 31)); // Sheet name max 31 chars
+            });
+            
+            // Generate file and download
+            XLSX.writeFile(wb, "All_Event_Budget_Templates.xlsx");
+        }
+
+        // Download template as PDF
+        function downloadTemplatePDF(template) {
+            const doc = new jsPDF();
+            
+            // Add title
+            doc.setFontSize(18);
+            doc.text(template.title, 14, 20);
+            
+            // Add subtitle
+            doc.setFontSize(12);
+            doc.setTextColor(100);
+            doc.text(`Total Budget: $${template.totalBudget.toLocaleString()} | Items: ${template.items.length}`, 14, 30);
+            
+            // Add table header
+            doc.setFontSize(12);
+            doc.setTextColor(0);
+            doc.setFont(undefined, 'bold');
+            doc.text("Item", 14, 45);
+            doc.text("Category", 70, 45);
+            doc.text("Cost", 120, 45);
+            doc.text("Notes", 150, 45);
+            
+            // Add items
+            doc.setFont(undefined, 'normal');
+            let y = 55;
+            template.items.forEach(item => {
+                doc.text(item.name, 14, y);
+                doc.text(formatCategory(item.category), 70, y);
+                doc.text(`$${item.cost.toLocaleString()}`, 120, y);
+                doc.text(item.notes || '-', 150, y, { maxWidth: 50 });
+                y += 10;
+                
+                // Add new page if needed
+                if (y > 280) {
+                    doc.addPage();
+                    y = 20;
+                }
+            });
+            
+            // Add summary
+            y += 15;
+            doc.setFont(undefined, 'bold');
+            doc.text("Summary", 14, y);
+            y += 10;
+            doc.setFont(undefined, 'normal');
+            doc.text(`Total Budget: $${template.totalBudget.toLocaleString()}`, 14, y);
+            y += 7;
+            doc.text(`Current Total: $${calculateTotal(template.items).toLocaleString()}`, 14, y);
+            y += 7;
+            
+            const percentage = (calculateTotal(template.items) / template.totalBudget) * 100;
+            doc.text(`Budget Utilization: ${Math.round(percentage)}%`, 14, y);
+            
+            // Save the PDF
+            doc.save(`${template.title.replace(/[^a-z0-9]/gi, '_')}_Budget.pdf`);
+        }
+
+        // Download all templates as PDF
+        function downloadAllTemplatesPDF() {
+            const doc = new jsPDF();
+            
+            templates.forEach((template, index) => {
+                if (index > 0) {
+                    doc.addPage();
+                }
+                
+                // Add title
+                doc.setFontSize(18);
+                doc.text(template.title, 14, 20);
+                
+                // Add subtitle
+                doc.setFontSize(12);
+                doc.setTextColor(100);
+                doc.text(`Type: ${formatCategory(template.type)} | Total Budget: $${template.totalBudget.toLocaleString()}`, 14, 30);
+                
+                // Add table header
+                doc.setFontSize(12);
+                doc.setTextColor(0);
+                doc.setFont(undefined, 'bold');
+                doc.text("Item", 14, 45);
+                doc.text("Category", 70, 45);
+                doc.text("Cost", 120, 45);
+                doc.text("Notes", 150, 45);
+                
+                // Add items
+                doc.setFont(undefined, 'normal');
+                let y = 55;
+                template.items.forEach(item => {
+                    doc.text(item.name, 14, y);
+                    doc.text(formatCategory(item.category), 70, y);
+                    doc.text(`$${item.cost.toLocaleString()}`, 120, y);
+                    doc.text(item.notes || '-', 150, y, { maxWidth: 50 });
+                    y += 10;
+                    
+                    // Add new page if needed
+                    if (y > 280) {
+                        doc.addPage();
+                        y = 20;
+                    }
+                });
+                
+                // Add summary
+                y += 15;
+                doc.setFont(undefined, 'bold');
+                doc.text("Summary", 14, y);
+                y += 10;
+                doc.setFont(undefined, 'normal');
+                doc.text(`Total Budget: $${template.totalBudget.toLocaleString()}`, 14, y);
+                y += 7;
+                doc.text(`Current Total: $${calculateTotal(template.items).toLocaleString()}`, 14, y);
+                y += 7;
+                
+                const percentage = (calculateTotal(template.items) / template.totalBudget) * 100;
+                doc.text(`Budget Utilization: ${Math.round(percentage)}%`, 14, y);
+            });
+            
+            // Save the PDF
+            doc.save("All_Event_Budget_Templates.pdf");
+        }
+    </script>
 
     <!-- Footer -->
     <footer class="bg-gray-900 text-white py-12">
