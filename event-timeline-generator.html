@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Timeline Generator</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 0;
+            width: 2px;
+            height: 100%;
+            background-color: #3b82f6;
+        }
+        
+        .timeline-item:last-child::before {
+            height: 50%;
+        }
+        
+        .timeline-dot {
+            position: absolute;
+            left: -26px;
+            top: 8px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #3b82f6;
+            border: 2px solid white;
+        }
+        
+        .reminder-badge {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Header -->
+        <header class="mb-10 text-center">
+            <h1 class="text-4xl font-bold text-blue-600 mb-2">Event Timeline Generator</h1>
+            <p class="text-gray-600">Plan your event with precision and never miss important milestones</p>
+        </header>
+        
+        <!-- Main Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Event Details Form -->
+            <div class="bg-white rounded-xl shadow-md p-6 lg:col-span-1 h-fit sticky top-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Create New Timeline</h2>
+                
+                <form id="eventForm" class="space-y-4">
+                    <div>
+                        <label for="eventName" class="block text-sm font-medium text-gray-700 mb-1">Event Name</label>
+                        <input type="text" id="eventName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Annual Conference" required>
+                    </div>
+                    
+                    <div>
+                        <label for="eventDate" class="block text-sm font-medium text-gray-700 mb-1">Event Date</label>
+                        <input type="date" id="eventDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                    </div>
+                    
+                    <div>
+                        <label for="eventType" class="block text-sm font-medium text-gray-700 mb-1">Event Type</label>
+                        <select id="eventType" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                            <option value="conference">Conference</option>
+                            <option value="wedding">Wedding</option>
+                            <option value="birthday">Birthday Party</option>
+                            <option value="corporate">Corporate Event</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="pt-2">
+                        <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                            Create Timeline
+                        </button>
+                    </div>
+                </form>
+                
+                <!-- Milestone Form (hidden initially) -->
+                <div id="milestoneForm" class="mt-8 hidden">
+                    <h3 class="text-lg font-medium text-gray-800 mb-3">Add Milestone</h3>
+                    
+                    <form id="addMilestoneForm" class="space-y-4">
+                        <div>
+                            <label for="milestoneName" class="block text-sm font-medium text-gray-700 mb-1">Task/Milestone</label>
+                            <input type="text" id="milestoneName" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="e.g., Send invitations" required>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="milestoneDate" class="block text-sm font-medium text-gray-700 mb-1">Due Date</label>
+                                <input type="date" id="milestoneDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" required>
+                            </div>
+                            
+                            <div>
+                                <label for="reminderDate" class="block text-sm font-medium text-gray-700 mb-1">Reminder</label>
+                                <select id="reminderDate" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                                    <option value="none">No reminder</option>
+                                    <option value="1">1 day before</option>
+                                    <option value="3">3 days before</option>
+                                    <option value="7">1 week before</option>
+                                    <option value="14">2 weeks before</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label for="milestoneNotes" class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                            <textarea id="milestoneNotes" rows="2" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" placeholder="Additional details..."></textarea>
+                        </div>
+                        
+                        <div class="pt-2">
+                            <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition duration-200">
+                                Add to Timeline
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Timeline Display -->
+            <div class="bg-white rounded-xl shadow-md p-6 lg:col-span-2">
+                <!-- Empty State -->
+                <div id="emptyState" class="text-center py-12">
+                    <div class="mx-auto w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                        <i class="fas fa-calendar-alt text-blue-500 text-3xl"></i>
+                    </div>
+                    <h3 class="text-xl font-medium text-gray-700 mb-2">No Timeline Created Yet</h3>
+                    <p class="text-gray-500 mb-6">Fill out the form to start planning your event</p>
+                </div>
+                
+                <!-- Event Header (hidden initially) -->
+                <div id="eventHeader" class="hidden mb-8">
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 id="displayEventName" class="text-2xl font-bold text-gray-800"></h2>
+                        <span id="displayEventDate" class="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full"></span>
+                    </div>
+                    <div class="flex items-center text-gray-600 mb-4">
+                        <i class="fas fa-tag mr-2"></i>
+                        <span id="displayEventType" class="text-sm"></span>
+                    </div>
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <i class="fas fa-info-circle text-blue-500 mt-1"></i>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700">
+                                    <span id="daysUntilEvent"></span> days until your event. Add milestones below to stay on track.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Timeline (hidden initially) -->
+                <div id="timelineContainer" class="hidden">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-semibold text-gray-800">Event Timeline</h3>
+                        <button id="exportBtn" class="flex items-center text-sm text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-download mr-1"></i> Export
+                        </button>
+                    </div>
+                    
+                    <div id="timelineList" class="relative pl-8 space-y-8">
+                        <!-- Timeline items will be added here dynamically -->
+                    </div>
+                    
+                    <div id="completedTasks" class="mt-12 hidden">
+                        <h3 class="text-lg font-semibold text-gray-800 mb-4">Completed Tasks</h3>
+                        <div id="completedTasksList" class="space-y-4">
+                            <!-- Completed tasks will be added here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reminder Modal -->
+    <div id="reminderModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl shadow-xl p-6 w-full max-w-md fade-in">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold text-gray-800">Reminder!</h3>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <p id="reminderMessage" class="text-gray-700"></p>
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button id="snoozeReminder" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">
+                    Snooze (1 day)
+                </button>
+                <button id="dismissReminder" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                    Dismiss
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const eventForm = document.getElementById('eventForm');
+            const milestoneForm = document.getElementById('milestoneForm');
+            const addMilestoneForm = document.getElementById('addMilestoneForm');
+            const emptyState = document.getElementById('emptyState');
+            const eventHeader = document.getElementById('eventHeader');
+            const timelineContainer = document.getElementById('timelineContainer');
+            const timelineList = document.getElementById('timelineList');
+            const completedTasks = document.getElementById('completedTasks');
+            const completedTasksList = document.getElementById('completedTasksList');
+            const exportBtn = document.getElementById('exportBtn');
+            const reminderModal = document.getElementById('reminderModal');
+            const closeModal = document.getElementById('closeModal');
+            const reminderMessage = document.getElementById('reminderMessage');
+            const snoozeReminder = document.getElementById('snoozeReminder');
+            const dismissReminder = document.getElementById('dismissReminder');
+            
+            // Event data
+            let currentEvent = null;
+            let milestones = [];
+            let reminders = [];
+            
+            // Form submission - Create new event
+            eventForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const eventName = document.getElementById('eventName').value;
+                const eventDate = document.getElementById('eventDate').value;
+                const eventType = document.getElementById('eventType').value;
+                
+                currentEvent = {
+                    name: eventName,
+                    date: eventDate,
+                    type: eventType
+                };
+                
+                // Update UI
+                document.getElementById('displayEventName').textContent = eventName;
+                document.getElementById('displayEventDate').textContent = formatDate(eventDate);
+                document.getElementById('displayEventType').textContent = getEventTypeName(eventType);
+                
+                // Calculate days until event
+                const today = new Date();
+                const eventDateObj = new Date(eventDate);
+                const diffTime = eventDateObj - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                document.getElementById('daysUntilEvent').textContent = diffDays;
+                
+                // Show timeline sections
+                emptyState.classList.add('hidden');
+                eventHeader.classList.remove('hidden');
+                timelineContainer.classList.remove('hidden');
+                milestoneForm.classList.remove('hidden');
+                
+                // Clear form
+                eventForm.reset();
+            });
+            
+            // Form submission - Add milestone
+            addMilestoneForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const milestoneName = document.getElementById('milestoneName').value;
+                const milestoneDate = document.getElementById('milestoneDate').value;
+                const reminderDate = document.getElementById('reminderDate').value;
+                const milestoneNotes = document.getElementById('milestoneNotes').value;
+                
+                const milestone = {
+                    id: Date.now(),
+                    name: milestoneName,
+                    date: milestoneDate,
+                    reminder: reminderDate,
+                    notes: milestoneNotes,
+                    completed: false
+                };
+                
+                milestones.push(milestone);
+                
+                // Add to timeline
+                renderMilestone(milestone);
+                
+                // Set reminder if needed
+                if (reminderDate !== 'none') {
+                    setReminder(milestone);
+                }
+                
+                // Clear form
+                addMilestoneForm.reset();
+            });
+            
+            // Export timeline
+            exportBtn.addEventListener('click', function() {
+                if (!currentEvent || milestones.length === 0) {
+                    alert('No timeline to export!');
+                    return;
+                }
+                
+                let exportContent = `Event: ${currentEvent.name}\n`;
+                exportContent += `Date: ${formatDate(currentEvent.date)}\n`;
+                exportContent += `Type: ${getEventTypeName(currentEvent.type)}\n\n`;
+                exportContent += `TIMELINE:\n\n`;
+                
+                milestones.forEach(milestone => {
+                    exportContent += `- ${milestone.name} (${formatDate(milestone.date)})`;
+                    if (milestone.notes) {
+                        exportContent += ` - ${milestone.notes}`;
+                    }
+                    exportContent += `\n`;
+                });
+                
+                const blob = new Blob([exportContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${currentEvent.name.replace(/\s+/g, '_')}_Timeline.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+            
+            // Close modal
+            closeModal.addEventListener('click', function() {
+                reminderModal.classList.add('hidden');
+            });
+            
+            // Dismiss reminder
+            dismissReminder.addEventListener('click', function() {
+                reminderModal.classList.add('hidden');
+            });
+            
+            // Snooze reminder
+            snoozeReminder.addEventListener('click', function() {
+                reminderModal.classList.add('hidden');
+                const currentReminder = reminders.find(r => r.active);
+                if (currentReminder) {
+                    // Snooze for 1 day
+                    currentReminder.time = new Date(Date.now() + 24 * 60 * 60 * 1000);
+                    currentReminder.active = false;
+                    setTimeout(() => {
+                        showReminder(currentReminder);
+                    }, 24 * 60 * 60 * 1000);
+                }
+            });
+            
+            // Helper functions
+            function formatDate(dateString) {
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                return new Date(dateString).toLocaleDateString(undefined, options);
+            }
+            
+            function getEventTypeName(type) {
+                const types = {
+                    'conference': 'Conference',
+                    'wedding': 'Wedding',
+                    'birthday': 'Birthday Party',
+                    'corporate': 'Corporate Event',
+                    'other': 'Other Event'
+                };
+                return types[type] || type;
+            }
+            
+            function renderMilestone(milestone) {
+                const milestoneElement = document.createElement('div');
+                milestoneElement.className = 'timeline-item relative pl-6';
+                
+                let badgeClass = 'bg-blue-100 text-blue-800';
+                const today = new Date();
+                const milestoneDate = new Date(milestone.date);
+                
+                if (milestoneDate < today) {
+                    badgeClass = 'bg-red-100 text-red-800';
+                }
+                
+                milestoneElement.innerHTML = `
+                    <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition duration-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h4 class="font-medium text-gray-800">${milestone.name}</h4>
+                                <div class="flex items-center mt-1">
+                                    <span class="text-xs ${badgeClass} px-2 py-1 rounded-full mr-2">
+                                        <i class="far fa-calendar mr-1"></i> ${formatDate(milestone.date)}
+                                    </span>
+                                    ${milestone.reminder !== 'none' ? 
+                                        `<span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full reminder-badge">
+                                            <i class="far fa-bell mr-1"></i> ${milestone.reminder} day${milestone.reminder !== '1' ? 's' : ''} before
+                                        </span>` : ''}
+                                </div>
+                            </div>
+                            <div class="flex space-x-2">
+                                <button class="complete-btn p-1 text-gray-400 hover:text-green-500" data-id="${milestone.id}">
+                                    <i class="far fa-check-circle text-lg"></i>
+                                </button>
+                                <button class="delete-btn p-1 text-gray-400 hover:text-red-500" data-id="${milestone.id}">
+                                    <i class="far fa-trash-alt text-lg"></i>
+                                </button>
+                            </div>
+                        </div>
+                        ${milestone.notes ? `<p class="mt-2 text-sm text-gray-600">${milestone.notes}</p>` : ''}
+                        <div class="timeline-dot"></div>
+                    </div>
+                `;
+                
+                timelineList.appendChild(milestoneElement);
+                
+                // Add event listeners to new buttons
+                milestoneElement.querySelector('.complete-btn').addEventListener('click', function() {
+                    completeMilestone(milestone.id);
+                });
+                
+                milestoneElement.querySelector('.delete-btn').addEventListener('click', function() {
+                    deleteMilestone(milestone.id);
+                });
+                
+                // Sort milestones by date
+                sortTimeline();
+            }
+            
+            function completeMilestone(id) {
+                const milestoneIndex = milestones.findIndex(m => m.id === id);
+                if (milestoneIndex !== -1) {
+                    milestones[milestoneIndex].completed = true;
+                    
+                    // Remove from active timeline
+                    const milestoneElements = document.querySelectorAll('.timeline-item');
+                    milestoneElements.forEach(el => {
+                        if (el.querySelector(`.complete-btn[data-id="${id}"]`)) {
+                            el.remove();
+                        }
+                    });
+                    
+                    // Add to completed tasks
+                    addToCompletedTasks(milestones[milestoneIndex]);
+                    
+                    // Show completed tasks section if not already visible
+                    if (completedTasks.classList.contains('hidden')) {
+                        completedTasks.classList.remove('hidden');
+                    }
+                }
+            }
+            
+            function addToCompletedTasks(milestone) {
+                const completedElement = document.createElement('div');
+                completedElement.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-lg';
+                
+                completedElement.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                            <i class="fas fa-check text-green-500 text-sm"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-gray-700 line-through">${milestone.name}</p>
+                            <p class="text-xs text-gray-500">Completed on ${formatDate(new Date().toISOString().split('T')[0])}</p>
+                        </div>
+                    </div>
+                    <button class="undo-btn p-1 text-gray-400 hover:text-blue-500" data-id="${milestone.id}">
+                        <i class="fas fa-undo text-sm"></i>
+                    </button>
+                `;
+                
+                completedTasksList.appendChild(completedElement);
+                
+                // Add event listener to undo button
+                completedElement.querySelector('.undo-btn').addEventListener('click', function() {
+                    undoCompleteMilestone(milestone.id);
+                });
+            }
+            
+            function undoCompleteMilestone(id) {
+                const milestoneIndex = milestones.findIndex(m => m.id === id);
+                if (milestoneIndex !== -1) {
+                    milestones[milestoneIndex].completed = false;
+                    
+                    // Remove from completed tasks
+                    const completedElements = document.querySelectorAll('#completedTasksList > div');
+                    completedElements.forEach(el => {
+                        if (el.querySelector(`.undo-btn[data-id="${id}"]`)) {
+                            el.remove();
+                        }
+                    });
+                    
+                    // Add back to timeline
+                    renderMilestone(milestones[milestoneIndex]);
+                    
+                    // Hide completed tasks section if empty
+                    if (completedTasksList.children.length === 0) {
+                        completedTasks.classList.add('hidden');
+                    }
+                }
+            }
+            
+            function deleteMilestone(id) {
+                if (confirm('Are you sure you want to delete this milestone?')) {
+                    // Remove from milestones array
+                    milestones = milestones.filter(m => m.id !== id);
+                    
+                    // Remove from active timeline
+                    const milestoneElements = document.querySelectorAll('.timeline-item');
+                    milestoneElements.forEach(el => {
+                        if (el.querySelector(`.delete-btn[data-id="${id}"]`)) {
+                            el.remove();
+                        }
+                    });
+                    
+                    // Remove from completed tasks if it's there
+                    const completedElements = document.querySelectorAll('#completedTasksList > div');
+                    completedElements.forEach(el => {
+                        if (el.querySelector(`.undo-btn[data-id="${id}"]`)) {
+                            el.remove();
+                        }
+                    });
+                    
+                    // Hide completed tasks section if empty
+                    if (completedTasksList.children.length === 0) {
+                        completedTasks.classList.add('hidden');
+                    }
+                    
+                    // Remove any active reminders for this milestone
+                    reminders = reminders.filter(r => r.milestoneId !== id);
+                }
+            }
+            
+            function sortTimeline() {
+                // Convert NodeList to array for sorting
+                const items = Array.from(timelineList.children);
+                
+                // Sort items based on their date
+                items.sort((a, b) => {
+                    const dateA = new Date(a.querySelector('.text-xs').textContent.split(' ').slice(-3).join(' '));
+                    const dateB = new Date(b.querySelector('.text-xs').textContent.split(' ').slice(-3).join(' '));
+                    return dateA - dateB;
+                });
+                
+                // Clear and re-append sorted items
+                timelineList.innerHTML = '';
+                items.forEach(item => timelineList.appendChild(item));
+            }
+            
+            function setReminder(milestone) {
+                const reminderDays = parseInt(milestone.reminder);
+                const milestoneDate = new Date(milestone.date);
+                const reminderDate = new Date(milestoneDate);
+                reminderDate.setDate(milestoneDate.getDate() - reminderDays);
+                
+                const reminder = {
+                    id: Date.now(),
+                    milestoneId: milestone.id,
+                    milestoneName: milestone.name,
+                    date: milestone.date,
+                    time: reminderDate,
+                    active: false
+                };
+                
+                reminders.push(reminder);
+                
+                // Check if reminder should trigger now
+                const now = new Date();
+                if (reminderDate <= now) {
+                    showReminder(reminder);
+                } else {
+                    // Set timeout for future reminder
+                    setTimeout(() => {
+                        showReminder(reminder);
+                    }, reminderDate - now);
+                }
+            }
+            
+            function showReminder(reminder) {
+                reminder.active = true;
+                reminderMessage.textContent = `Don't forget: "${reminder.milestoneName}" is due on ${formatDate(reminder.date)}.`;
+                reminderModal.classList.remove('hidden');
+            }
+            
+            // Check for reminders on page load (for demo purposes)
+            setTimeout(() => {
+                if (milestones.length > 0 && Math.random() > 0.7) {
+                    const randomMilestone = milestones[Math.floor(Math.random() * milestones.length)];
+                    const demoReminder = {
+                        id: Date.now(),
+                        milestoneId: randomMilestone.id,
+                        milestoneName: randomMilestone.name,
+                        date: randomMilestone.date,
+                        time: new Date(),
+                        active: true
+                    };
+                    showReminder(demoReminder);
+                }
+            }, 3000);
+        });
+    </script>
+</body>
+</html>
