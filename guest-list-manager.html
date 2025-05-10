@@ -19,83 +19,49 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        
-        body {
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #6b73ff 0%, #000dff 100%);
-        }
-        .gradient-bg-secondary {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ff0000 100%);
-        }
-        .gradient-bg-success {
-            background: linear-gradient(135deg, #4ade80 0%, #16a34a 100%);
-        }
-        .gradient-bg-warning {
-            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
-        }
-        .gradient-bg-info {
-            background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
-        }
-        .input-highlight:focus {
-            border-color: #6b73ff;
-            box-shadow: 0 0 0 3px rgba(107, 115, 255, 0.2);
-        }
-        .category-chip {
-            transition: all 0.2s;
-        }
-        .category-chip:hover {
-            transform: translateY(-2px);
-        }
-        .guest-card {
-            transition: all 0.3s ease;
-        }
-        .guest-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        .status-pending {
-            background-color: #fef08a;
-            color: #854d0e;
-        }
-        .status-confirmed {
-            background-color: #bbf7d0;
-            color: #166534;
-        }
-        .status-declined {
-            background-color: #fecaca;
-            color: #991b1b;
-        }
-        .modal-overlay {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-        }
-        .animate-bounce {
-            animation: bounce 2s infinite;
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(-5px); }
-            50% { transform: translateY(5px); }
-        }
-        .glow {
-            box-shadow: 0 0 15px rgba(107, 115, 255, 0.5);
-        }
-        .glow:hover {
-            box-shadow: 0 0 20px rgba(107, 115, 255, 0.8);
-        }
-        #fileInput {
-            display: none;
-        }
-        .file-upload-btn:hover {
-            transform: translateY(-2px);
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
+    
 </head>
 <body class="bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen">
+     <!-- Header -->
+    <header class="gradient-bg text-white">
+        <div class="container mx-auto px-4 py-8">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-2">
+                    <i class="fas fa-money-bill-wave text-3xl"></i>
+                    <h1 class="text-2xl font-bold">Event Budget Sample</h1>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="index.html" class="hover:text-indigo-200 transition">Home</a>
+                    <a href="calculator.html" class="hover:text-indigo-200 transition">Calculator</a>
+                    <a href="contact.html" class="hover:text-indigo-200 transition">Contact</a>
+                </nav>
+                <button id="mobileMenuButton" class="md:hidden text-xl">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobileMenu" class="mobile-menu md:hidden bg-indigo-700 rounded-lg mt-4">
+                <div class="flex flex-col space-y-3 p-4">
+                    <a href="index.html" class="hover:text-indigo-200 transition">Home</a>
+                    <a href="calculator.html" class="hover:text-indigo-200 transition">Calculator</a>
+                    <a href="guest-list-manager.html" class="hover:text-indigo-200 transition">Guest List Manager</a>
+                    <a href="event-checklist-generator.html" class="hover:text-indigo-200 transition">Event Checklist Generator</a>
+                    <a href="contact.html" class="hover:text-indigo-200 transition">Contact</a>
+                </div>
+            </div>
+
+            <div class="mt-16 mb-20 text-center">
+                <h2 class="text-4xl md:text-5xl font-bold mb-4">Professional Event Budget</h2>
+                <p class="text-xl md:text-2xl max-w-3xl mx-auto">Use our budgeting tools to plan your next event with precision</p>
+                <p>Our tools allows you to take a stock budget and edit it to fit your needs. You are then able to download the budget in excel format or even pdf format.
+                    </p>
+                    <p>You also have the option of building a budget of your own from scratch. Just click the button labeled "Custom Budget" and you are on way way to making the best budget that meets your needs.
+                        </p>
+            </div>
+        </div>
+    </header>
     <div class="container mx-auto px-4 py-8">
         <div class="text-center mb-12">
             <h1 class="text-5xl font-bold text-gray-800 mb-4">Guest List Manager</h1>
@@ -1217,5 +1183,63 @@
         return new Date(dateString).toLocaleDateString(undefined, options);
     }
 </script>
+<!-- Footer -->
+    <footer class="bg-gray-900 text-white py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid md:grid-cols-4 gap-8">
+                <!-- Column 1 -->
+                <div>
+                    <h3 class="text-xl font-bold mb-4 flex items-center">
+                        <i class="fas fa-money-bill-wave mr-2"></i>
+                        Event Budget Sample
+                    </h3>
+                    <p class="text-gray-400">Choice of professionals for accurate event budgeting since 2025.</p>
+                </div>
+
+                <!-- Column 2 -->
+                <div>
+                    <h4 class="font-bold mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="how-to-make-a-budget-for-an-event.html" class="text-gray-400 hover:text-white transition">How to make a budget for an event</a></li>
+                       
+                    </ul>
+                </div>
+
+                <!-- Column 3 -->
+                <div>
+                    <h4 class="font-bold mb-4">Company</h4>
+                    <ul class="space-y-2">
+                        <li><a href="about-us.html" class="text-gray-400 hover:text-white transition">About Us</a></li>
+                       
+                    </ul>
+                </div>
+
+                <!-- Column 4 -->
+                <div>
+                    <h4 class="font-bold mb-4">Contact</h4>
+                    <ul class="space-y-2">
+                        <li class="flex items-center">
+                            <i class="fas fa-envelope mr-2 text-gray-400"></i>
+                            <a href="mailto:hello@eventbudgetpro.com" class="text-gray-400 hover:text-white transition">eventbudgetsample@gmail.com</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-phone mr-2 text-gray-400"></i>
+                            <a href="tel:+18005551234" class="text-gray-400 hover:text-white transition">(757) 949-4621</a>
+                        </li>
+                        <li class="flex items-center">
+                            <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
+                            <span class="text-gray-400">Virginia Beach, VA</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
+                <p>&copy; 2025 Event Budget Sample. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+    <script src="index.js"></script>
 </body>
+
 </html>
