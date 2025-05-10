@@ -1,512 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-GYTHNW4T2S"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-GYTHNW4T2S');
-</script>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Use our event checklist generator to edit or create your own event checklist.">
-    <title>Ultimate Event Checklist Generator</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
-    <script src="https://cdn.sheetjs.com/xlsx-0.19.3/package/dist/xlsx.full.min.js"></script>
-    <link rel="stylesheet" href="styles.css">
-    
-    
-    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
-<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-<link rel="shortcut icon" href="/favicon.ico" />
-<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-<link rel="manifest" href="/site.webmanifest" />
-<style>
-       
-    </style>
-</head>
-<body class="bg-gray-50 min-h-screen">
-   
-
-    <!-- Header -->
-    <header class="gradient-bg text-white">
-        <div class="container mx-auto px-4 py-8">
-            <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-money-bill-wave text-3xl"></i>
-                    <h1 class="text-2xl font-bold">Event Budget Sample</h1>
-                </div>
-                <nav class="hidden md:flex space-x-6">
-                    <a href="index.html" class="hover:text-indigo-200 transition">Home</a>
-                    <a href="calculator.html" class="hover:text-indigo-200 transition">Calculator</a>
-                    <a href="contact.html" class="hover:text-indigo-200 transition">Contact</a>
-                </nav>
-                <button id="mobileMenuButton" class="md:hidden text-xl">
-                    <i class="fas fa-bars"></i>
-                </button>
-            </div>
-
-            <!-- Mobile Menu -->
-            <div id="mobileMenu" class="mobile-menu md:hidden bg-indigo-700 rounded-lg mt-4">
-                <div class="flex flex-col space-y-3 p-4">
-                    <a href="index.html" class="hover:text-indigo-200 transition">Home</a>
-                    <a href="calculator.html" class="hover:text-indigo-200 transition">Calculator</a>
-                    <a href="guest-list-manager.html" class="hover:text-indigo-200 transition">Guest List Manager</a>
-                    <a href="event-checklist-generator.html" class="hover:text-indigo-200 transition">Event Checklist Generator</a>
-                    <a href="contact.html" class="hover:text-indigo-200 transition">Contact</a>
-                </div>
-            </div>
-
-            <div class="mt-16 mb-20 text-center">
-                <div class="mt-16 mb-20 text-center">
-
-                
-            </div>
-                
-                        <h1 class="text-4xl md:text-5xl font-bold mb-4">Event Checklist Generator</h1>
-            <p class="text-xl md:text-2xl max-w-3xl mx-auto">Plan your next event with our customizable checklist</p>
-           <button id="startTutorialBtn" class="mt-6 px-6 py-3 bg-white text-blue-600 rounded-lg font-medium hover:bg-blue-50 transition flex items-center gap-2 mx-auto">
-                    <i class="fas fa-graduation-cap"></i>
-                    Start Tutorial
-                </button>
-            </div>
-        </div>
-        
-    </header>
-    
-<body class="bg-gray-50 min-h-screen">
-    <div class="container mx-auto px-4 py-8 max-w-4xl">
-        <!-- Header -->
-        <header class="mb-8 text-center">
-            
-        </header>
-        
-        <!-- Main Content -->
-        <main>
-            <!-- Event Type Selection -->
-            <div class="card rounded-xl p-6 mb-8">
-                
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">1. Select Your Event Type</h2>
-                
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                    <button data-event="wedding" class="event-type-btn flex flex-col items-center justify-center p-4 rounded-lg">
-                        <i class="fas fa-ring text-3xl text-blue-500 mb-2"></i>
-                        <span class="font-medium">Wedding</span>
-                    </button>
-                    
-                    <button data-event="birthday" class="event-type-btn flex flex-col items-center justify-center p-4 rounded-lg">
-                        <i class="fas fa-birthday-cake text-3xl text-blue-500 mb-2"></i>
-                        <span class="font-medium">Birthday</span>
-                    </button>
-                    
-                    <button data-event="corporate" class="event-type-btn flex flex-col items-center justify-center p-4 rounded-lg">
-                        <i class="fas fa-briefcase text-3xl text-blue-500 mb-2"></i>
-                        <span class="font-medium">Corporate</span>
-                    </button>
-                    
-                    <button data-event="festival" class="event-type-btn flex flex-col items-center justify-center p-4 rounded-lg">
-                        <i class="fas fa-music text-3xl text-blue-500 mb-2"></i>
-                        <span class="font-medium">Festival</span>
-                    </button>
-                    
-                    <button data-event="fundraiser" class="event-type-btn flex flex-col items-center justify-center p-4 rounded-lg">
-                        <i class="fas fa-hand-holding-heart text-3xl text-blue-500 mb-2"></i>
-                        <span class="font-medium">Fundraiser</span>
-                    </button>
-                </div>
-                
-                <div class="mt-6">
-                    <label for="customEventName" class="block text-sm font-medium text-gray-700 mb-1">Or name your custom event:</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="customEventName" placeholder="e.g. Baby Shower, Graduation..." class="flex-1 px-4 py-2 rounded-lg">
-                        <button id="customEventBtn" class="btn-primary px-4 py-2 rounded-lg flex items-center gap-2">
-                            <i class="fas fa-plus"></i>
-                            Create
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Checklist Section -->
-            <div id="checklistSection" class="hidden card rounded-xl p-6 mb-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-semibold text-gray-800">
-                        <span id="eventTitle">Wedding</span> Checklist
-                    </h2>
-                    
-                    <div class="flex gap-2">
-                        <button id="sortPriorityBtn" class="btn-secondary px-3 py-1 text-sm rounded-lg flex items-center gap-1">
-                            <i class="fas fa-flag"></i>
-                            <span>Priority</span>
-                        </button>
-                        <button id="sortDeadlineBtn" class="btn-secondary px-3 py-1 text-sm rounded-lg flex items-center gap-1">
-                            <i class="fas fa-calendar-day"></i>
-                            <span>Deadline</span>
-                        </button>
-                    </div>
-                </div>
-                
-                <!-- Progress Tracker -->
-                <div class="mb-6">
-                    <div class="flex items-center justify-between mb-2">
-                        <h3 class="font-medium text-gray-700">Progress</h3>
-                        <span id="progressText" class="font-bold text-blue-600">0%</span>
-                    </div>
-                    
-                    <div class="flex items-center gap-4">
-                        <div class="w-full progress-bar-bg rounded-full h-4">
-                            <div id="progressBar" class="progress-bar-fill h-4 rounded-full" style="width: 0%"></div>
-                        </div>
-                        
-                        <div class="relative w-12 h-12">
-                            <svg class="w-full h-full" viewBox="0 0 36 36">
-                                <path
-                                    d="M18 2.0845
-                                    a 15.9155 15.9155 0 0 1 0 31.831
-                                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                                    fill="none"
-                                    stroke="#e5e7eb"
-                                    stroke-width="3"
-                                />
-                                <path
-                                    id="progressCircle"
-                                    d="M18 2.0845
-                                    a 15.9155 15.9155 0 0 1 0 31.831
-                                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                                    fill="none"
-                                    stroke="#3b82f6"
-                                    stroke-width="3"
-                                    stroke-dasharray="0, 100"
-                                />
-                            </svg>
-                            <div class="absolute inset-0 flex items-center justify-center">
-                                <span id="progressPercent" class="text-xs font-bold text-blue-600">0%</span>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div id="motivationalMessage" class="mt-2 text-sm text-gray-600 italic text-center"></div>
-                </div>
-                
-                <!-- Task List -->
-                <div id="taskList" class="space-y-3 mb-6">
-                    <!-- Tasks will be added here dynamically -->
-                </div>
-                
-                <!-- Add Task Form -->
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <h3 class="font-medium text-gray-700 mb-3">Add New Task</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <div>
-                            <label for="taskName" class="block text-sm text-gray-600 mb-1">Task Name*</label>
-                            <input type="text" id="taskName" placeholder="What needs to be done?" class="w-full px-3 py-2 rounded-lg">
-                        </div>
-                        <div>
-                            <label for="taskPriority" class="block text-sm text-gray-600 mb-1">Priority</label>
-                            <select id="taskPriority" class="w-full px-3 py-2 rounded-lg">
-                                <option value="low">Low</option>
-                                <option value="medium" selected>Medium</option>
-                                <option value="high">High</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="taskDeadline" class="block text-sm text-gray-600 mb-1">Deadline</label>
-                            <input type="date" id="taskDeadline" class="w-full px-3 py-2 rounded-lg">
-                        </div>
-                    </div>
-                    <div class="mt-3">
-                        <label for="taskNotes" class="block text-sm text-gray-600 mb-1">Notes</label>
-                        <textarea id="taskNotes" rows="2" placeholder="Additional details..." class="w-full px-3 py-2 rounded-lg"></textarea>
-                    </div>
-                    <button id="addTaskBtn" class="btn-primary mt-3 px-4 py-2 rounded-lg flex items-center gap-2">
-                        <i class="fas fa-plus"></i>
-                        Add Task
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Action Buttons -->
-            <div id="actionButtons" class="hidden flex flex-wrap justify-center gap-4 mt-6">
-                <button id="saveChecklistBtn" class="btn-primary px-6 py-3 rounded-lg flex items-center gap-2">
-                    <i class="fas fa-save"></i>
-                    Save Checklist
-                </button>
-                <button id="exportPdfBtn" class="btn-primary px-6 py-3 rounded-lg flex items-center gap-2" style="background-color: #10b981;">
-                    <i class="fas fa-file-pdf"></i>
-                    Export PDF
-                </button>
-                <button id="emailChecklistBtn" class="btn-primary px-6 py-3 rounded-lg flex items-center gap-2" style="background-color: #3b82f6;">
-                    <i class="fas fa-envelope"></i>
-                    Email Checklist
-                </button>
-                <button id="newChecklistBtn" class="btn-secondary px-6 py-3 rounded-lg flex items-center gap-2">
-                    <i class="fas fa-plus"></i>
-                    New Checklist
-                </button>
-            </div>
-            
-            <!-- Saved Checklists -->
-            <div id="savedChecklistsSection" class="hidden mt-8">
-                <h2 class="text-2xl font-semibold text-gray-800 mb-4">Your Saved Checklists</h2>
-                <div id="savedChecklists" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Saved checklists will appear here -->
-                </div>
-            </div>
-
-            <!-- Tutorial -->
-
-            <!-- Tutorial Modal -->
-        <div id="tutorialModal" class="fixed inset-0 tutorial-modal hidden flex items-center justify-center p-4">
-            <div class="tutorial-content bg-white rounded-xl shadow-2xl p-6 relative">
-                <div class="absolute top-4 right-4">
-                    <button id="closeTutorialBtn" class="text-gray-500 hover:text-gray-700">
-                        <i class="fas fa-times text-xl"></i>
-                    </button>
-                </div>
-                                
-                <div id="tutorialSteps">
-                    <!-- Step 1 -->
-                    <div class="tutorial-step active" data-step="1">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">Welcome to Event Budget Sample!</h3>
-                        <div class="text-gray-600 mb-6">
-                            <p class="mb-4">This tool helps you create and manage checklists for any type of event. Follow this quick tutorial to learn how to use all the features.</p>
-                            <div class="flex items-center gap-2 bg-blue-50 p-3 rounded-lg">
-                                <i class="fas fa-info-circle text-blue-500 text-xl"></i>
-                                <p class="text-blue-700">You can always access this tutorial by clicking the "Help" button in the footer.</p>
-                            </div>
-                        </div>
-                    </div>
-                                        
-                    <!-- Step 2 -->
-                    <div class="tutorial-step hidden" data-step="2">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">1. Select Your Event Type</h3>
-                        <div class="text-gray-600 mb-6">
-                            <p class="mb-4">Start by selecting one of our pre-defined event types or create your own custom event.</p>
-                            <ul class="list-disc pl-5 space-y-2 mb-4">
-                                <li>Click on any event type button to load a pre-made checklist</li>
-                                <li>Or type your custom event name and click "Create"</li>
-                            </ul>
-                            <div class="bg-yellow-50 p-3 rounded-lg border-l-4 border-yellow-400">
-                                <p class="text-yellow-700"><i class="fas fa-lightbulb mr-2"></i> The pre-made checklists include common tasks for each event type that you can customize.</p>
-                            </div>
-                        </div>
-                    </div>
-                                        
-                    <!-- Step 3 -->
-                    <div class="tutorial-step hidden" data-step="3">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">2. Manage Your Checklist</h3>
-                        <div class="text-gray-600 mb-6">
-                            <p class="mb-4">Once you've selected an event type, you'll see your checklist with these features:</p>
-                            <ul class="list-disc pl-5 space-y-2 mb-4">
-                                <li><strong>Progress Tracker:</strong> Shows your completion percentage</li>
-                                <li><strong>Task List:</strong> View and manage all your tasks</li>
-                                <li><strong>Add Task Form:</strong> Create new custom tasks</li>
-                            </ul>
-                            <div class="bg-green-50 p-3 rounded-lg">
-                                <p class="text-green-700"><i class="fas fa-check-circle mr-2"></i> Click the checkbox next to each task to mark it as complete.</p>
-                            </div>
-                        </div>
-                    </div>
-                                        
-                    <!-- Step 4 -->
-                    <div class="tutorial-step hidden" data-step="4">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">3. Adding and Editing Tasks</h3>
-                        <div class="text-gray-600 mb-6">
-                            <p class="mb-4">You can add new tasks or edit existing ones:</p>
-                            <ul class="list-disc pl-5 space-y-2 mb-4">
-                                <li>Fill out the "Add New Task" form to create tasks</li>
-                                <li>Click "Edit" on any task to modify it</li>
-                                <li>Click "Delete" to remove tasks</li>
-                            </ul>
-                            <div class="bg-purple-50 p-3 rounded-lg">
-                                <p class="text-purple-700"><i class="fas fa-sort mr-2"></i> Use the sort buttons to organize tasks by priority or deadline.</p>
-                            </div>
-                        </div>
-                    </div>
-                                        
-                    <!-- Step 5 -->
-                    <div class="tutorial-step hidden" data-step="5">
-                        <h3 class="text-2xl font-bold text-gray-800 mb-4">4. Saving and Exporting</h3>
-        <div class="text-gray-600 mb-6">
-            <p class="mb-4">Save your checklist or export it for sharing:</p>
-            <ul class="list-disc pl-5 space-y-2 mb-4">
-                <li><strong>Save Checklist:</strong> Stores your checklist in this browser</li>
-                <li><strong>Export PDF:</strong> Download a printable PDF version</li>
-                <li><strong>Email Checklist:</strong> Send to yourself or team members</li>
-            </ul>
-            <div class="bg-red-50 p-3 rounded-lg">
-                <p class="text-red-700"><i class="fas fa-save mr-2"></i> Remember to save your checklist before leaving if you want to access it later!</p>
-            </div>
-        </div>
-    </div>
-                                    
-    <!-- Step 6 -->
-    <div class="tutorial-step hidden" data-step="6">
-        <h3 class="text-2xl font-bold text-gray-800 mb-4">You're Ready to Start Planning!</h3>
-        <div class="text-gray-600 mb-6">
-            <p class="mb-4">Now you know how to use all the features of Event Budget Sample. Here are some final tips:</p>
-            <ul class="list-disc pl-5 space-y-2 mb-4">
-                <li>Access your saved checklists anytime from the "Your Saved Checklists" section</li>
-                <li>Use the "New Checklist" button to start fresh</li>
-                <li>Set deadlines and priorities to stay organized</li>
-            </ul>
-            <div class="bg-blue-50 p-3 rounded-lg">
-                <p class="text-blue-700"><i class="fas fa-calendar-check mr-2"></i> Happy planning! Your perfect event starts here.</p>
-            </div>
-        </div>
-    </div>
-</div>
-                                
-<!-- Tutorial Navigation -->
-<div class="flex justify-between items-center mt-6">
-    <button id="prevTutorialStep" class="tutorial-nav-btn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg flex items-center gap-2">
-        <i class="fas fa-arrow-left"></i>
-        Previous
-    </button>
-                                    
-    <div class="flex gap-2">
-        <div class="tutorial-step-indicator rounded-full bg-gray-300 active"></div>
-        <div class="tutorial-step-indicator rounded-full bg-gray-300"></div>
-        <div class="tutorial-step-indicator rounded-full bg-gray-300"></div>
-        <div class="tutorial-step-indicator rounded-full bg-gray-300"></div>
-        <div class="tutorial-step-indicator rounded-full bg-gray-300"></div>
-        <div class="tutorial-step-indicator rounded-full bg-gray-300"></div>
-    </div>
-                                    
-    <button id="nextTutorialStep" class="tutorial-nav-btn px-4 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2">
-        Next
-        <i class="fas fa-arrow-right"></i>
-    </button>
-</div>
-</div>
-</div>
-        </main>
-        
-      
-    </div>
-
-    <!-- Start Tutorial Script (Separated) -->
-<script>
-    // Tutorial Elements
-    const tutorialModal = document.getElementById('tutorialModal');
-    const startTutorialBtn = document.getElementById('startTutorialBtn');
-    const closeTutorialBtn = document.getElementById('closeTutorialBtn');
-    const prevTutorialStep = document.getElementById('prevTutorialStep');
-    const nextTutorialStep = document.getElementById('nextTutorialStep');
-    const tutorialSteps = document.querySelectorAll('.tutorial-step');
-    const tutorialStepIndicators = document.querySelectorAll('.tutorial-step-indicator');
-    const helpBtn = document.getElementById('helpBtn');
-
-    // Tutorial State
-    let currentTutorialStep = 1;
-
-    // Tutorial Functions
-    function showTutorial() {
-        currentTutorialStep = 1;
-        updateTutorialStep();
-        tutorialModal.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function hideTutorial() {
-        tutorialModal.classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-
-    function prevTutorialStepHandler() {
-        if (currentTutorialStep > 1) {
-            currentTutorialStep--;
-            updateTutorialStep();
-        }
-    }
-
-    function nextTutorialStepHandler() {
-        if (currentTutorialStep < tutorialSteps.length) {
-            currentTutorialStep++;
-            updateTutorialStep();
-        } else {
-            hideTutorial();
-        }
-    }
-
-    function updateTutorialStep() {
-        // Update active step
-        tutorialSteps.forEach(step => {
-            if (parseInt(step.dataset.step) === currentTutorialStep) {
-                step.classList.remove('hidden');
-                step.classList.add('active');
-            } else {
-                step.classList.add('hidden');
-                step.classList.remove('active');
-            }
-        });
-                                
-        // Update indicators
-        tutorialStepIndicators.forEach((indicator, index) => {
-            if (index < currentTutorialStep) {
-                indicator.classList.add('active');
-            } else {
-                indicator.classList.remove('active');
-            }
-        });
-                                
-        // Update button states
-        prevTutorialStep.disabled = currentTutorialStep === 1;
-                                
-        if (currentTutorialStep === tutorialSteps.length) {
-            nextTutorialStep.innerHTML = 'Finish <i class="fas fa-check ml-1"></i>';
-        } else {
-            nextTutorialStep.innerHTML = 'Next <i class="fas fa-arrow-right ml-1"></i>';
-        }
-                                
-        // Highlight relevant elements on the page for the current step
-        highlightTutorialElements();
-    }
-
-    function highlightTutorialElements() {
-        // Remove all highlights first
-        const highlightedElements = document.querySelectorAll('.tutorial-highlight');
-        highlightedElements.forEach(el => {
-            el.classList.remove('tutorial-highlight');
-        });
-                                
-        // Add highlight based on current step
-        switch(currentTutorialStep) {
-            case 2:
-                // Highlight event type selection
-                document.getElementById('eventTypeSection').classList.add('tutorial-highlight');
-                break;
-            case 3:
-                // Highlight checklist section
-                document.getElementById('checklistSection').classList.add('tutorial-highlight');
-                break;
-            case 4:
-                // Highlight add task form
-                document.getElementById('addTaskForm').classList.add('tutorial-highlight');
-                break;
-            case 5:
-                // Highlight action buttons
-                document.getElementById('actionButtons').classList.add('tutorial-highlight');
-                break;
-        }
-    }
-
-    // Event Listeners for Tutorial
-    startTutorialBtn.addEventListener('click', showTutorial);
-    closeTutorialBtn.addEventListener('click', hideTutorial);
-    prevTutorialStep.addEventListener('click', prevTutorialStepHandler);
-    nextTutorialStep.addEventListener('click', nextTutorialStepHandler);
-    helpBtn.addEventListener('click', showTutorial);
-</script>
-
-    <script>
         // DOM Elements
         const eventTypeBtns = document.querySelectorAll('.event-type-btn');
         const customEventBtn = document.getElementById('customEventBtn');
@@ -1161,72 +652,121 @@
             }
         }
 
+        <!-- Start Tutorial Script (Separated) -->
+<s>
+    // Tutorial Elements
+    const tutorialModal = document.getElementById('tutorialModal');
+    const startTutorialBtn = document.getElementById('startTutorialBtn');
+    const closeTutorialBtn = document.getElementById('closeTutorialBtn');
+    const prevTutorialStep = document.getElementById('prevTutorialStep');
+    const nextTutorialStep = document.getElementById('nextTutorialStep');
+    const tutorialSteps = document.querySelectorAll('.tutorial-step');
+    const tutorialStepIndicators = document.querySelectorAll('.tutorial-step-indicator');
+    const helpBtn = document.getElementById('helpBtn');
+
+    // Tutorial State
+    let currentTutorialStep = 1;
+
+    // Tutorial Functions
+    function showTutorial() {
+        currentTutorialStep = 1;
+        updateTutorialStep();
+        tutorialModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function hideTutorial() {
+        tutorialModal.classList.add('hidden');
+        document.body.style.overflow = '';
+    }
+
+    function prevTutorialStepHandler() {
+        if (currentTutorialStep > 1) {
+            currentTutorialStep--;
+            updateTutorialStep();
+        }
+    }
+
+    function nextTutorialStepHandler() {
+        if (currentTutorialStep < tutorialSteps.length) {
+            currentTutorialStep++;
+            updateTutorialStep();
+        } else {
+            hideTutorial();
+        }
+    }
+
+    function updateTutorialStep() {
+        // Update active step
+        tutorialSteps.forEach(step => {
+            if (parseInt(step.dataset.step) === currentTutorialStep) {
+                step.classList.remove('hidden');
+                step.classList.add('active');
+            } else {
+                step.classList.add('hidden');
+                step.classList.remove('active');
+            }
+        });
+                                
+        // Update indicators
+        tutorialStepIndicators.forEach((indicator, index) => {
+            if (index < currentTutorialStep) {
+                indicator.classList.add('active');
+            } else {
+                indicator.classList.remove('active');
+            }
+        });
+                                
+        // Update button states
+        prevTutorialStep.disabled = currentTutorialStep === 1;
+                                
+        if (currentTutorialStep === tutorialSteps.length) {
+            nextTutorialStep.innerHTML = 'Finish <i class="fas fa-check ml-1"></i>';
+        } else {
+            nextTutorialStep.innerHTML = 'Next <i class="fas fa-arrow-right ml-1"></i>';
+        }
+                                
+        // Highlight relevant elements on the page for the current step
+        highlightTutorialElements();
+    }
+
+    function highlightTutorialElements() {
+        // Remove all highlights first
+        const highlightedElements = document.querySelectorAll('.tutorial-highlight');
+        highlightedElements.forEach(el => {
+            el.classList.remove('tutorial-highlight');
+        });
+                                
+        // Add highlight based on current step
+        switch(currentTutorialStep) {
+            case 2:
+                // Highlight event type selection
+                document.getElementById('eventTypeSection').classList.add('tutorial-highlight');
+                break;
+            case 3:
+                // Highlight checklist section
+                document.getElementById('checklistSection').classList.add('tutorial-highlight');
+                break;
+            case 4:
+                // Highlight add task form
+                document.getElementById('addTaskForm').classList.add('tutorial-highlight');
+                break;
+            case 5:
+                // Highlight action buttons
+                document.getElementById('actionButtons').classList.add('tutorial-highlight');
+                break;
+        }
+    }
+
+    // Event Listeners for Tutorial
+    startTutorialBtn.addEventListener('click', showTutorial);
+    closeTutorialBtn.addEventListener('click', hideTutorial);
+    prevTutorialStep.addEventListener('click', prevTutorialStepHandler);
+    nextTutorialStep.addEventListener('click', nextTutorialStepHandler);
+    helpBtn.addEventListener('click', showTutorial);
+</s
+
         
 
         // Initialize the app
         init();
-    </script>
-
-    
-
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white py-12">
-        <div class="container mx-auto px-4">
-            <div class="grid md:grid-cols-4 gap-8">
-                <!-- Column 1 -->
-                <div>
-                    <h3 class="text-xl font-bold mb-4 flex items-center">
-                        <i class="fas fa-money-bill-wave mr-2"></i>
-                        Event Budget Sample
-                    </h3>
-                    <p class="text-gray-400">Choice of professionals for accurate event budgeting since 2025.</p>
-                </div>
-
-                <!-- Column 2 -->
-                <div>
-                    <h4 class="font-bold mb-4">Resources</h4>
-                    <ul class="space-y-2">
-                        <li><a href="how-to-make-a-budget-for-an-event.html" class="text-gray-400 hover:text-white transition">How to make a budget for an event</a></li>
-                       
-                    </ul>
-                </div>
-
-                <!-- Column 3 -->
-                <div>
-                    <h4 class="font-bold mb-4">Company</h4>
-                    <ul class="space-y-2">
-                        <li><a href="about-us.html" class="text-gray-400 hover:text-white transition">About Us</a></li>
-                       
-                    </ul>
-                </div>
-
-                <!-- Column 4 -->
-                <div>
-                    <h4 class="font-bold mb-4">Contact</h4>
-                    <ul class="space-y-2">
-                        <li class="flex items-center">
-                            <i class="fas fa-envelope mr-2 text-gray-400"></i>
-                            <a href="mailto:hello@eventbudgetpro.com" class="text-gray-400 hover:text-white transition">eventbudgetsample@gmail.com</a>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-phone mr-2 text-gray-400"></i>
-                            <a href="tel:+18005551234" class="text-gray-400 hover:text-white transition">(757) 949-4621</a>
-                        </li>
-                        <li class="flex items-center">
-                            <i class="fas fa-map-marker-alt mr-2 text-gray-400"></i>
-                            <span class="text-gray-400">Virginia Beach, VA</span>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-                <p>&copy; 2025 Event Budget Sample. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-   
-<script src="index.js"></script>
-   
-</body>
-</html>
