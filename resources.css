@@ -1,0 +1,59 @@
+ @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+.gradient-bg {
+            background: linear-gradient(135deg, #6b46c1 0%, #805ad5 50%, #9f7aea 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .tool-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .featured-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .featured-card::before {
+            content: "Featured";
+            position: absolute;
+            top: 10px;
+            right: -30px;
+            background-color: #f59e0b;
+            color: white;
+            padding: 2px 30px;
+            transform: rotate(45deg);
+            font-size: 12px;
+            font-weight: bold;
+        }
