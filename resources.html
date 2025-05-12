@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Budget Sample - Resources</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #6b46c1 0%, #805ad5 50%, #9f7aea 100%);
+        }
+        
+        .card-hover {
+            transition: all 0.3s ease;
+            transform: translateY(0);
+        }
+        
+        .card-hover:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .tool-icon {
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .featured-card {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .featured-card::before {
+            content: "Featured";
+            position: absolute;
+            top: 10px;
+            right: -30px;
+            background-color: #f59e0b;
+            color: white;
+            padding: 2px 30px;
+            transform: rotate(45deg);
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <i class="fas fa-calendar-alt text-purple-600 text-2xl mr-2"></i>
+                        <span class="text-xl font-bold text-gray-900">EventBudgetSample</span>
+                    </div>
+                </div>
+                <div class="hidden md:ml-6 md:flex md:items-center md:space-x-8">
+                    <a href="#" class="text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-purple-500 text-sm font-medium">Resources</a>
+                    <a href="#" class="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-gray-300 text-sm font-medium">About</a>
+                    <a href="#" class="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 border-transparent hover:border-gray-300 text-sm font-medium">Contact</a>
+                    <a href="#" class="bg-purple-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-purple-700">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="gradient-bg text-white">
+        <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
+                Event Planning Resources
+            </h1>
+            <p class="mt-6 max-w-3xl mx-auto text-xl text-purple-100">
+                Discover all the tools and guides you need to plan your perfect event
+            </p>
+            <div class="mt-10 flex justify-center">
+                <div class="relative rounded-md shadow-sm max-w-md w-full">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fas fa-search text-purple-300"></i>
+                    </div>
+                    <input type="text" class="focus:ring-purple-500 focus:border-purple-500 block w-full pl-10 pr-12 py-4 border border-transparent rounded-md text-gray-900 placeholder-purple-300" placeholder="Search resources...">
+                    <div class="absolute inset-y-0 right-0 flex items-center">
+                        <button class="bg-purple-800 text-white px-4 py-2 rounded-r-md hover:bg-purple-900 focus:outline-none">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <!-- Featured Resource -->
+        <div class="mb-16">
+            <h2 class="text-2xl font-bold text-gray-900 mb-8 flex items-center">
+                <span class="w-4 h-4 bg-purple-600 rounded-full mr-2"></span>
+                Featured Tool
+            </h2>
+            <div class="bg-white overflow-hidden shadow rounded-lg featured-card">
+                <div class="px-4 py-5 sm:p-6 flex flex-col md:flex-row">
+                    <div class="flex-shrink-0 mb-6 md:mb-0 md:mr-6">
+                        <div class="tool-icon bg-purple-100 text-purple-600">
+                            <i class="fas fa-calculator text-2xl"></i>
+                        </div>
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Event Budget Calculator</h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Our comprehensive calculator helps you estimate all potential costs for your event, from venue to catering and everything in between.
+                        </p>
+                        <div class="mt-4">
+                            <a href="https://eventbudgetsample.com/calculator" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500">
+                                Try the Calculator
+                                <i class="fas fa-arrow-right ml-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- All Resources -->
+        <div>
+            <h2 class="text-2xl font-bold text-gray-900 mb-8 flex items-center">
+                <span class="w-4 h-4 bg-purple-600 rounded-full mr-2"></span>
+                All Resources
+            </h2>
+            
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <!-- Guest List Manager -->
+                <div class="bg-white overflow-hidden shadow rounded-lg card-hover">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="tool-icon bg-blue-100 text-blue-600">
+                            <i class="fas fa-users text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Guest List Manager</h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Keep track of your attendees, RSVPs, and special requirements all in one place.
+                        </p>
+                        <div class="mt-4">
+                            <a href="https://eventbudgetsample.com/guest-list-manager" class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                Access Tool <i class="fas fa-external-link-alt ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Budget Tracker -->
+                <div class="bg-white overflow-hidden shadow rounded-lg card-hover">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="tool-icon bg-green-100 text-green-600">
+                            <i class="fas fa-chart-line text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Budget Tracker</h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Monitor your event expenses in real-time and stay within your planned budget.
+                        </p>
+                        <div class="mt-4">
+                            <a href="https://eventbudgetsample.com/budget-tracker" class="text-green-600 hover:text-green-800 text-sm font-medium">
+                                Access Tool <i class="fas fa-external-link-alt ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Event Checklist Generator -->
+                <div class="bg-white overflow-hidden shadow rounded-lg card-hover">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="tool-icon bg-yellow-100 text-yellow-600">
+                            <i class="fas fa-tasks text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Event Checklist Generator</h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Generate a customized checklist for your event based on type, size, and complexity.
+                        </p>
+                        <div class="mt-4">
+                            <a href="https://eventbudgetsample.com/event-checklist-generator" class="text-yellow-600 hover:text-yellow-800 text-sm font-medium">
+                                Access Tool <i class="fas fa-external-link-alt ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Event Timeline Generator -->
+                <div class="bg-white overflow-hidden shadow rounded-lg card-hover">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="tool-icon bg-red-100 text-red-600">
+                            <i class="fas fa-clock text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Event Timeline Generator</h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Create a detailed timeline for your event to ensure everything runs smoothly.
+                        </p>
+                        <div class="mt-4">
+                            <a href="https://eventbudgetsample.com/event-timeline-generator" class="text-red-600 hover:text-red-800 text-sm font-medium">
+                                Access Tool <i class="fas fa-external-link-alt ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Budget Sample -->
+                <div class="bg-white overflow-hidden shadow rounded-lg card-hover">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="tool-icon bg-indigo-100 text-indigo-600">
+                            <i class="fas fa-file-invoice-dollar text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Budget Sample</h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Download our free event budget template to get started with your planning.
+                        </p>
+                        <div class="mt-4">
+                            <a href="https://eventbudgetsample.com/budget-sample" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">
+                                Download Template <i class="fas fa-download ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- How to Make a Budget for an Event -->
+                <div class="bg-white overflow-hidden shadow rounded-lg card-hover">
+                    <div class="px-4 py-5 sm:p-6">
+                        <div class="tool-icon bg-pink-100 text-pink-600">
+                            <i class="fas fa-book text-2xl"></i>
+                        </div>
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Budget Guide</h3>
+                        <p class="mt-1 text-sm text-gray-500">
+                            Learn how to create a comprehensive budget for any type of event with our step-by-step guide.
+                        </p>
+                        <div class="mt-4">
+                            <a href="https://eventbudgetsample.com/how-to-make-a-budget-for-an-event" class="text-pink-600 hover:text-pink-800 text-sm font-medium">
+                                Read Guide <i class="fas fa-book-open ml-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Call to Action -->
+        <div class="mt-16 bg-purple-50 rounded-lg overflow-hidden">
+            <div class="px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
+                <div class="text-center">
+                    <h2 class="text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">
+                        <span class="block">Ready to plan your perfect event?</span>
+                    </h2>
+                    <p class="mt-4 max-w-2xl text-xl text-gray-600 mx-auto">
+                        Get started with our comprehensive event planning tools today.
+                    </p>
+                    <div class="mt-8 flex justify-center">
+                        <div class="inline-flex rounded-md shadow">
+                            <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700 pulse">
+                                Get Started
+                                <i class="fas fa-arrow-right ml-3 -mr-1"></i>
+                            </a>
+                        </div>
+                        <div class="ml-3 inline-flex">
+                            <a href="#" class="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-purple-700 bg-purple-100 hover:bg-purple-200">
+                                Learn more
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800">
+        <div class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Tools</h3>
+                    <ul class="mt-4 space-y-4">
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Budget Calculator</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Guest List Manager</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Checklist Generator</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Resources</h3>
+                    <ul class="mt-4 space-y-4">
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Budget Guide</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Templates</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Blog</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Company</h3>
+                    <ul class="mt-4 space-y-4">
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">About</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Contact</a></li>
+                        <li><a href="#" class="text-base text-gray-300 hover:text-white">Careers</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-sm font-semibold text-gray-400 tracking-wider uppercase">Connect</h3>
+                    <div class="mt-4 flex space-x-6">
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-facebook-f"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="#" class="text-gray-400 hover:text-white">
+                            <i class="fab fa-linkedin-in"></i>
+                        </a>
+                    </div>
+                    <div class="mt-6">
+                        <p class="text-gray-300 text-sm">
+                            Subscribe to our newsletter for event planning tips and updates.
+                        </p>
+                        <div class="mt-2 flex">
+                            <input type="email" class="px-4 py-2 border border-gray-600 rounded-l-md bg-gray-700 text-white focus:outline-none focus:ring-1 focus:ring-purple-500 w-full" placeholder="Your email">
+                            <button class="bg-purple-600 text-white px-4 py-2 rounded-r-md hover:bg-purple-700 focus:outline-none">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-12 border-t border-gray-700 pt-8 flex flex-col md:flex-row justify-between">
+                <p class="text-gray-400 text-sm">
+                    &copy; 2023 EventBudgetSample. All rights reserved.
+                </p>
+                <div class="mt-4 md:mt-0 flex space-x-6">
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">Privacy Policy</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">Terms of Service</a>
+                    <a href="#" class="text-gray-400 hover:text-white text-sm">Cookie Policy</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple search functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('input[type="text"]');
+            const searchButton = document.querySelector('button');
+            
+            searchButton.addEventListener('click', function() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const cards = document.querySelectorAll('.card-hover');
+                
+                cards.forEach(card => {
+                    const title = card.querySelector('h3').textContent.toLowerCase();
+                    const description = card.querySelector('p').textContent.toLowerCase();
+                    
+                    if (title.includes(searchTerm) || description.includes(searchTerm)) {
+                        card.style.display = 'block';
+                        card.classList.add('animate-pulse');
+                        setTimeout(() => {
+                            card.classList.remove('animate-pulse');
+                        }, 1000);
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Reset search when input is cleared
+            searchInput.addEventListener('input', function() {
+                if (searchInput.value === '') {
+                    const cards = document.querySelectorAll('.card-hover');
+                    cards.forEach(card => {
+                        card.style.display = 'block';
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
