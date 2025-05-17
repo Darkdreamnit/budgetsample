@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>20 Essential Event Planning Tips | EventPro</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -81,6 +83,72 @@
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        .checklist-item {
+            transition: all 0.2s ease;
+        }
+        .checklist-item:hover {
+            transform: translateY(-2px);
+        }
+        .progress-bar {
+            transition: width 0.5s ease;
+        }
+        .floating-btn {
+            box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3);
+        }
+        .floating-btn:hover {
+            box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4);
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.5s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .checklist-container {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border-radius: 12px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .checklist-header {
+            background: linear-gradient(135deg, #0ea5e9 0%, #7c3aed 100%);
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
+        .checkmark {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            border: 2px solid #cbd5e1;
+            transition: all 0.2s ease;
+        }
+        .checkmark.checked {
+            background-color: #0ea5e9;
+            border-color: #0ea5e9;
+        }
+        .checkmark.checked::after {
+            content: "✓";
+            color: white;
+            font-size: 14px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+        }
+        .checklist-item.completed {
+            background-color: #f0fdf4;
+            border-left: 4px solid #10b981;
+        }
+        .checklist-item.completed .item-title {
+            text-decoration: line-through;
+            color: #64748b;
+        }
+        .export-btn {
+            transition: all 0.2s ease;
+        }
+        .export-btn:hover {
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body class="min-h-screen">
@@ -112,8 +180,8 @@
                 </div>
             </div>
             <p class="text-gray-700 mb-6">
-                Planning an event can be both exciting and overwhelming. Whether you're organizing a corporate conference, 
-                a wedding, or a birthday party, these 20 essential tips will help you stay organized, reduce stress, 
+                Planning an event can be both exciting and overwhelming. Whether you're organizing a corporate conference,
+                a wedding, or a birthday party, these 20 essential tips will help you stay organized, reduce stress,
                 and create an unforgettable experience for your guests.
             </p>
             <div class="flex items-center text-sm text-gray-500">
@@ -123,7 +191,7 @@
         </div>
 
         <!-- Tips Section -->
-        <div class="space-y-8">
+        <div class="space-y-8" id="tipsSection">
             <!-- Tip 1 -->
             <div class="article-card bg-white rounded-xl p-6">
                 <div class="flex items-start">
@@ -131,7 +199,7 @@
                     <div>
                         <h3 class="text-xl font-bold mb-3 text-gray-800">Start with Clear Objectives</h3>
                         <p class="text-gray-700 mb-4">
-                            Define the purpose of your event early on. Are you aiming to educate, celebrate, network, or raise funds? 
+                            Define the purpose of your event early on. Are you aiming to educate, celebrate, network, or raise funds?
                             Clear objectives will guide all your planning decisions and help you measure success.
                         </p>
                         <div class="flex flex-wrap gap-2">
@@ -149,7 +217,7 @@
                     <div>
                         <h3 class="text-xl font-bold mb-3 text-gray-800">Create a Detailed Budget</h3>
                         <p class="text-gray-700 mb-4">
-                            List all potential expenses including venue, catering, decorations, entertainment, and unexpected costs. 
+                            List all potential expenses including venue, catering, decorations, entertainment, and unexpected costs.
                             Allocate about 10-15% of your budget for contingencies. Use budgeting tools or apps to track expenses in real-time.
                         </p>
                         <div class="flex flex-wrap gap-2">
@@ -167,7 +235,7 @@
                     <div>
                         <h3 class="text-xl font-bold mb-3 text-gray-800">Choose the Right Venue Early</h3>
                         <p class="text-gray-700 mb-4">
-                            Book your venue as soon as possible, considering location, capacity, accessibility, and amenities. 
+                            Book your venue as soon as possible, considering location, capacity, accessibility, and amenities.
                             Visit potential venues in person to assess the space and ask about restrictions (decorations, noise, catering, etc.).
                         </p>
                         <div class="flex flex-wrap gap-2">
@@ -185,8 +253,8 @@
                     <div>
                         <h3 class="text-xl font-bold mb-3 text-gray-800">Develop a Timeline</h3>
                         <p class="text-gray-700 mb-4">
-                            Create a master timeline starting from the planning phase through post-event follow-up. 
-                            Include deadlines for booking vendors, sending invitations, and finalizing details. 
+                            Create a master timeline starting from the planning phase through post-event follow-up.
+                            Include deadlines for booking vendors, sending invitations, and finalizing details.
                             Share this timeline with your team and vendors.
                         </p>
                         <div class="flex flex-wrap gap-2">
@@ -204,7 +272,7 @@
                     <div>
                         <h3 class="text-xl font-bold mb-3 text-gray-800">Build a Reliable Vendor Team</h3>
                         <p class="text-gray-700 mb-4">
-                            Research and vet vendors thoroughly. Check reviews, ask for references, and review contracts carefully. 
+                            Research and vet vendors thoroughly. Check reviews, ask for references, and review contracts carefully.
                             Establish good communication with your vendors and confirm all details in writing.
                         </p>
                         <div class="flex flex-wrap gap-2">
@@ -222,8 +290,8 @@
                     <div>
                         <h3 class="text-xl font-bold mb-3 text-gray-800">Prioritize Guest Experience</h3>
                         <p class="text-gray-700 mb-4">
-                            Consider every aspect from arrival to departure. Ensure clear signage, comfortable seating, 
-                            appropriate temperature, and smooth flow between activities. Anticipate guest needs like charging stations, 
+                            Consider every aspect from arrival to departure. Ensure clear signage, comfortable seating,
+                            appropriate temperature, and smooth flow between activities. Anticipate guest needs like charging stations,
                             coat check, or dietary restrictions.
                         </p>
                         <div class="flex flex-wrap gap-2">
@@ -239,9 +307,9 @@
                 <div class="flex items-start">
                     <span class="tip-number text-3xl font-bold mr-4">7</span>
                     <div>
-                        <h3 class="text-xl font-bold mb-3 text-gray-800">Create a Contingency Plan</h3>
+                        <h3 class="text-xl font-bold mb-3 text-gray-极光8">Create a Contingency Plan</h3>
                         <p class="text-gray-700 mb-4">
-                            Prepare for potential issues like bad weather, technical difficulties, or vendor cancellations. 
+                            Prepare for potential issues like bad weather, technical difficulties, or vendor cancellations.
                             Have backup vendors, an indoor alternative for outdoor events, and emergency contact numbers readily available.
                         </p>
                         <div class="flex flex-wrap gap-2">
@@ -258,9 +326,9 @@
                     <span class="tip-number text-3xl font-bold mr-4">8</span>
                     <div>
                         <h3 class="text-xl font-bold mb-3 text-gray-800">Use Technology to Your Advantage</h3>
-                        <p class="text-gray-700 mb-4">
-                            Leverage event management software for registration, ticketing, and communication. 
-                            Consider apps for scheduling, task management, and budget tracking. Use social media to generate excitement 
+                       极光<p class="text-gray-700 mb-4">
+                            Leverage event management software for registration, ticketing, and communication.
+                            Consider apps for scheduling, task management, and budget tracking. Use social media to generate excitement
                             and provide updates.
                         </p>
                         <div class="flex flex-wrap gap-2">
@@ -278,7 +346,7 @@
                     <div>
                         <h3 class="text-xl font-bold mb-3 text-gray-800">Delegate Responsibilities</h3>
                         <p class="text-gray-700 mb-4">
-                            Build a team and assign clear roles. Create a contact sheet with everyone's responsibilities and contact information. 
+                            Build a team and assign clear roles. Create a contact sheet with everyone's responsibilities and contact information.
                             Trust your team but verify critical details yourself.
                         </p>
                         <div class="flex flex-wrap gap-2">
@@ -296,11 +364,11 @@
                     <div>
                         <h3 class="text-xl font-bold mb-3 text-gray-800">Plan for Registration and Check-In</h3>
                         <p class="text-gray-700 mb-4">
-                            Streamline the arrival process with multiple check-in stations, clear signage, and trained staff. 
+                            Streamline the arrival process with multiple check-in stations, clear signage, and trained staff.
                             Consider digital check-in options or self-service kiosks for large events to reduce wait times.
                         </p>
                         <div class="flex flex-wrap gap-2">
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Logistics</span>
+                            <span class="px极光-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Logistics</span>
                             <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">First Impressions</span>
                         </div>
                     </div>
@@ -314,8 +382,8 @@
                     <div>
                         <h3 class="text-xl font-bold mb-3 text-gray-800">Focus on Food and Beverage</h3>
                         <p class="text-gray-700 mb-4">
-                            Work with your caterer to design a menu that fits your event's style and guest preferences. 
-                            Consider dietary restrictions, serving style (buffet vs. plated), and timing. Ensure proper staffing for 
+                            Work with your caterer to design a menu that fits your event's style and guest preferences.
+                            Consider dietary restrictions, serving style (buffet vs. plated), and timing. Ensure proper staffing for
                             smooth service.
                         </p>
                         <div class="flex flex-wrap gap-2">
@@ -333,7 +401,7 @@
                     <div>
                         <h3 class="text-xl font-bold mb-3 text-gray-800">Create Engaging Content</h3>
                         <p class="text-gray-700 mb-4">
-                            Whether it's speeches, presentations, or entertainment, ensure your program is well-paced and engaging. 
+                            Whether it's speeches, presentations, or entertainment, ensure your program is well-paced and engaging.
                             Mix different formats (talks, videos, interactive elements) to maintain audience interest.
                         </p>
                         <div class="flex flex-wrap gap-2">
@@ -351,12 +419,12 @@
                     <div>
                         <h3 class="text-xl font-bold mb-3 text-gray-800">Pay Attention to Lighting and Sound</h3>
                         <p class="text-gray-700 mb-4">
-                            Poor audio or lighting can ruin an otherwise perfect event. Test all AV equipment beforehand. 
+                            Poor audio or lighting can ruin an otherwise perfect event. Test all AV equipment beforehand.
                             Hire professionals for important events and have backup equipment available.
                         </p>
                         <div class="flex flex-wrap gap-2">
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">AV</span>
                             <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Technical</span>
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Atmosphere</span>
                         </div>
                     </div>
                 </div>
@@ -364,17 +432,17 @@
 
             <!-- Tip 14 -->
             <div class="article-card bg-white rounded-xl p-6">
-                <div class="flex items-start">
+                <div class="极光flex items-start">
                     <span class="tip-number text-3xl font-bold mr-4">14</span>
                     <div>
-                        <h3 class="text-xl font-bold mb-3 text-gray-800">Design Effective Signage</h3>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">Promote Your Event Effectively</h3>
                         <p class="text-gray-700 mb-4">
-                            Clear, attractive signage improves guest experience. Include directional signs, schedule boards, 
-                            sponsor recognition, and any necessary instructions. Ensure signage is visible and placed at key decision points.
+                            Develop a multi-channel marketing strategy including email, social media, and traditional methods.
+                            Create compelling content that highlights the value of attending. Consider early bird discounts to boost registrations.
                         </p>
                         <div class="flex flex-wrap gap-2">
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Design</span>
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Navigation</span>
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Marketing</span>
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Promotion</span>
                         </div>
                     </div>
                 </div>
@@ -385,14 +453,14 @@
                 <div class="flex items-start">
                     <span class="tip-number text-3xl font-bold mr-4">15</span>
                     <div>
-                        <h3 class="text-xl font-bold mb-3 text-gray-800">Plan for Photography and Videography</h3>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">Prepare for Post-Event Follow-Up</h3>
                         <p class="text-gray-700 mb-4">
-                            Document your event with professional photos and videos. Provide photographers with a shot list 
-                            and key moments to capture. Consider live streaming for virtual attendees.
+                            Plan how you'll gather feedback (surveys, social media polls), thank attendees and sponsors,
+                            and share event highlights (photos, videos, key takeaways). This helps build anticipation for future events.
                         </p>
                         <div class="flex flex-wrap gap-2">
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Memories</span>
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Documentation</span>
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Follow-Up</span>
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Engagement</span>
                         </div>
                     </div>
                 </div>
@@ -403,14 +471,14 @@
                 <div class="flex items-start">
                     <span class="tip-number text-3xl font-bold mr-4">16</span>
                     <div>
-                        <h3 class="text-xl font-bold mb-3 text-gray-800">Manage Time Effectively</h3>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">Create a Detailed Floor Plan</h3>
                         <p class="text-gray-700 mb-4">
-                            Create a detailed run-of-show document with exact timings for each segment. Build in buffer time 
-                            between sessions. Assign someone to keep the program on schedule during the event.
+                            Visualize the event space layout including seating, stages, food stations, and exits.
+                            Ensure proper spacing for comfort and safety. Share the plan with vendors and venue staff.
                         </p>
                         <div class="flex flex-wrap gap-2">
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Timing</span>
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Execution</span>
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Layout</span>
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Planning</span>
                         </div>
                     </div>
                 </div>
@@ -421,14 +489,14 @@
                 <div class="flex items-start">
                     <span class="tip-number text-3xl font-bold mr-4">17</span>
                     <div>
-                        <h3 class="text-xl font-bold mb-3 text-gray-800">Consider Sustainability</h3>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">Hire Professional Photographers/Videographers</h3>
                         <p class="text-gray-700 mb-4">
-                            Reduce your event's environmental impact with digital invitations, reusable decor, proper waste sorting, 
-                            and local food sourcing. Communicate your sustainability efforts to attendees.
+                            Capture the event professionally to use in future marketing and as a keepsake for attendees.
+                            Provide photographers with a shot list of key moments and people you want documented.
                         </p>
                         <div class="flex flex-wrap gap-2">
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Eco-Friendly</span>
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Responsibility</span>
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Media</span>
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Memories</span>
                         </div>
                     </div>
                 </div>
@@ -439,14 +507,14 @@
                 <div class="flex items-start">
                     <span class="tip-number text-3xl font-bold mr-4">18</span>
                     <div>
-                        <h3 class="text-xl font-bold mb-3 text-gray-800">Prepare an Emergency Kit</h3>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">Plan for Sustainability</h3>
                         <p class="text-gray-700 mb-4">
-                            Pack an event emergency kit with tape, scissors, safety pins, stain remover, basic first aid supplies, 
-                            phone chargers, and other essentials that might be needed last minute.
+                            Consider eco-friendly options like digital invitations, reusable decor, proper waste sorting,
+                            and local food sourcing. Communicate your sustainability efforts to attendees.
                         </p>
                         <div class="flex flex-wrap gap-2">
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Preparation</span>
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Problem-Solving</span>
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Green</span>
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Responsibility</span>
                         </div>
                     </div>
                 </div>
@@ -457,14 +525,14 @@
                 <div class="flex items-start">
                     <span class="tip-number text-3xl font-bold mr-4">19</span>
                     <div>
-                        <h3 class="text-xl font-bold mb-3 text-gray-800">Conduct a Post-Event Review</h3>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">Have an Emergency Kit</h3>
                         <p class="text-gray-700 mb-4">
-                            After the event, gather feedback from attendees, staff, and vendors. Analyze what worked well and 
-                            what could be improved. Document lessons learned for future events.
+                            Prepare a kit with essentials like first aid supplies, tools, extra cables, tape, scissors,
+                            stain remover, safety pins, and other items that might be needed for quick fixes.
                         </p>
                         <div class="flex flex-wrap gap-2">
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Evaluation</span>
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Improvement</span>
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Preparation</span>
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Safety</span>
                         </div>
                     </div>
                 </div>
@@ -475,134 +543,281 @@
                 <div class="flex items-start">
                     <span class="tip-number text-3xl font-bold mr-4">20</span>
                     <div>
-                        <h3 class="text-xl font-bold mb-3 text-gray-800">Enjoy the Moment</h3>
+                        <h3 class="text-xl font-bold mb-3 text-gray-800">Take Time to Enjoy the Event</h3>
                         <p class="text-gray-700 mb-4">
-                            After all your hard work, take time to appreciate your event. Delegate day-of tasks so you can 
-                            oversee operations while still enjoying the experience you've created.
+                            After all your hard work, make sure to step back and appreciate the moment. Delegate tasks during the event
+                            so you can be present and enjoy the experience you've created.
                         </p>
                         <div class="flex flex-wrap gap-2">
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Mindset</span>
-                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Celebration</span>
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Mindfulness</span>
+                            <span class="px-2 py-1 bg-primary-100 text-primary-800 rounded-full text-xs font-medium">Enjoyment</span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Conclusion -->
-        <div class="glass-effect rounded-xl p-6 mt-12">
-            <h2 class="text-2xl font-bold mb-4 text-gray-800">Final Thoughts</h2>
-            <p class="text-gray-700 mb-4">
-                Successful event planning is all about preparation, attention to detail, and flexibility. 
-                By following these tips, you'll be well on your way to creating memorable experiences that 
-                achieve your objectives and delight your guests.
-            </p>
-            <p class="text-gray-700">
-                Remember that every event is unique, so adapt these suggestions to fit your specific needs. 
-                With practice and experience, you'll develop your own event planning style and best practices.
-            </p>
-        </div>
-
-        <!-- Newsletter Signup -->
-        <div class="bg-white rounded-xl p-6 mt-8 shadow-sm">
-            <div class="flex flex-col md:flex-row items-center">
-                <div class="md:w-2/3 mb-6 md:mb-0">
-                    <h3 class="text-xl font-bold mb-2 text-gray-800">Get More Event Planning Tips</h3>
-                    <p class="text-gray-600">Subscribe to our newsletter for monthly insights and exclusive content</p>
+        <!-- Checklist Section -->
+        <div class="mt-16 mb-12">
+            <div class="checklist-container overflow-hidden">
+                <div class="checklist-header px-6 py-4 text-white">
+                    <h2 class="text-2xl font-bold flex items-center">
+                        <i class="fas fa-clipboard-check mr-3"></i>
+                        Event Planning Checklist
+                    </h2>
+                    <p class="text-white/90 mt-1">Track your progress with this interactive checklist</p>
                 </div>
-                <div class="md:w-1/3">
-                    <form class="flex">
-                        <input type="email" placeholder="Your email" class="flex-1 px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
-                        <button type="submit" class="px-4 py-2 bg-primary-600 text-white rounded-r-lg hover:bg-primary-700 transition">
-                            <i class="fas fa-paper-plane"></i>
+                
+                <div class="p-6">
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-medium text-gray-700">Progress</span>
+                            <span id="progressPercentage" class="font-bold text-primary-600">0%</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="progressBar" class="progress-bar bg-primary-600 h-2.5 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Checklist Items -->
+                    <div class="space-y-3" id="checklistItems">
+                        <!-- Items will be added dynamically by JavaScript -->
+                    </div>
+                    
+                    <!-- Export Buttons -->
+                    <div class="mt-8 flex flex-wrap gap-4 justify-center">
+                        <button id="exportPdfBtn" class="export-btn px-6 py-2 bg-red-500 text-white rounded-lg flex items-center hover:bg-red-600">
+                            <i class="fas fa-file-pdf mr-2"></i> Export to PDF
                         </button>
-                    </form>
+                        <button id="exportExcelBtn" class="export-btn px-6 py-2 bg-green-500 text-white rounded-lg flex items-center hover:bg-green-600">
+                            <i class="fas fa-file-excel mr-2"></i> Export to Excel
+                        </button>
+                        <button id="resetChecklistBtn" class="export-btn px-6 py-2 bg-gray-500 text-white rounded-lg flex items-center hover:bg-gray-600">
+                            <i class="fas fa-redo mr-2"></i> Reset Checklist
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Footer -->
-    <footer class="bg-gray-800 text-white py-12 mt-12">
-        <div class="container mx-auto px-4">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div>
-                    <h3 class="text-lg font-bold mb-4">EventPro</h3>
-                    <p class="text-gray-400">Helping you create unforgettable events since 2010.</p>
-                </div>
-                <div>
-                    <h4 class="font-medium mb-4">Resources</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Blog</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Templates</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Vendor Directory</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-medium mb-4">Services</h4>
-                    <ul class="space-y-2">
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Event Planning</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Consulting</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-white transition">Training</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="font-medium mb-4">Connect</h4>
-                    <div class="flex space-x-4">
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-twitter"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-instagram"></i></a>
-                        <a href="#" class="text-gray-400 hover:text-white transition"><i class="fab fa-linkedin-in"></i></a>
-                    </div>
-                </div>
+    <div class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <div class="flex justify-center space-x-6 mb-6">
+                <a href="#" class="text-gray-400 hover:text-white">
+                    <i class="fab fa-facebook-f"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white">
+                    <i class="fab fa-twitter"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="#" class="text-gray-400 hover:text-white">
+                    <i class="fab fa-linkedin-in"></i>
+                </a>
             </div>
-            <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400 text-sm">
-                <p>© 2023 EventPro. All rights reserved.</p>
+            <p class="text-gray-400 text-sm">
+                © 2023 EventPro. All rights reserved. | 
+                <a href="#" class="hover:text-white">Privacy Policy</a> | 
+                <a href="#" class="hover:text-white">Terms of Service</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-6 max-w-sm w-full modal-animation">
+            <div class="text-center">
+                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+                    <i class="fas fa-check text-green-600"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mt-3" id="modalTitle">Success!</h3>
+                <div class="mt-2">
+                    <p class="text-sm text-gray-500" id="modalMessage">Your checklist has been exported successfully.</p>
+                </div>
+                <div class="mt-5">
+                    <button type="button" id="modalCloseBtn" class="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700">
+                        Close
+                    </button>
+                </div>
             </div>
         </div>
-    </footer>
-
-    <!-- Back to Top Button -->
-    <button id="backToTop" class="fixed bottom-8 right-8 w-12 h-12 bg-primary-600 text-white rounded-full shadow-lg hover:bg-primary-700 transition hidden">
-        <i class="fas fa-arrow-up"></i>
-    </button>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Back to top button
-            const backToTopButton = document.getElementById('backToTop');
+            // Get all the tips from the page
+            const tips = document.querySelectorAll('#tipsSection .article-card');
+            const checklistItemsContainer = document.getElementById('checklistItems');
+            const progressBar = document.getElementById('progressBar');
+            const progressPercentage = document.getElementById('progressPercentage');
             
-            window.addEventListener('scroll', function() {
-                if (window.pageYOffset > 300) {
-                    backToTopButton.classList.remove('hidden');
-                } else {
-                    backToTopButton.classList.add('hidden');
-                }
-            });
-            
-            backToTopButton.addEventListener('click', function() {
-                window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
+            // Create checklist items from the tips
+            tips.forEach((tip, index) => {
+                const tipNumber = tip.querySelector('.tip-number').textContent;
+                const tipTitle = tip.querySelector('h3').textContent;
+                
+                const checklistItem = document.createElement('div');
+                checklistItem.className = 'checklist-item bg-white p-4 rounded-lg shadow-sm border border-gray-100 cursor-pointer';
+                checklistItem.innerHTML = `
+                    <div class="flex items-center">
+                        <div class="checkmark mr-3"></div>
+                        <div>
+                            <div class="item-title font-medium text-gray-800">${tipTitle}</div>
+                            <div class="text-xs text-gray-500 mt-1">Tip #${tipNumber}</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add click event to toggle completion
+                checklistItem.addEventListener('click', function() {
+                    const checkmark = this.querySelector('.checkmark');
+                    checkmark.classList.toggle('checked');
+                    this.classList.toggle('completed');
+                    updateProgress();
                 });
+                
+                checklistItemsContainer.appendChild(checklistItem);
             });
-
-            // Add animation to article cards when they come into view
-            const observerOptions = {
-                threshold: 0.1
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('animate-fadeIn');
-                        observer.unobserve(entry.target);
+            
+            // Update progress function
+            function updateProgress() {
+                const totalItems = document.querySelectorAll('.checklist-item').length;
+                const completedItems = document.querySelectorAll('.checklist-item.completed').length;
+                const percentage = Math.round((completedItems / totalItems) * 100);
+                
+                progressBar.style.width = `${percentage}%`;
+                progressPercentage.textContent = `${percentage}%`;
+            }
+            
+            // Export to PDF
+            document.getElementById('exportPdfBtn').addEventListener('click', function() {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add title
+                doc.setFontSize(20);
+                doc.text('Event Planning Checklist', 105, 20, { align: 'center' });
+                
+                // Add date
+                doc.setFontSize(12);
+                doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 105, 30, { align: 'center' });
+                
+                // Add progress
+                const totalItems = document.querySelectorAll('.checklist-item').length;
+                const completedItems = document.querySelectorAll('.checklist-item.completed').length;
+                const percentage = Math.round((completedItems / totalItems) * 100);
+                doc.text(`Progress: ${percentage}% completed`, 105, 40, { align: 'center' });
+                
+                // Add checklist items
+                let yPosition = 50;
+                doc.setFontSize(12);
+                
+                document.querySelectorAll('.checklist-item').forEach((item, index) => {
+                    const isCompleted = item.classList.contains('completed');
+                    const title = item.querySelector('.item-title').textContent;
+                    const tipNumber = item.querySelector('.text-xs').textContent;
+                    
+                    if (yPosition > 270) { // Add new page if we're near the bottom
+                        doc.addPage();
+                        yPosition = 20;
                     }
+                    
+                    doc.setFont('helvetica', isCompleted ? 'italic' : 'normal');
+                    doc.setTextColor(isCompleted ? 100 : 0);
+                    
+                    // Add checkbox
+                    doc.rect(20, yPosition - 4, 5, 5, isCompleted ? 'F' : 'S');
+                    if (isCompleted) {
+                        doc.setTextColor(255);
+                        doc.text('✓', 22, yPosition);
+                        doc.setTextColor(100);
+                    }
+                    
+                    // Add item text
+                    doc.text(`${tipNumber}: ${title}`, 30, yPosition);
+                    
+                    yPosition += 10;
                 });
-            }, observerOptions);
-
-            document.querySelectorAll('.article-card').forEach(card => {
-                observer.observe(card);
+                
+                // Save the PDF
+                doc.save('Event_Planning_Checklist.pdf');
+                
+                // Show success modal
+                showModal('Export Successful', 'Your checklist has been exported to PDF successfully.');
+            });
+            
+            // Export to Excel
+            document.getElementById('exportExcelBtn').addEventListener('click', function() {
+                // Create workbook
+                const wb = XLSX.utils.book_new();
+                
+                // Create worksheet data
+                const wsData = [
+                    ['Event Planning Checklist'],
+                    [`Generated on: ${new Date().toLocaleDateString()}`],
+                    [],
+                    ['Status', 'Tip #', 'Task']
+                ];
+                
+                // Add checklist items
+                document.querySelectorAll('.checklist-item').forEach((item) => {
+                    const isCompleted = item.classList.contains('completed');
+                    const title = item.querySelector('.item-title').textContent;
+                    const tipNumber = item.querySelector('.text-xs').textContent.replace('Tip #', '');
+                    
+                    wsData.push([
+                        isCompleted ? '✓ Completed' : 'Pending',
+                        tipNumber,
+                        title
+                    ]);
+                });
+                
+                // Add progress summary
+                const totalItems = document.querySelectorAll('.checklist-item').length;
+                const completedItems = document.querySelectorAll('.checklist-item.completed').length;
+                const percentage = Math.round((completedItems / totalItems) * 100);
+                
+                wsData.push([], ['Summary']);
+                wsData.push(['Completed Items', completedItems]);
+                wsData.push(['Total Items', totalItems]);
+                wsData.push(['Progress', `${percentage}%`]);
+                
+                // Create worksheet
+                const ws = XLSX.utils.aoa_to_sheet(wsData);
+                
+                // Add to workbook and save
+                XLSX.utils.book_append_sheet(wb, ws, 'Checklist');
+                XLSX.writeFile(wb, 'Event_Planning_Checklist.xlsx');
+                
+                // Show success modal
+                showModal('Export Successful', 'Your checklist has been exported to Excel successfully.');
+            });
+            
+            // Reset checklist
+            document.getElementById('resetChecklistBtn').addEventListener('click', function() {
+                document.querySelectorAll('.checklist-item').forEach(item => {
+                    item.classList.remove('completed');
+                    item.querySelector('.checkmark').classList.remove('checked');
+                });
+                updateProgress();
+                
+                // Show success modal
+                showModal('Checklist Reset', 'All items have been reset to incomplete status.');
+            });
+            
+            // Modal functions
+            function showModal(title, message) {
+                document.getElementById('modalTitle').textContent = title;
+                document.getElementById('modalMessage').textContent = message;
+                document.getElementById('successModal').classList.remove('hidden');
+            }
+            
+            document.getElementById('modalCloseBtn').addEventListener('click', function() {
+                document.getElementById('successModal').classList.add('hidden');
             });
         });
     </script>
